@@ -134,7 +134,7 @@ Update this file in real time while executing each step.
 
 - Status: `[x]`
 - Notes:
-  - `package.json` bumped to `0.1.1` for patch release after binary runtime validation failure on `v0.1.0`.
+  - `package.json` bumped to `0.1.2` for follow-up patch release after runtime validation failures on `v0.1.0` and `v0.1.1`.
   - `CHANGELOG.md` updated and aligned for first public release.
   - `README.md` install/upgrade section updated with final slug and supported binary targets.
 
@@ -152,6 +152,7 @@ Update this file in real time while executing each step.
     - `glean-linux-x64`
     - `glean-windows-x64.exe`
     - `checksums.txt`
+  - Released `v0.1.1` from tag workflow run `22082550937`.
 
 ### Step 8 - Validate installers against published release
 
@@ -159,13 +160,14 @@ Update this file in real time while executing each step.
 - Notes:
   - Installer happy path against `v0.1.0` downloaded and verified checksum successfully.
   - Runtime validation failed after install: binary crashed on startup due missing `jsdom` default stylesheet asset in compiled bundle.
-  - Implemented `jsdom` compiled-binary compatibility loader (`src/lib/jsdomCompat.ts`) and updated DOM pipeline imports.
+  - `v0.1.1` improved startup (`--help` works) but command execution still failed at runtime.
+  - Reworked compatibility path to preload `jsdom` fallback before module import (`src/lib/jsdomPreload.ts`) and restored static `jsdom` imports.
   - Local validation now passes:
     - `bun test`
     - `bun run build:binary`
     - `dist/glean --help`
     - `printf '<article...>' | dist/glean clean`
-  - Next: ship patch release with binary runtime fix, then rerun installer validation.
+  - Next: ship `v0.1.2` with final runtime fix, then rerun installer validation.
 
 ### Step 9 - Final open-source readiness pass
 
