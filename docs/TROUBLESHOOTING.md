@@ -34,6 +34,13 @@
   - `bun install`
   - `bun link`
 
+## Windows arm64 install support
+
+- Windows arm64 prebuilt binaries are not currently published.
+- Use source install for now:
+  - `bun install`
+  - `bun link`
+
 ## Clipboard not detected in interactive mode
 
 - Confirm HTML is copied in DevTools before running `glean`.

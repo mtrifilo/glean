@@ -21,7 +21,7 @@ if ([string]::IsNullOrWhiteSpace($InstallDir)) {
 $archRaw = [System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture.ToString().ToLowerInvariant()
 switch ($archRaw) {
   "x64" { $arch = "x64" }
-  "arm64" { $arch = "arm64" }
+  "arm64" { throw "Windows arm64 binaries are not published yet. Use Bun-based install from source for now." }
   default { throw "Unsupported architecture: $archRaw" }
 }
 

@@ -15,6 +15,10 @@ Semantic Versioning after `1.0.0`.
 
 - Compiled binaries now correctly run `clean`/`extract`/`stats` by switching DOM parsing from `jsdom` to `linkedom`, avoiding `jsdom` compiled-binary runtime module loading failures.
 
+### Changed
+
+- Install docs and installer behavior now explicitly mark `windows-arm64` as source-install-only alongside other unsupported binary targets.
+
 ## [0.1.2] - 2026-02-16
 
 ### Changed

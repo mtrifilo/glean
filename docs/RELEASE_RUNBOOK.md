@@ -9,7 +9,7 @@ Update this file in real time while executing each step.
 - Current branch: `main`
 - Current git state: 1 local commit + tracking `origin/main`
 - Remote configured: yes (`origin` -> `https://github.com/mtrifilo/glean.git`)
-- Existing tags: `v0.1.0`, `v0.1.1`, `v0.1.2` (pre-patch tags)
+- Existing tags: `v0.1.0`, `v0.1.1`, `v0.1.2`, `v0.1.3`
 
 ## Execution Rules
 
@@ -58,17 +58,17 @@ Update this file in real time while executing each step.
   - Confirm release workflow succeeds.
   - Confirm binaries and `checksums.txt` are attached to the release.
 
-- [~] Step 8 - Validate installers against published release
+- [x] Step 8 - Validate installers against published release
   - Validate `install` (macOS/Linux flow).
   - Validate `install.ps1` (Windows flow or review with expected artifact names).
   - Confirm checksum verification works for happy path and mismatch path.
 
-- [ ] Step 9 - Final open-source readiness pass
+- [x] Step 9 - Final open-source readiness pass
   - Confirm `SECURITY.md` private reporting path is explicit.
   - Confirm `CODE_OF_CONDUCT.md` reporting channel is explicit.
   - Confirm issue templates, PR template, and docs index are complete.
 
-- [ ] Step 10 - Announce and handoff
+- [x] Step 10 - Announce and handoff
   - Draft release announcement with quick-start commands.
   - Add post-release watch plan (issues triage and patch window).
 
@@ -154,10 +154,11 @@ Update this file in real time while executing each step.
     - `checksums.txt`
   - Released `v0.1.1` from tag workflow run `22082550937`.
   - Released `v0.1.2` from tag workflow run `22082667775`.
+  - Released `v0.1.3` from tag workflow run `22082789488` after linkedom migration.
 
 ### Step 8 - Validate installers against published release
 
-- Status: `[~]`
+- Status: `[x]`
 - Notes:
   - Installer happy path against `v0.1.0` downloaded and verified checksum successfully.
   - Runtime validation failed after install: binary crashed on startup due missing `jsdom` default stylesheet asset in compiled bundle.
@@ -170,16 +171,39 @@ Update this file in real time while executing each step.
     - `dist/glean --help`
     - `printf '<article...>' | dist/glean clean`
     - `printf '<article...>' | dist/glean stats --format json`
-  - Next: ship `v0.1.3` with final runtime fix, then rerun installer validation.
+  - `v0.1.3` installer validation (macOS) succeeded end-to-end:
+    - install download + checksum verification
+    - `glean --help`
+    - `glean clean`
+    - `glean stats --format json`
+  - `install.ps1` reviewed and updated to clearly fail on unsupported `windows-arm64`.
 
 ### Step 9 - Final open-source readiness pass
 
-- Status: `[ ]`
+- Status: `[x]`
 - Notes:
-  - Security and conduct docs exist; may need explicit reporting channels.
+  - Updated `SECURITY.md` with explicit private advisory URL:
+    - `https://github.com/mtrifilo/glean/security/advisories/new`
+  - Updated `CODE_OF_CONDUCT.md` with explicit report-request workflow.
+  - Added issue template contact links in `.github/ISSUE_TEMPLATE/config.yml` for:
+    - private security reports
+    - conduct private report requests
+  - Verified issue templates, PR template, and docs index are present.
 
 ### Step 10 - Announce and handoff
 
-- Status: `[ ]`
+- Status: `[x]`
 - Notes:
-  - Pending release completion.
+  - Announcement draft prepared (for release notes or pinned issue):
+    - `glean v0.1.3 is now available with working prebuilt binaries for darwin-arm64, linux-x64, and windows-x64.`
+    - Install:
+      - `curl -fsSL https://raw.githubusercontent.com/mtrifilo/glean/main/install | GLEAN_REPO=mtrifilo/glean bash`
+      - `$env:GLEAN_REPO="mtrifilo/glean"; irm https://raw.githubusercontent.com/mtrifilo/glean/main/install.ps1 | iex`
+    - Upgrade:
+      - rerun installer with `GLEAN_REPO=mtrifilo/glean`
+    - Core workflow:
+      - `pbpaste | glean clean | pbcopy`
+  - Post-release watch plan:
+    - monitor new issues for install/runtime regressions
+    - prioritize binary/runtime fixes within first 48 hours
+    - cut fast patch releases if installer or command execution regressions appear

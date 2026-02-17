@@ -31,7 +31,13 @@ issues, and other contributions that are not aligned with this Code of Conduct.
 ## Reporting
 
 If you experience or witness unacceptable behavior, report it privately to the
-project maintainers. Do not file public issues for conduct reports.
+project maintainers. Do not post incident details publicly.
+
+Reporting path:
+
+1. Open a minimal issue titled `Code of Conduct report request`.
+2. Do not include private or incident details in that issue.
+3. A maintainer will move follow-up to a private channel.
 
 All reports will be reviewed promptly and handled as confidentially as
 possible.

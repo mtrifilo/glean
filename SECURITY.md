@@ -16,8 +16,12 @@ Please report vulnerabilities privately. Do not open a public issue.
 
 Recommended path:
 
-1. Use GitHub private vulnerability reporting if available.
-2. If unavailable, contact project maintainers through a private channel.
+1. Use GitHub private vulnerability reporting:
+   - `https://github.com/mtrifilo/glean/security/advisories/new`
+2. If you cannot access that flow, open a minimal public issue titled:
+   - `Security contact request`
+   - Do not include vulnerability details.
+   - A maintainer will move follow-up to a private channel.
 
 Please include:
 
