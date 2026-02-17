@@ -1,0 +1,47 @@
+name: Feature request
+description: Suggest an improvement aligned with Glean's workflow.
+title: "[Feature]: "
+labels:
+  - enhancement
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please describe the problem first, then the proposed solution.
+        Glean is focused on DevTools HTML -> clean markdown workflows.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem statement
+      description: What pain are you experiencing today?
+      placeholder: |
+        I copy HTML from DevTools and ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: Describe behavior, UX, flags, or command changes.
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Any workarounds or other approaches considered.
+    validations:
+      required: false
+
+  - type: textarea
+    id: scope
+    attributes:
+      label: Scope fit
+      description: Explain why this belongs in Glean's core scope.
+      placeholder: |
+        This improves the HTML -> markdown context workflow by ...
+    validations:
+      required: true

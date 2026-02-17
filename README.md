@@ -1,0 +1,158 @@
+# glean
+
+Get markdown from HTML for your LLM as fast as possible.
+
+`glean` is a Bun CLI that cleans noisy HTML (like copied DevTools elements) and converts it to compact markdown for LLM context.
+
+## Why this exists
+
+Copying HTML from browser DevTools usually includes wrapper markup, styling attributes, nav/footer blocks, and other page furniture that burns tokens in chat context windows.  
+This tool keeps the meaningful content and drops most of the noise.
+
+## Requirements
+
+- Bun `>= 1.3`
+- macOS only if you want clipboard output via `--copy`
+
+## Install from source (development)
+
+```bash
+bun install
+```
+
+Link as a local CLI command:
+
+```bash
+bun link
+```
+
+After linking, `glean` is available in your shell.
+
+## Install from GitHub Releases (one command)
+
+macOS / Linux:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/mtrifilo/glean/main/install | GLEAN_REPO=mtrifilo/glean bash
+```
+
+Windows PowerShell:
+
+```powershell
+$env:GLEAN_REPO="mtrifilo/glean"; irm https://raw.githubusercontent.com/mtrifilo/glean/main/install.ps1 | iex
+```
+
+Optional installer env vars:
+
+- `GLEAN_VERSION` (default: `latest`)
+- `GLEAN_INSTALL_DIR` (custom binary destination)
+
+## Upgrade
+
+Re-run the install command above with the same `GLEAN_REPO`.
+Use `GLEAN_VERSION=<tag>` to pin a specific release.
+
+## Commands
+
+- `glean` - interactive mode (clipboard-first, auto-process + auto-copy + stats)
+- `glean clean` - deterministic HTML cleanup + markdown conversion
+- `glean extract` - Readability-first extraction, then cleanup + markdown conversion
+- `glean stats` - report character/token estimate deltas between input and markdown output
+
+## No-subcommand options (`glean`)
+
+- `--mode clean|extract` choose pipeline for interactive/no-subcommand runs (default: `clean`)
+- `--aggressive` enable stronger pruning for interactive/no-subcommand runs (default: off)
+- `--tui` launch the OpenTUI screen (requires TTY; falls back to standard interactive mode if TUI startup fails)
+
+## Common options (`clean`, `extract`, `stats`)
+
+- `-i, --input <path>` read HTML from file instead of stdin
+- `--copy` copy output to clipboard using `pbcopy` (macOS)
+- `--keep-links` preserve markdown links (default)
+- `--strip-links` keep link text, remove URLs
+- `--keep-images` preserve images
+- `--strip-images` remove images (default)
+- `--no-preserve-tables` remove table output
+- `--max-heading-level <1-6>` clamp heading depth
+- `--aggressive` stronger pruning heuristics
+
+## Stats-only options
+
+- `--mode clean|extract` pipeline used before reporting (default: `clean`)
+- `--format md|json` output format (default: `md`)
+
+## Interactive mode
+
+Run `glean` with no subcommand to enter interactive mode.
+
+- Uses defaults automatically (`clean`, aggressive off)
+- Does not prompt for mode/pruning choices during normal flow (use flags to override)
+- Detects HTML in clipboard and runs immediately
+- If clipboard has no HTML, prompts you to copy HTML first and press Enter to retry
+- Copies parsed markdown to clipboard automatically
+- Shows current-run stats and session totals (tokens/chars saved)
+- Use `--tui` for a full-screen OpenTUI variant of the same default-first flow
+
+Session stats are persisted to `~/.glean/stats.json` by default.  
+Set `GLEAN_STATS_PATH` to override the stats file location.
+
+## Examples
+
+```bash
+# Clipboard-first workflow on macOS
+pbpaste | glean clean | pbcopy
+
+# No-arg interactive workflow (recommended for everyday use)
+glean
+
+# No-arg interactive, but use extract mode + aggressive pruning
+glean --mode extract --aggressive
+
+# Copy directly from command output
+pbpaste | glean clean --copy
+
+# Run extract mode against a local HTML snippet
+glean extract -i snippet.html
+
+# Compare reductions as JSON
+glean stats -i snippet.html --format json
+
+# Full-screen OpenTUI mode
+glean --tui
+```
+
+## LLM Session Handoff
+
+For fast session resume and context-efficient drilldown:
+
+- `docs/llm-context.md` - compact project snapshot for LLM bootstrapping
+- `docs/RESUME_PROMPT.md` - copy/paste resume prompt templates
+- `docs/CONTRIBUTING.md` - repo-specific implementation and validation rules
+- `docs/README.md` - docs index and recommended load order
+- `docs/plans/GLEAN_CLI_PLAN.md` - implementation and roadmap source of truth
+
+## Open Source Docs
+
+- `LICENSE`
+- `CODE_OF_CONDUCT.md`
+- `SECURITY.md`
+- `CONTRIBUTING.md`
+- `CHANGELOG.md`
+- `docs/RELEASE.md`
+- `docs/TROUBLESHOOTING.md`
+- `docs/FAQ.md`
+
+## Development
+
+Run tests:
+
+```bash
+bun test
+```
+
+Build a single binary (optional):
+
+```bash
+bun run build:binary
+```

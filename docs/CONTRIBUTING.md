@@ -1,0 +1,46 @@
+# Contributing to Glean
+
+## Project Focus
+
+`glean` exists to make DevTools HTML -> clean markdown fast and low-friction.
+
+Keep changes aligned with this workflow:
+
+- copy HTML
+- run `glean`
+- paste concise markdown
+- understand token impact quickly
+
+Avoid broad feature creep that belongs in a separate platform project.
+
+## Code Change Guidelines
+
+- Prefer small, targeted changes with clear behavior.
+- Preserve script-friendly command workflows.
+- Keep default interactive flow frictionless.
+- Keep CLI output predictable for automation.
+
+## Validation Checklist
+
+Before finalizing changes:
+
+1. Run tests:
+   - `bun test`
+2. Run at least one smoke command relevant to your change.
+3. Confirm docs stay accurate:
+   - `README.md`
+   - `docs/llm-context.md` if architecture/behavior changed
+
+## Naming and State
+
+- Canonical command name: `glean`
+- Session state path namespace: `.glean`
+- Environment override for stats path: `GLEAN_STATS_PATH`
+
+## Documentation Expectations
+
+For substantial behavior changes, update:
+
+- `README.md` for user-facing behavior
+- `docs/plans/GLEAN_CLI_PLAN.md` for roadmap/progress impact
+- `docs/llm-context.md` for future LLM session continuity

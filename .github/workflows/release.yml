@@ -1,0 +1,98 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Tag to release (for example v0.1.0)"
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  build-binaries:
+    name: Build binary (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+          - macos-latest
+          - windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.tag || github.ref }}
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Build native binary
+        run: bun run build:binary
+
+      - name: Normalize binary filename
+        run: |
+          bun -e "
+          import { existsSync, renameSync, rmSync } from 'node:fs';
+          import { join } from 'node:path';
+          const sourceCandidates = ['dist/glean.exe', 'dist/glean'];
+          const source = sourceCandidates.find((file) => existsSync(file));
+          if (!source) {
+            throw new Error('Built binary not found in dist/.');
+          }
+          const osMap = { Linux: 'linux', macOS: 'darwin', Windows: 'windows' };
+          const archMap = { X64: 'x64', ARM64: 'arm64' };
+          const osName = osMap[process.env.RUNNER_OS] ?? process.env.RUNNER_OS.toLowerCase();
+          const archName = archMap[process.env.RUNNER_ARCH] ?? process.env.RUNNER_ARCH.toLowerCase();
+          const ext = source.endsWith('.exe') ? '.exe' : '';
+          const target = join('dist', `glean-${osName}-${archName}${ext}`);
+          if (existsSync(target)) {
+            rmSync(target);
+          }
+          renameSync(source, target);
+          console.log('Prepared artifact:', target);
+          "
+
+      - name: Upload binary artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: binaries-${{ runner.os }}-${{ runner.arch }}
+          path: dist/glean-*
+          if-no-files-found: error
+
+  publish-release:
+    name: Publish GitHub release
+    needs: build-binaries
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download built binaries
+        uses: actions/download-artifact@v4
+        with:
+          path: release-artifacts
+          merge-multiple: true
+
+      - name: Generate checksums
+        run: |
+          cd release-artifacts
+          shasum -a 256 * > checksums.txt
+
+      - name: Publish release assets
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.tag || github.ref_name }}
+          files: |
+            release-artifacts/*

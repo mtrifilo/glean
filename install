@@ -1,0 +1,138 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+print_usage() {
+  cat <<'EOF'
+Install Glean from GitHub Releases.
+
+Usage:
+  install --repo <owner/repo> [--version <tag|latest>] [--install-dir <path>]
+
+Environment variables:
+  GLEAN_REPO         GitHub repo slug (for example owner/repo)
+  GLEAN_VERSION      Release tag (default: latest)
+  GLEAN_INSTALL_DIR  Install destination directory
+  XDG_BIN_DIR        Fallback install directory
+EOF
+}
+
+repo="${GLEAN_REPO:-}"
+version="${GLEAN_VERSION:-latest}"
+install_dir="${GLEAN_INSTALL_DIR:-${XDG_BIN_DIR:-}}"
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --repo)
+      repo="${2:-}"
+      shift 2
+      ;;
+    --version)
+      version="${2:-}"
+      shift 2
+      ;;
+    --install-dir)
+      install_dir="${2:-}"
+      shift 2
+      ;;
+    -h|--help)
+      print_usage
+      exit 0
+      ;;
+    *)
+      echo "Unknown argument: $1" >&2
+      print_usage
+      exit 1
+      ;;
+  esac
+done
+
+if [[ -z "$repo" ]]; then
+  echo "Missing repository. Set GLEAN_REPO or pass --repo owner/repo." >&2
+  exit 1
+fi
+
+if [[ -z "$install_dir" ]]; then
+  if [[ -d "$HOME/bin" || ! -e "$HOME/bin" ]]; then
+    install_dir="$HOME/bin"
+  else
+    install_dir="$HOME/.glean/bin"
+  fi
+fi
+
+uname_s="$(uname -s)"
+uname_m="$(uname -m)"
+
+case "$uname_s" in
+  Darwin) os_name="darwin" ;;
+  Linux) os_name="linux" ;;
+  *)
+    echo "Unsupported OS for this installer: $uname_s" >&2
+    echo "Use install.ps1 on Windows." >&2
+    exit 1
+    ;;
+esac
+
+case "$uname_m" in
+  x86_64|amd64) arch_name="x64" ;;
+  arm64|aarch64) arch_name="arm64" ;;
+  *)
+    echo "Unsupported architecture: $uname_m" >&2
+    exit 1
+    ;;
+esac
+
+asset_name="glean-${os_name}-${arch_name}"
+
+if [[ "$version" == "latest" ]]; then
+  api_url="https://api.github.com/repos/${repo}/releases/latest"
+else
+  api_url="https://api.github.com/repos/${repo}/releases/tags/${version}"
+fi
+
+echo "Fetching release metadata for ${repo} (${version})..."
+release_json="$(curl -fsSL "$api_url")"
+
+asset_url="$(printf '%s' "$release_json" | grep -Eo "https://[^\"]*/${asset_name}" | head -n 1 || true)"
+checksum_url="$(printf '%s' "$release_json" | grep -Eo "https://[^\"]*/checksums\\.txt" | head -n 1 || true)"
+tag_name="$(printf '%s' "$release_json" | sed -n 's/.*"tag_name"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' | head -n 1 || true)"
+
+if [[ -z "$asset_url" ]]; then
+  echo "Could not find release asset '${asset_name}' for ${repo}." >&2
+  echo "Ensure release assets include ${asset_name}." >&2
+  exit 1
+fi
+
+tmp_dir="$(mktemp -d)"
+cleanup() {
+  rm -rf "$tmp_dir"
+}
+trap cleanup EXIT
+
+echo "Downloading ${asset_name}..."
+curl -fsSL "$asset_url" -o "${tmp_dir}/${asset_name}"
+
+if [[ -n "$checksum_url" ]]; then
+  echo "Verifying checksum..."
+  curl -fsSL "$checksum_url" -o "${tmp_dir}/checksums.txt"
+  expected_hash="$(awk -v file="$asset_name" '$2 == file { print $1 }' "${tmp_dir}/checksums.txt" | head -n 1 || true)"
+  if [[ -n "$expected_hash" ]]; then
+    actual_hash="$(shasum -a 256 "${tmp_dir}/${asset_name}" | awk '{ print $1 }')"
+    if [[ "$actual_hash" != "$expected_hash" ]]; then
+      echo "Checksum mismatch for ${asset_name}." >&2
+      exit 1
+    fi
+  else
+    echo "Warning: no checksum entry found for ${asset_name}. Skipping verification."
+  fi
+fi
+
+mkdir -p "$install_dir"
+install -m 755 "${tmp_dir}/${asset_name}" "${install_dir}/glean"
+
+echo "Installed glean ${tag_name:-$version} to ${install_dir}/glean"
+if ! command -v glean >/dev/null 2>&1; then
+  echo "Note: '${install_dir}' is not currently on PATH for this shell."
+  echo "Add it to PATH, then run: glean --help"
+else
+  echo "Run: glean --help"
+fi
