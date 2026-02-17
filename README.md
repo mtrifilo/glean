@@ -42,6 +42,15 @@ Windows PowerShell:
 $env:GLEAN_REPO="mtrifilo/glean"; irm https://raw.githubusercontent.com/mtrifilo/glean/main/install.ps1 | iex
 ```
 
+Current prebuilt binary targets:
+
+- `darwin-arm64`
+- `darwin-x64`
+- `linux-x64`
+- `windows-x64`
+
+Linux `arm64` users should install from source with Bun for now.
+
 Optional installer env vars:
 
 - `GLEAN_VERSION` (default: `latest`)

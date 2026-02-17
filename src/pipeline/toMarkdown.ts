@@ -1,5 +1,5 @@
 import TurndownService from "turndown";
-import turndownPluginGfm from "turndown-plugin-gfm";
+import { gfm as turndownPluginGfm } from "turndown-plugin-gfm";
 import type { TransformOptions } from "../lib/types";
 
 function clampHeadingLevels(markdown: string, maxHeadingLevel: number): string {
@@ -34,7 +34,7 @@ export function toMarkdown(cleanedHtml: string, options: TransformOptions): stri
     emDelimiter: "_",
   });
 
-  turndown.use(turndownPluginGfm.gfm);
+  turndown.use(turndownPluginGfm);
 
   if (!options.keepLinks) {
     turndown.addRule("stripLinks", {

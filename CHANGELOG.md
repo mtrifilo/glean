@@ -7,17 +7,7 @@ Semantic Versioning after `1.0.0`.
 
 ## [Unreleased]
 
-### Added
-
-- Open-source governance docs:
-  - `LICENSE`
-  - `CODE_OF_CONDUCT.md`
-  - `SECURITY.md`
-  - root `CONTRIBUTING.md`
-- Maintainer docs:
-  - `docs/RELEASE.md`
-  - `docs/TROUBLESHOOTING.md`
-  - `docs/FAQ.md`
+- No changes yet.
 
 ## [0.1.0] - 2026-02-16
 
@@ -31,3 +21,31 @@ Semantic Versioning after `1.0.0`.
 - `--tui` minimal OpenTUI full-screen mode.
 - Session stats tracking at `~/.glean/stats.json` (`GLEAN_STATS_PATH` override).
 - Fixture and CLI test coverage with Bun test runner.
+- Open-source governance docs:
+  - `LICENSE`
+  - `CODE_OF_CONDUCT.md`
+  - `SECURITY.md`
+  - root `CONTRIBUTING.md`
+- Project docs and maintainer guides:
+  - `docs/RELEASE.md`
+  - `docs/TROUBLESHOOTING.md`
+  - `docs/FAQ.md`
+  - `docs/llm-context.md`
+  - `docs/RESUME_PROMPT.md`
+  - `docs/CONTRIBUTING.md`
+- GitHub collaboration and automation scaffolding:
+  - issue templates and PR template
+  - CI workflow
+  - release workflow with checksums publishing
+- Installer scripts:
+  - `install` (macOS/Linux)
+  - `install.ps1` (Windows)
+
+### Changed
+
+- Binary build now supports `bun build --compile` reliably by using a named GFM plugin import in markdown conversion.
+- Release artifact matrix and docs are aligned to published targets:
+  - `darwin-arm64`
+  - `darwin-x64`
+  - `linux-x64`
+  - `windows-x64`

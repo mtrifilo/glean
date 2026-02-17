@@ -15,10 +15,18 @@
 ## Installer cannot find matching release asset
 
 - Confirm your release includes platform binaries named like:
+  - `glean-darwin-x64`
   - `glean-darwin-arm64`
   - `glean-linux-x64`
   - `glean-windows-x64.exe`
 - Confirm you are installing from the intended repository and release tag.
+
+## Linux arm64 install support
+
+- Linux arm64 prebuilt binaries are not currently published.
+- Use source install for now:
+  - `bun install`
+  - `bun link`
 
 ## Clipboard not detected in interactive mode
 

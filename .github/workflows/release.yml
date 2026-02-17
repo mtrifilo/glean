@@ -16,15 +16,28 @@ permissions:
 
 jobs:
   build-binaries:
-    name: Build binary (${{ matrix.os }})
-    runs-on: ${{ matrix.os }}
+    name: Build binary (${{ matrix.os_name }}-${{ matrix.arch_name }})
+    runs-on: ${{ matrix.runner }}
     strategy:
       fail-fast: false
       matrix:
-        os:
-          - ubuntu-latest
-          - macos-latest
-          - windows-latest
+        include:
+          - runner: ubuntu-latest
+            os_name: linux
+            arch_name: x64
+            binary_ext: ""
+          - runner: macos-13
+            os_name: darwin
+            arch_name: x64
+            binary_ext: ""
+          - runner: macos-14
+            os_name: darwin
+            arch_name: arm64
+            binary_ext: ""
+          - runner: windows-latest
+            os_name: windows
+            arch_name: x64
+            binary_ext: ".exe"
 
     steps:
       - name: Checkout
@@ -53,11 +66,12 @@ jobs:
           if (!source) {
             throw new Error('Built binary not found in dist/.');
           }
-          const osMap = { Linux: 'linux', macOS: 'darwin', Windows: 'windows' };
-          const archMap = { X64: 'x64', ARM64: 'arm64' };
-          const osName = osMap[process.env.RUNNER_OS] ?? process.env.RUNNER_OS.toLowerCase();
-          const archName = archMap[process.env.RUNNER_ARCH] ?? process.env.RUNNER_ARCH.toLowerCase();
-          const ext = source.endsWith('.exe') ? '.exe' : '';
+          const osName = process.env.GLEAN_OS_NAME;
+          const archName = process.env.GLEAN_ARCH_NAME;
+          const ext = process.env.GLEAN_BINARY_EXT ?? (source.endsWith('.exe') ? '.exe' : '');
+          if (!osName || !archName) {
+            throw new Error('Missing target platform metadata for artifact rename.');
+          }
           const target = join('dist', `glean-${osName}-${archName}${ext}`);
           if (existsSync(target)) {
             rmSync(target);
@@ -65,11 +79,15 @@ jobs:
           renameSync(source, target);
           console.log('Prepared artifact:', target);
           "
+        env:
+          GLEAN_OS_NAME: ${{ matrix.os_name }}
+          GLEAN_ARCH_NAME: ${{ matrix.arch_name }}
+          GLEAN_BINARY_EXT: ${{ matrix.binary_ext }}
 
       - name: Upload binary artifact
         uses: actions/upload-artifact@v4
         with:
-          name: binaries-${{ runner.os }}-${{ runner.arch }}
+          name: binaries-${{ matrix.os_name }}-${{ matrix.arch_name }}
           path: dist/glean-*
           if-no-files-found: error
 

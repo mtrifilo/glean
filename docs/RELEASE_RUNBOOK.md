@@ -7,8 +7,8 @@ Update this file in real time while executing each step.
 
 - Date: 2026-02-16
 - Current branch: `main`
-- Current git state: no commits yet
-- Remote configured: no
+- Current git state: 1 local commit + tracking `origin/main`
+- Remote configured: yes (`origin` -> `https://github.com/mtrifilo/glean.git`)
 - Existing tags: none
 
 ## Execution Rules
@@ -29,31 +29,31 @@ Update this file in real time while executing each step.
   - Replace placeholder repo references in docs/install instructions.
   - Verify all install commands point to the final slug.
 
-- [~] Step 2 - Establish initial remote and first push
+- [x] Step 2 - Establish initial remote and first push
   - Create GitHub repository if not already created.
   - Add `origin` remote.
   - Make initial commit.
   - Push `main` to GitHub.
 
-- [ ] Step 3 - Verify CI on GitHub
+- [x] Step 3 - Verify CI on GitHub
   - Confirm `CI` workflow runs and passes on pushed `main`.
   - Confirm branch protection and contribution settings are configured.
 
-- [ ] Step 4 - Run local release validation
+- [x] Step 4 - Run local release validation
   - Run `bun test`.
   - Run smoke checks: `glean`, `glean clean`, `glean stats`, `glean --tui`.
   - Run `bun run build:binary` and validate binary help output.
 
-- [ ] Step 5 - Confirm release artifact matrix
+- [x] Step 5 - Confirm release artifact matrix
   - Verify release workflow builds all promised platform and architecture artifacts.
   - Update workflow or docs if artifact scope differs.
 
-- [ ] Step 6 - Prepare release metadata
+- [x] Step 6 - Prepare release metadata
   - Confirm `package.json` version.
   - Finalize `CHANGELOG.md` release section.
   - Confirm `README.md` install and upgrade sections are accurate.
 
-- [ ] Step 7 - Cut and publish first release
+- [~] Step 7 - Cut and publish first release
   - Create and push release tag (`vX.Y.Z`).
   - Confirm release workflow succeeds.
   - Confirm binaries and `checksums.txt` are attached to the release.
@@ -86,41 +86,62 @@ Update this file in real time while executing each step.
 
 ### Step 2 - Establish initial remote and first push
 
-- Status: `[~]`
+- Status: `[x]`
 - Notes:
-  - Baseline check: no `origin` remote configured.
+  - Created GitHub repo: `https://github.com/mtrifilo/glean`.
+  - Initial commit created: `5d2188a`.
+  - Pushed `main` and set upstream to `origin/main`.
 
 ### Step 3 - Verify CI on GitHub
 
-- Status: `[ ]`
+- Status: `[x]`
 - Notes:
-  - Cannot run until first push is complete.
+  - CI run `22082241150` passed on `main` push.
+  - Repo settings verified:
+    - Visibility: `PUBLIC`
+    - Default branch: `main`
+    - Issues: enabled
+  - Branch protection check returned `Branch not protected` (currently unset).
 
 ### Step 4 - Run local release validation
 
-- Status: `[ ]`
+- Status: `[x]`
 - Notes:
-  - Pending execution.
+  - `bun test` passed locally (17/17).
+  - Smoke checks passed:
+    - `printf '<article...>' | glean clean`
+    - `printf '<article...>' | glean stats`
+    - `printf '<article...>' | glean`
+  - `glean --tui` non-TTY behavior validated: exits `1` with clear TTY-required message.
+  - `bun run build:binary` initially failed due GFM plugin default import mismatch.
+  - Fixed in `src/pipeline/toMarkdown.ts` by switching to named `gfm` import.
+  - Re-ran validation: tests pass, binary build succeeds, `dist/glean --help` works.
 
 ### Step 5 - Confirm release artifact matrix
 
-- Status: `[ ]`
+- Status: `[x]`
 - Notes:
-  - Current workflow matrix is OS-only (`ubuntu`, `macos`, `windows`).
-  - Need to verify if this meets promised per-arch artifacts.
+  - Updated `.github/workflows/release.yml` to explicit target matrix:
+    - `darwin-arm64` (`macos-14`)
+    - `darwin-x64` (`macos-13`)
+    - `linux-x64` (`ubuntu-latest`)
+    - `windows-x64` (`windows-latest`)
+  - Updated `README.md`, `install`, `docs/TROUBLESHOOTING.md`, and plan docs to align with current published targets.
+  - `linux-arm64` is documented as planned and currently unsupported in installer.
 
 ### Step 6 - Prepare release metadata
 
-- Status: `[ ]`
+- Status: `[x]`
 - Notes:
   - `package.json` currently `0.1.0`.
-  - `CHANGELOG.md` has `0.1.0` section and `Unreleased`.
+  - `CHANGELOG.md` updated and aligned for first public release.
+  - `README.md` install/upgrade section updated with final slug and supported binary targets.
 
 ### Step 7 - Cut and publish first release
 
-- Status: `[ ]`
+- Status: `[~]`
 - Notes:
-  - Pending first remote push and tag.
+  - Preparing release-prep commit before tag creation.
 
 ### Step 8 - Validate installers against published release
 
