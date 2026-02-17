@@ -1,5 +1,4 @@
-import "../lib/jsdomPreload";
-import { JSDOM } from "jsdom";
+import { DOMParser } from "linkedom";
 import {
   ABSOLUTE_URL_PROTOCOLS,
   AGGRESSIVE_NOISE_KEYWORDS,
@@ -333,8 +332,7 @@ function pruneEmptyElements(document: Document): void {
 }
 
 export function cleanHtml(rawHtml: string, options: TransformOptions): CleanResult {
-  const dom = new JSDOM(wrapHtml(rawHtml));
-  const { document } = dom.window;
+  const document = new DOMParser().parseFromString(wrapHtml(rawHtml), "text/html");
 
   for (const tag of NOISE_TAGS) {
     removeByTagName(document, tag);

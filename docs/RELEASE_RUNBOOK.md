@@ -9,7 +9,7 @@ Update this file in real time while executing each step.
 - Current branch: `main`
 - Current git state: 1 local commit + tracking `origin/main`
 - Remote configured: yes (`origin` -> `https://github.com/mtrifilo/glean.git`)
-- Existing tags: `v0.1.0` (release workflow rerun pending)
+- Existing tags: `v0.1.0`, `v0.1.1`, `v0.1.2` (pre-patch tags)
 
 ## Execution Rules
 
@@ -134,7 +134,7 @@ Update this file in real time while executing each step.
 
 - Status: `[x]`
 - Notes:
-  - `package.json` bumped to `0.1.2` for follow-up patch release after runtime validation failures on `v0.1.0` and `v0.1.1`.
+  - `package.json` bumped to `0.1.3` for follow-up patch release after runtime validation failures on `v0.1.0`, `v0.1.1`, and `v0.1.2`.
   - `CHANGELOG.md` updated and aligned for first public release.
   - `README.md` install/upgrade section updated with final slug and supported binary targets.
 
@@ -153,6 +153,7 @@ Update this file in real time while executing each step.
     - `glean-windows-x64.exe`
     - `checksums.txt`
   - Released `v0.1.1` from tag workflow run `22082550937`.
+  - Released `v0.1.2` from tag workflow run `22082667775`.
 
 ### Step 8 - Validate installers against published release
 
@@ -161,13 +162,15 @@ Update this file in real time while executing each step.
   - Installer happy path against `v0.1.0` downloaded and verified checksum successfully.
   - Runtime validation failed after install: binary crashed on startup due missing `jsdom` default stylesheet asset in compiled bundle.
   - `v0.1.1` improved startup (`--help` works) but command execution still failed at runtime.
-  - Reworked compatibility path to preload `jsdom` fallback before module import (`src/lib/jsdomPreload.ts`) and restored static `jsdom` imports.
+  - `v0.1.2` still failed at runtime (`xhr-sync-worker.js` module resolution from `jsdom` in compiled binary).
+  - Migrated DOM parsing from `jsdom` to `linkedom` in processing pipelines to remove Bun compiled-binary runtime incompatibilities.
   - Local validation now passes:
     - `bun test`
     - `bun run build:binary`
     - `dist/glean --help`
     - `printf '<article...>' | dist/glean clean`
-  - Next: ship `v0.1.2` with final runtime fix, then rerun installer validation.
+    - `printf '<article...>' | dist/glean stats --format json`
+  - Next: ship `v0.1.3` with final runtime fix, then rerun installer validation.
 
 ### Step 9 - Final open-source readiness pass
 

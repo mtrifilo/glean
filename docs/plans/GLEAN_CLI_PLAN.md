@@ -148,7 +148,7 @@ V1 has been implemented and validated.
 
 ## Candidate Libraries (Bun + TypeScript)
 
-- HTML parsing: `jsdom` (implemented)
+- HTML parsing: `linkedom` (implemented)
 - Readability-style extraction: `@mozilla/readability` (implemented)
 - HTML to markdown: `turndown` + `turndown-plugin-gfm` (implemented)
 - CLI framework: `commander` (implemented)

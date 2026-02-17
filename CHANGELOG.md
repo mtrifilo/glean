@@ -9,11 +9,17 @@ Semantic Versioning after `1.0.0`.
 
 - No changes yet.
 
-## [0.1.2] - 2026-02-16
+## [0.1.3] - 2026-02-16
 
 ### Fixed
 
-- Compiled binaries now correctly run `clean`/`extract`/`stats` by preloading a `jsdom` stylesheet fallback before `jsdom` module initialization in Bun compiled mode.
+- Compiled binaries now correctly run `clean`/`extract`/`stats` by switching DOM parsing from `jsdom` to `linkedom`, avoiding `jsdom` compiled-binary runtime module loading failures.
+
+## [0.1.2] - 2026-02-16
+
+### Changed
+
+- Added a `jsdom` preload fallback for compiled binaries; this reduced startup failures but was insufficient for full command execution and is superseded by `0.1.3`.
 
 ## [0.1.1] - 2026-02-16
 

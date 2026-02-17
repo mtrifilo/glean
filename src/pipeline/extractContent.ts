@@ -1,6 +1,5 @@
-import "../lib/jsdomPreload";
 import { Readability } from "@mozilla/readability";
-import { JSDOM } from "jsdom";
+import { DOMParser } from "linkedom";
 import type { ExtractResult, TransformOptions } from "../lib/types";
 import { cleanHtml } from "./cleanHtml";
 
@@ -34,15 +33,13 @@ function shouldFallbackToDeterministic(
 }
 
 export function extractContent(rawHtml: string, options: TransformOptions): ExtractResult {
-  const sourceDom = new JSDOM(wrapHtml(rawHtml), { url: "https://example.com" });
-  const fallbackHeading = sourceDom.window.document
-    .querySelector("article h1, main h1, h1")
-    ?.textContent?.trim();
+  const sourceDocument = new DOMParser().parseFromString(wrapHtml(rawHtml), "text/html");
+  const fallbackHeading = sourceDocument.querySelector("article h1, main h1, h1")?.textContent?.trim();
   const originalTextLength = normalizedTextLength(
-    sourceDom.window.document.body.textContent ?? "",
+    sourceDocument.body.textContent ?? "",
   );
 
-  const reader = new Readability(sourceDom.window.document, {
+  const reader = new Readability(sourceDocument, {
     keepClasses: false,
     nbTopCandidates: options.aggressive ? 8 : 5,
   });
