@@ -9,7 +9,7 @@ Update this file in real time while executing each step.
 - Current branch: `main`
 - Current git state: 1 local commit + tracking `origin/main`
 - Remote configured: yes (`origin` -> `https://github.com/mtrifilo/glean.git`)
-- Existing tags: none
+- Existing tags: `v0.1.0` (release workflow rerun pending)
 
 ## Execution Rules
 
@@ -123,11 +123,12 @@ Update this file in real time while executing each step.
 - Notes:
   - Updated `.github/workflows/release.yml` to explicit target matrix:
     - `darwin-arm64` (`macos-14`)
-    - `darwin-x64` (`macos-13`)
     - `linux-x64` (`ubuntu-latest`)
     - `windows-x64` (`windows-latest`)
+  - Initial release attempt showed `macos-13` is unsupported in current Actions tier.
+  - Matrix was adjusted to currently supported runners/targets.
   - Updated `README.md`, `install`, `docs/TROUBLESHOOTING.md`, and plan docs to align with current published targets.
-  - `linux-arm64` is documented as planned and currently unsupported in installer.
+  - `darwin-x64` and `linux-arm64` are documented as planned and currently unsupported in installer.
 
 ### Step 6 - Prepare release metadata
 
@@ -141,7 +142,11 @@ Update this file in real time while executing each step.
 
 - Status: `[~]`
 - Notes:
-  - Preparing release-prep commit before tag creation.
+  - Created and pushed tag: `v0.1.0`.
+  - First release run (`22082359415`) failed for two reasons:
+    - unsupported runner label (`macos-13`)
+    - shell interpolation bug in binary rename step
+  - Applied workflow/docs/installer fixes on `main`; rerun for `v0.1.0` is next.
 
 ### Step 8 - Validate installers against published release
 

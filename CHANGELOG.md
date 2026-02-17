@@ -46,6 +46,5 @@ Semantic Versioning after `1.0.0`.
 - Binary build now supports `bun build --compile` reliably by using a named GFM plugin import in markdown conversion.
 - Release artifact matrix and docs are aligned to published targets:
   - `darwin-arm64`
-  - `darwin-x64`
   - `linux-x64`
   - `windows-x64`

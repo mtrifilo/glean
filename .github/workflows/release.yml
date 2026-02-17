@@ -26,10 +26,6 @@ jobs:
             os_name: linux
             arch_name: x64
             binary_ext: ""
-          - runner: macos-13
-            os_name: darwin
-            arch_name: x64
-            binary_ext: ""
           - runner: macos-14
             os_name: darwin
             arch_name: arm64
@@ -72,7 +68,7 @@ jobs:
           if (!osName || !archName) {
             throw new Error('Missing target platform metadata for artifact rename.');
           }
-          const target = join('dist', `glean-${osName}-${archName}${ext}`);
+          const target = join('dist', 'glean-' + osName + '-' + archName + ext);
           if (existsSync(target)) {
             rmSync(target);
           }

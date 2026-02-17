@@ -73,7 +73,14 @@ case "$uname_s" in
 esac
 
 case "$uname_m" in
-  x86_64|amd64) arch_name="x64" ;;
+  x86_64|amd64)
+    if [[ "$os_name" == "darwin" ]]; then
+      echo "macOS x64 binaries are not published yet." >&2
+      echo "Use Bun-based install from source for now." >&2
+      exit 1
+    fi
+    arch_name="x64"
+    ;;
   arm64|aarch64)
     if [[ "$os_name" == "linux" ]]; then
       echo "Linux arm64 binaries are not published yet." >&2

@@ -259,7 +259,7 @@ Goal: provide one-command install and easy upgrades while keeping package manage
 
 ### Binary Artifacts (Per Release)
 
-- macOS: `darwin-arm64`, `darwin-x64`
+- macOS: `darwin-arm64` (`darwin-x64` planned)
 - Linux: `linux-x64` (`linux-arm64` planned)
 - Windows: `windows-x64`
 - Include `checksums.txt` (and optional signatures) alongside release artifacts.

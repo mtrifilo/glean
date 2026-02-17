@@ -15,11 +15,17 @@
 ## Installer cannot find matching release asset
 
 - Confirm your release includes platform binaries named like:
-  - `glean-darwin-x64`
   - `glean-darwin-arm64`
   - `glean-linux-x64`
   - `glean-windows-x64.exe`
 - Confirm you are installing from the intended repository and release tag.
+
+## macOS x64 install support
+
+- macOS x64 prebuilt binaries are not currently published.
+- Use source install for now:
+  - `bun install`
+  - `bun link`
 
 ## Linux arm64 install support
 
