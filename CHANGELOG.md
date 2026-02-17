@@ -9,6 +9,21 @@ Semantic Versioning after `1.0.0`.
 
 - No changes yet.
 
+## [0.1.1] - 2026-02-16
+
+### Fixed
+
+- Compiled binaries no longer crash on startup due missing `jsdom` stylesheet asset paths in Bun compiled mode.
+- Release workflow now avoids unsupported macOS runner labels and correctly renames artifacts without shell interpolation issues.
+
+### Changed
+
+- Published binary target matrix is now:
+  - `darwin-arm64`
+  - `linux-x64`
+  - `windows-x64`
+- Installer and troubleshooting docs now clearly direct unsupported platforms (`darwin-x64`, `linux-arm64`) to source install.
+
 ## [0.1.0] - 2026-02-16
 
 ### Added

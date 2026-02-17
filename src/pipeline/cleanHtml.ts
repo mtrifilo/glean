@@ -1,4 +1,3 @@
-import { JSDOM } from "jsdom";
 import {
   ABSOLUTE_URL_PROTOCOLS,
   AGGRESSIVE_NOISE_KEYWORDS,
@@ -11,6 +10,7 @@ import {
   TAG_ALLOWED_ATTRIBUTES,
 } from "../lib/rules";
 import type { CleanResult, TransformOptions } from "../lib/types";
+import { createJSDOM } from "../lib/jsdomCompat";
 
 const CONTENT_CANDIDATE_SELECTOR = "article,main,section,div";
 const CONTENT_PROTECTED_TAGS = new Set(["article", "main"]);
@@ -332,7 +332,7 @@ function pruneEmptyElements(document: Document): void {
 }
 
 export function cleanHtml(rawHtml: string, options: TransformOptions): CleanResult {
-  const dom = new JSDOM(wrapHtml(rawHtml));
+  const dom = createJSDOM(wrapHtml(rawHtml));
   const { document } = dom.window;
 
   for (const tag of NOISE_TAGS) {
