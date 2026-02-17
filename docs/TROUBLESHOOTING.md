@@ -20,6 +20,22 @@
   - `glean-windows-x64.exe`
 - Confirm you are installing from the intended repository and release tag.
 
+## Homebrew install issues
+
+- Confirm tap setup:
+  - `brew tap mtrifilo/tap https://github.com/mtrifilo/homebrew-tap`
+- Then install:
+  - `brew install mtrifilo/tap/glean`
+- On unsupported architectures, Homebrew formula will direct you to source install.
+
+## Scoop install issues
+
+- Confirm bucket setup:
+  - `scoop bucket add mtrifilo https://github.com/mtrifilo/scoop-bucket`
+- Then install:
+  - `scoop install mtrifilo/glean`
+- If Scoop blocks execution, ensure your PowerShell execution policy allows Scoop usage.
+
 ## macOS x64 install support
 
 - macOS x64 prebuilt binaries are not currently published.

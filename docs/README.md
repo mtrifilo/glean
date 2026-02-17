@@ -27,6 +27,8 @@ For most sessions, read in this order:
   - common operational and environment issues
 - `docs/FAQ.md`
   - quick answers for users and contributors
+- `docs/PACKAGE_MANAGERS.md`
+  - maintainer guide for Homebrew/Scoop/Winget distribution
 
 ## Open Source Governance Files
 

@@ -12,7 +12,8 @@
     "extract": "bun run src/cli.ts extract",
     "stats": "bun run src/cli.ts stats",
     "test": "bun test",
-    "build:binary": "bun build src/cli.ts --compile --outfile dist/glean"
+    "build:binary": "bun build src/cli.ts --compile --outfile dist/glean",
+    "package:manifests": "bun run scripts/generate-package-manager-manifests.ts"
   },
   "dependencies": {
     "@mozilla/readability": "^0.6.0",

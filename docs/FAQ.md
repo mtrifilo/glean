@@ -14,6 +14,19 @@ Use the installer scripts documented in `README.md`:
 
 Set `GLEAN_REPO=mtrifilo/glean` for this repository.
 
+## Is Glean available in package managers?
+
+Yes.
+
+- Homebrew tap:
+  - `brew tap mtrifilo/tap https://github.com/mtrifilo/homebrew-tap`
+  - `brew install mtrifilo/tap/glean`
+- Scoop bucket:
+  - `scoop bucket add mtrifilo https://github.com/mtrifilo/scoop-bucket`
+  - `scoop install mtrifilo/glean`
+
+Current prebuilt targets are `darwin-arm64`, `linux-x64`, and `windows-x64`.
+
 ## What is the difference between `clean` and `extract`?
 
 - `clean`: deterministic cleanup and conversion.

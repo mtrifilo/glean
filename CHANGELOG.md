@@ -7,7 +7,17 @@ Semantic Versioning after `1.0.0`.
 
 ## [Unreleased]
 
-- No changes yet.
+### Added
+
+- Package-manager distribution scaffolding:
+  - Homebrew formula generator (`scripts/generate-package-manager-manifests.ts`)
+  - Scoop manifest generator (same script output)
+  - automation workflow (`.github/workflows/package-managers.yml`)
+- Generated maintainer-managed package metadata:
+  - `packaging/homebrew/glean.rb`
+  - `packaging/scoop/glean.json`
+- New maintainer guide:
+  - `docs/PACKAGE_MANAGERS.md`
 
 ## [0.1.3] - 2026-02-16
 

@@ -9,56 +9,75 @@ Get markdown from HTML for your LLM as fast as possible.
 Copying HTML from browser DevTools usually includes wrapper markup, styling attributes, nav/footer blocks, and other page furniture that burns tokens in chat context windows.  
 This tool keeps the meaningful content and drops most of the noise.
 
-## Requirements
+## Install (fastest paths)
 
-- Bun `>= 1.3`
-- macOS only if you want clipboard output via `--copy`
+Pick one command path and run it.
 
-## Install from source (development)
-
-```bash
-bun install
-```
-
-Link as a local CLI command:
+macOS/Linux (Homebrew):
 
 ```bash
-bun link
+brew tap mtrifilo/tap https://github.com/mtrifilo/homebrew-tap && brew install mtrifilo/tap/glean
 ```
 
-After linking, `glean` is available in your shell.
+Windows (Scoop):
 
-## Install from GitHub Releases (one command)
+```powershell
+scoop bucket add mtrifilo https://github.com/mtrifilo/scoop-bucket; scoop install mtrifilo/glean
+```
 
-macOS / Linux:
+No package manager? Use the release installer:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/mtrifilo/glean/main/install | GLEAN_REPO=mtrifilo/glean bash
 ```
 
-Windows PowerShell:
-
 ```powershell
 $env:GLEAN_REPO="mtrifilo/glean"; irm https://raw.githubusercontent.com/mtrifilo/glean/main/install.ps1 | iex
 ```
 
-Current prebuilt binary targets:
+Verify install:
+
+```bash
+glean --help
+```
+
+Quick first run:
+
+```bash
+pbpaste | glean clean | pbcopy
+```
+
+Current prebuilt targets:
 
 - `darwin-arm64`
 - `linux-x64`
 - `windows-x64`
 
-macOS `x64` and Linux `arm64` users should install from source with Bun for now.
-
-Optional installer env vars:
-
-- `GLEAN_VERSION` (default: `latest`)
-- `GLEAN_INSTALL_DIR` (custom binary destination)
+For unsupported targets (for example macOS `x64`, Linux `arm64`, Windows `arm64`), use source install.
 
 ## Upgrade
 
-Re-run the install command above with the same `GLEAN_REPO`.
+Re-run your install command (`brew`, `scoop`, or installer script).
 Use `GLEAN_VERSION=<tag>` to pin a specific release.
+
+## Source install (development or unsupported targets)
+
+Requirements:
+
+- Bun `>= 1.3`
+- macOS only if you want clipboard output via `--copy`
+
+```bash
+bun install
+bun link
+```
+
+After linking, `glean` is available in your shell.
+
+Installer env vars (script path only):
+
+- `GLEAN_VERSION` (default: `latest`)
+- `GLEAN_INSTALL_DIR` (custom binary destination)
 
 ## Commands
 
@@ -150,6 +169,7 @@ For fast session resume and context-efficient drilldown:
 - `docs/RELEASE.md`
 - `docs/TROUBLESHOOTING.md`
 - `docs/FAQ.md`
+- `docs/PACKAGE_MANAGERS.md`
 
 ## Development
 
