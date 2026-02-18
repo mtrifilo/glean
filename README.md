@@ -2,7 +2,14 @@
 
 Get markdown from HTML for your LLM as fast as possible.
 
-`glean` is a Bun CLI that cleans noisy HTML (like copied DevTools elements) and converts it to compact markdown for LLM context.
+## Just `glean`
+
+Run `glean` to transform your buffer's HTML into clean Markdown. Then paste the markdown into your agent.
+
+```bash
+glean
+
+```
 
 ## Why this exists
 
