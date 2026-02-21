@@ -221,20 +221,31 @@ export async function runExperimentalTui(options: TuiRunOptions): Promise<boolea
           Text({
             content: "Output preview:",
             fg: MUTED,
+            flexShrink: 0,
           }),
           Text({
             content: "\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500",
             fg: MUTED,
+            flexShrink: 0,
           }),
-          Text({
-            content: previewLines(processed.markdown).join("\n"),
-            wrapMode: "word",
-          }),
-          // Spacer + exit hint
-          Box({ flexGrow: 1 }),
+          // Preview container: fills remaining space, clips overflow
+          Box(
+            {
+              flexGrow: 1,
+              flexShrink: 1,
+              overflow: "hidden" as const,
+              minHeight: 1,
+            },
+            Text({
+              content: previewLines(processed.markdown).join("\n"),
+              wrapMode: "word",
+            }),
+          ),
+          // Footer pinned at bottom
           Text({
             content: "Press q, Enter, or Esc to exit",
             fg: MUTED,
+            flexShrink: 0,
           }),
         ),
       );

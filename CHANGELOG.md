@@ -7,6 +7,10 @@ Semantic Versioning after `1.0.0`.
 
 ## [Unreleased]
 
+### Fixed
+
+- Fixed TUI results screen where output preview text overlapped the "Press q, Enter, or Esc to exit" footer on smaller terminals. Preview now clips within available space and footer stays pinned at the bottom.
+
 ## [0.2.0] - 2026-02-21
 
 ### Added
