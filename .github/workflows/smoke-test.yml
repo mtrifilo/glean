@@ -1,0 +1,89 @@
+name: Smoke Test Release Binaries
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Release tag to test (e.g. v0.2.1)"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  smoke-test:
+    name: Smoke test (${{ matrix.os_name }}-${{ matrix.arch_name }})
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: ubuntu-latest
+            os_name: linux
+            arch_name: x64
+            binary_ext: ""
+          - runner: macos-14
+            os_name: darwin
+            arch_name: arm64
+            binary_ext: ""
+          - runner: windows-latest
+            os_name: windows
+            arch_name: x64
+            binary_ext: ".exe"
+
+    env:
+      TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.event.release.tag_name }}
+      BINARY: glean-${{ matrix.os_name }}-${{ matrix.arch_name }}${{ matrix.binary_ext }}
+      GH_TOKEN: ${{ github.token }}
+
+    steps:
+      - name: Download release binary and checksums
+        shell: bash
+        run: |
+          gh release download "$TAG" \
+            --repo "$GITHUB_REPOSITORY" \
+            --pattern "$BINARY" \
+            --pattern "checksums.txt"
+
+      - name: Verify SHA256 checksum
+        shell: bash
+        run: |
+          expected=$(grep "$BINARY" checksums.txt | awk '{print $1}')
+          actual=$(shasum -a 256 "$BINARY" | awk '{print $1}')
+          echo "Expected: $expected"
+          echo "Actual:   $actual"
+          if [ "$expected" != "$actual" ]; then
+            echo "::error::Checksum mismatch for $BINARY"
+            exit 1
+          fi
+          echo "Checksum verified."
+
+      - name: Make binary executable
+        if: runner.os != 'Windows'
+        shell: bash
+        run: chmod +x "$BINARY"
+
+      - name: Verify --version output
+        shell: bash
+        run: |
+          version_output=$(./"$BINARY" --version)
+          echo "Version output: $version_output"
+          if [ -z "$version_output" ]; then
+            echo "::error::--version produced empty output"
+            exit 1
+          fi
+          echo "Version check passed."
+
+      - name: Verify glean clean pipeline
+        shell: bash
+        run: |
+          output=$(echo '<div><h1>Hello</h1><p>World</p></div>' | ./"$BINARY" clean)
+          echo "Clean output: $output"
+          if ! echo "$output" | grep -q "Hello"; then
+            echo "::error::clean output missing expected content"
+            exit 1
+          fi
+          echo "Clean pipeline check passed."

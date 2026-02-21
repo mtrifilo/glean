@@ -88,14 +88,11 @@ glean --tui
 
 ## Current Priorities
 
-1. Distribution workflow completion:
-   - wire final public repo slug in release/install docs
-   - run first tagged release and validate installer flows
-   - self-update implemented via `glean update`
-2. Fixture maintenance tooling:
-   - regenerate expected outputs quickly
-3. Regression safety:
-   - smoke checks and reduction thresholds
+The user directs priority. See `docs/strategy/ROADMAP.md` for planned iterations:
+
+1. v0.3.0 Phase 2 — Manual cross-platform validation (at release time)
+2. v0.4.0 — Developer Experience and Heuristic Safety
+3. v0.5.0 — Word Document and RTF Support (spec: `docs/specs/WORD_RTF_SUPPORT.md`)
 
 ## Scope Guardrails
 
