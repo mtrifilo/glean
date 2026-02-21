@@ -1,4 +1,5 @@
 import { describe, expect, test } from "bun:test";
+import { readFile, unlink } from "node:fs/promises";
 
 interface CliRunResult {
   exitCode: number;
@@ -6,12 +7,16 @@ interface CliRunResult {
   stderr: string;
 }
 
-const textEncoder = new TextEncoder();
-
-async function runCli(args: string[], input?: string): Promise<CliRunResult> {
-  const statsPath = `${process.cwd()}/.tmp/glean-test-${Date.now()}-${Math.random()
+function uniqueStatsPath(): string {
+  return `${process.cwd()}/.tmp/glean-test-${Date.now()}-${Math.random()
     .toString(16)
     .slice(2)}.json`;
+}
+
+const textEncoder = new TextEncoder();
+
+async function runCli(args: string[], input?: string, statsPath?: string): Promise<CliRunResult> {
+  const resolvedStatsPath = statsPath ?? uniqueStatsPath();
   const proc = Bun.spawn(["bun", "run", "src/cli.ts", ...args], {
     cwd: process.cwd(),
     stdin: "pipe",
@@ -19,7 +24,7 @@ async function runCli(args: string[], input?: string): Promise<CliRunResult> {
     stderr: "pipe",
     env: {
       ...process.env,
-      GLEAN_STATS_PATH: statsPath,
+      GLEAN_STATS_PATH: resolvedStatsPath,
     },
   });
 
@@ -138,5 +143,39 @@ describe("glean cli", () => {
 
     expect(result.exitCode).toBe(1);
     expect(result.stderr).toContain("requires an interactive terminal");
+  });
+});
+
+describe("lifetime stats accumulation", () => {
+  test("lifetime totals accumulate across multiple runs", async () => {
+    const statsPath = uniqueStatsPath();
+
+    // Run 1
+    const run1 = await runCli(["clean", "-i", "test/fixtures/blog.html"], undefined, statsPath);
+    expect(run1.exitCode).toBe(0);
+
+    const storeAfterRun1 = JSON.parse(await readFile(statsPath, "utf8")) as {
+      lifetime: { runs: number; tokensSaved: number };
+    };
+    expect(storeAfterRun1.lifetime.runs).toBe(1);
+    const tokensSavedAfterRun1 = storeAfterRun1.lifetime.tokensSaved;
+    expect(tokensSavedAfterRun1).toBeGreaterThan(0);
+
+    // Run 2 — same stats file
+    const run2 = await runCli(["clean", "-i", "test/fixtures/docs.html"], undefined, statsPath);
+    expect(run2.exitCode).toBe(0);
+
+    const storeAfterRun2 = JSON.parse(await readFile(statsPath, "utf8")) as {
+      lifetime: { runs: number; tokensSaved: number };
+    };
+    expect(storeAfterRun2.lifetime.runs).toBe(2);
+    expect(storeAfterRun2.lifetime.tokensSaved).toBeGreaterThan(tokensSavedAfterRun1);
+
+    // Cleanup
+    try {
+      await unlink(statsPath);
+    } catch {
+      // best-effort
+    }
   });
 });
