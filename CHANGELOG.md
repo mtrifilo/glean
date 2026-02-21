@@ -12,6 +12,7 @@ Semantic Versioning after `1.0.0`.
 - `glean update` self-update command for compiled binaries (downloads latest release, verifies SHA256 checksum, atomic binary swap).
 - `glean --version` / `-V` flag to print the current version.
 - Package-manager distribution scaffolding:
+
   - Homebrew formula generator (`scripts/generate-package-manager-manifests.ts`)
   - Scoop manifest generator (same script output)
   - automation workflow (`.github/workflows/package-managers.yml`)
@@ -20,6 +21,10 @@ Semantic Versioning after `1.0.0`.
   - `packaging/scoop/glean.json`
 - New maintainer guide:
   - `docs/PACKAGE_MANAGERS.md`
+
+### Changed
+
+- Polished `--tui` full-screen mode with structured layout, color palette, and visual hierarchy (bordered Stats/Session boxes, colored stat labels and values, spinner characters, flex-based spacing).
 
 ## [0.1.3] - 2026-02-16
 

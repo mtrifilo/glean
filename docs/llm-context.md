@@ -19,7 +19,7 @@ Use this file as the primary context bootstrap for coding sessions.
 - Overrides are available via:
   - `--mode clean|extract`
   - `--aggressive`
-- `--tui` launches a minimal OpenTUI full-screen flow.
+- `--tui` launches a polished OpenTUI full-screen flow with color palette, bordered stat/session panels, and flex-based layout.
 - Session stats are tracked at:
   - `~/.glean/stats.json`
   - override with `GLEAN_STATS_PATH`
@@ -58,7 +58,7 @@ glean --tui
 - `src/interactive/runInteractive.ts`
   - clipboard-first interactive logic and summary output
 - `src/tui/experimental.ts`
-  - OpenTUI full-screen flow used by `--tui`
+  - polished OpenTUI full-screen flow used by `--tui` (color palette, bordered panels, flex layout)
 
 ### Core pipelines
 

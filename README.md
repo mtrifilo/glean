@@ -105,7 +105,7 @@ Installer env vars (script path only):
 
 - `--mode clean|extract` choose pipeline for interactive/no-subcommand runs (default: `clean`)
 - `--aggressive` enable stronger pruning for interactive/no-subcommand runs (default: off)
-- `--tui` launch the OpenTUI screen (requires TTY; falls back to standard interactive mode if TUI startup fails)
+- `--tui` launch the full-screen OpenTUI interface with color-coded stats, bordered panels, and live clipboard detection (requires TTY; falls back to standard interactive mode if TUI startup fails)
 
 ## Common options (`clean`, `extract`, `stats`)
 
@@ -134,7 +134,7 @@ Run `glean` with no subcommand to enter interactive mode.
 - If clipboard has no HTML, prompts you to copy HTML first and press Enter to retry
 - Copies parsed markdown to clipboard automatically
 - Shows current-run stats and session totals (tokens/chars saved)
-- Use `--tui` for a full-screen OpenTUI variant of the same default-first flow
+- Use `--tui` for a full-screen OpenTUI variant with styled stats panels, color-coded output, and live clipboard polling
 
 Session stats are persisted to `~/.glean/stats.json` by default.  
 Set `GLEAN_STATS_PATH` to override the stats file location.
