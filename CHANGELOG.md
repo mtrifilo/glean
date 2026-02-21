@@ -7,6 +7,8 @@ Semantic Versioning after `1.0.0`.
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-02-21
+
 ### Added
 
 - CI smoke test workflow (`.github/workflows/smoke-test.yml`) — validates release binaries on all three platforms (download, checksum verify, `--version`, `glean clean` pipeline).
