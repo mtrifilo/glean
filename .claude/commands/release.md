@@ -1,11 +1,12 @@
 Release a new version of Glean.
 
+**Important:** `main` has branch protection requiring CI status checks. You cannot push directly to main. Releases must go through a PR.
+
 Follow these steps:
 
 1. Verify preconditions (run in parallel):
    - `git status` — working tree must be clean
    - `git branch --show-current` — must be on `main`
-   - `git log --oneline -1 origin/main..main` — check if local is ahead of remote
    - `bun test` — all tests must pass
    - Read `CHANGELOG.md` to check for `[Unreleased]` entries
    - Read `package.json` to get current version
@@ -20,32 +21,38 @@ Follow these steps:
    - Breaking changes → major
    Ask the user to confirm the version number before proceeding.
 
-5. Update `package.json` with the new version.
+5. Create a release branch:
+   ```
+   git checkout -b chore/release-vX.Y.Z
+   ```
 
-6. Update `CHANGELOG.md`:
+6. Update `package.json` with the new version.
+
+7. Update `CHANGELOG.md`:
    - Rename `[Unreleased]` to `[X.Y.Z] - YYYY-MM-DD` (use today's date)
    - Add a new empty `[Unreleased]` section above it
 
-7. Run `bun test` again to confirm nothing broke.
+8. Run `bun test` again to confirm nothing broke.
 
-8. Stage and commit:
+9. Stage and commit:
    ```
    git add package.json CHANGELOG.md
    git commit -m "chore: release vX.Y.Z"
    ```
 
-9. Tag the release:
-   ```
-   git tag vX.Y.Z
-   ```
-
-10. Show the user a summary of what was done and ask for confirmation before pushing. Then:
+10. Push the branch and open a PR:
     ```
-    git push origin main --follow-tags
+    git push -u origin chore/release-vX.Y.Z
     ```
+    Create a PR with `gh pr create`. The PR body should list the version bump and summarize the changelog entries. Include a reminder in the PR body:
+    > **After merging:** tag the merge commit and push the tag to trigger the release workflow:
+    > ```
+    > git checkout main && git pull
+    > git tag vX.Y.Z
+    > git push origin vX.Y.Z
+    > ```
 
 11. Report the result:
-    - Confirm the tag was pushed
-    - Remind that `.github/workflows/release.yml` will build and publish binaries
-    - Remind that `.github/workflows/package-managers.yml` will update Homebrew/Scoop manifests
-    - Provide a link to check the release: `https://github.com/<owner>/<repo>/releases/tag/vX.Y.Z`
+    - Provide the PR URL
+    - Remind the user that after the PR merges and they tag + push, `.github/workflows/release.yml` will build and publish binaries and `.github/workflows/package-managers.yml` will update Homebrew/Scoop manifests
+    - Provide the future release link: `https://github.com/<owner>/<repo>/releases/tag/vX.Y.Z`

@@ -70,6 +70,15 @@ See `.github/PULL_REQUEST_TEMPLATE.md` for the full template.
 - Prefer **squash merge** for feature branches to keep `main` history clean.
 - Delete the feature branch after merging.
 
+## Branch Protection
+
+`main` has branch protection enabled:
+- Direct pushes to `main` are **not allowed**.
+- All changes (including releases) must go through a PR.
+- The `test` CI status check must pass before merging.
+
+This means release commits cannot be pushed directly — they must go through a `chore/release-vX.Y.Z` branch and PR, with the tag pushed separately after merge.
+
 ## Releasing a New Version
 
 After merging one or more PRs, cut a release when ready. Use the `/release` Claude Code skill or follow `docs/RELEASE.md` manually.
@@ -78,15 +87,22 @@ After merging one or more PRs, cut a release when ready. Use the `/release` Clau
 
 1. Ensure `main` is clean and CI passes.
 2. Decide the version bump (`patch`, `minor`, or `major`).
-3. Update `package.json` version.
-4. Move `[Unreleased]` entries in `CHANGELOG.md` to a dated version section.
-5. Commit the version bump: `chore: release vX.Y.Z`
-6. Tag and push:
+3. Create a release branch: `git checkout -b chore/release-vX.Y.Z`
+4. Update `package.json` version.
+5. Move `[Unreleased]` entries in `CHANGELOG.md` to a dated version section.
+6. Commit the version bump: `chore: release vX.Y.Z`
+7. Push the branch and open a PR:
    ```bash
-   git tag vX.Y.Z
-   git push origin main --follow-tags
+   git push -u origin chore/release-vX.Y.Z
+   gh pr create --title "chore: release vX.Y.Z" --body "..."
    ```
-7. The `release.yml` workflow builds binaries and publishes a GitHub release.
-8. The `package-managers.yml` workflow updates Homebrew and Scoop manifests.
+8. After CI passes and the PR is merged, tag the merge commit:
+   ```bash
+   git checkout main && git pull
+   git tag vX.Y.Z
+   git push origin vX.Y.Z
+   ```
+9. The `release.yml` workflow builds binaries and publishes a GitHub release.
+10. The `package-managers.yml` workflow updates Homebrew and Scoop manifests.
 
 For full details, see `docs/RELEASE.md` and `docs/PACKAGE_MANAGERS.md`.

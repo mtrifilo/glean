@@ -10,27 +10,43 @@ This guide describes how to cut and publish a new Glean release.
 
 ## Suggested Release Flow
 
-1. Update version in `package.json`.
-2. Move key notes from `Unreleased` into a dated version section in `CHANGELOG.md`.
-3. Run validation:
+> **Note:** `main` has branch protection — direct pushes are not allowed. Release commits must go through a PR.
+
+1. Start on `main` with a clean working tree:
+   ```bash
+   git checkout main && git pull
+   ```
+2. Create a release branch:
+   ```bash
+   git checkout -b chore/release-vX.Y.Z
+   ```
+3. Update version in `package.json`.
+4. Move key notes from `Unreleased` into a dated version section in `CHANGELOG.md`.
+5. Run validation:
    - `bun test`
    - smoke checks for:
      - `glean`
      - `glean clean`
      - `glean stats`
      - `glean --tui`
-4. Build binary:
-   - `bun run build:binary`
-5. Verify binary:
-   - run `dist/glean --help`
-6. Push a release tag:
-   - `git tag vX.Y.Z`
-   - `git push origin vX.Y.Z`
-7. Confirm GitHub release workflow succeeds:
+6. Commit and push the release branch:
+   ```bash
+   git add package.json CHANGELOG.md
+   git commit -m "chore: release vX.Y.Z"
+   git push -u origin chore/release-vX.Y.Z
+   ```
+7. Open a PR and wait for CI to pass, then merge.
+8. Tag the merge commit on `main`:
+   ```bash
+   git checkout main && git pull
+   git tag vX.Y.Z
+   git push origin vX.Y.Z
+   ```
+9. Confirm GitHub release workflow succeeds:
    - `.github/workflows/release.yml`
    - artifacts uploaded for each platform
    - `checksums.txt` attached
-8. Announce release with usage examples.
+10. Announce release with usage examples.
 
 ## Smoke Commands
 
