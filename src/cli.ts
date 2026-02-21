@@ -1,6 +1,8 @@
 #!/usr/bin/env bun
 
 import { Command, InvalidArgumentError } from "commander";
+import { version } from "../package.json";
+import { runUpdate } from "./commands/update";
 import { runInteractive } from "./interactive/runInteractive";
 import { copyToClipboard, readInput } from "./lib/io";
 import { recordRunStats } from "./lib/sessionStats";
@@ -151,6 +153,7 @@ const program = new Command();
 program
   .name("glean")
   .description("Clean noisy HTML and convert it into markdown context.")
+  .version(version, "-V, --version")
   .option(
     "--mode <mode>",
     "Default pipeline for no-subcommand runs: clean or extract",
@@ -197,6 +200,14 @@ addCommonOptions(
       await runStats(this.opts<StatsOptions>());
     }),
 );
+
+program
+  .command("update")
+  .description("Update glean to the latest version.")
+  .option("--force", "Reinstall even if already on the latest version")
+  .action(async function (this: Command) {
+    await runUpdate(this.opts<{ force?: boolean }>());
+  });
 
 program.action(async function (this: Command) {
   const options = this.opts<RootOptions>();

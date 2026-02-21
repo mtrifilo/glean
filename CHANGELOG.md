@@ -9,6 +9,8 @@ Semantic Versioning after `1.0.0`.
 
 ### Added
 
+- `glean update` self-update command for compiled binaries (downloads latest release, verifies SHA256 checksum, atomic binary swap).
+- `glean --version` / `-V` flag to print the current version.
 - Package-manager distribution scaffolding:
   - Homebrew formula generator (`scripts/generate-package-manager-manifests.ts`)
   - Scoop manifest generator (same script output)

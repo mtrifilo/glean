@@ -11,7 +11,8 @@ Use this file as the primary context bootstrap for coding sessions.
 ## Current Status Snapshot
 
 - CLI command is `glean` (hard switch from previous name).
-- Commands implemented: `clean`, `extract`, `stats`, plus no-subcommand interactive mode.
+- Commands implemented: `clean`, `extract`, `stats`, `update`, plus no-subcommand interactive mode.
+- `--version` / `-V` flag available.
 - No-subcommand mode defaults to:
   - `clean`
   - aggressive pruning off
@@ -52,6 +53,8 @@ glean --tui
 
 - `src/cli.ts`
   - command registration, root options, no-subcommand flow
+- `src/commands/update.ts`
+  - self-update logic (platform detection, GitHub release fetch, checksum verify, atomic swap)
 - `src/interactive/runInteractive.ts`
   - clipboard-first interactive logic and summary output
 - `src/tui/experimental.ts`
@@ -81,13 +84,14 @@ glean --tui
 
 - `test/pipeline.test.ts` - pipeline behavior
 - `test/cli.test.ts` - command-level behavior
+- `test/update.test.ts` - update command unit + integration tests
 
 ## Current Priorities
 
 1. Distribution workflow completion:
    - wire final public repo slug in release/install docs
    - run first tagged release and validate installer flows
-   - decide near-term upgrade UX (`self-update` vs installer rerun)
+   - self-update implemented via `glean update`
 2. Fixture maintenance tooling:
    - regenerate expected outputs quickly
 3. Regression safety:

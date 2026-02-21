@@ -27,6 +27,20 @@ Yes.
 
 Current prebuilt targets are `darwin-arm64`, `linux-x64`, and `windows-x64`.
 
+## How do I update Glean?
+
+If you installed a compiled binary (via installer, Homebrew, or Scoop), run:
+
+```bash
+glean update
+```
+
+This checks GitHub for the latest release, verifies the download checksum, and
+replaces the binary in place. Use `glean update --force` to reinstall even if
+already on the latest version.
+
+If you are running from source, use `git pull && bun install` instead.
+
 ## What is the difference between `clean` and `extract`?
 
 - `clean`: deterministic cleanup and conversion.

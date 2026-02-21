@@ -64,7 +64,13 @@ For unsupported targets (for example macOS `x64`, Linux `arm64`, Windows `arm64`
 
 ## Upgrade
 
-Re-run your install command (`brew`, `scoop`, or installer script).
+From a compiled binary:
+
+```bash
+glean update
+```
+
+Or re-run your install command (`brew upgrade`, `scoop update`, or installer script).
 Use `GLEAN_VERSION=<tag>` to pin a specific release.
 
 ## Source install (development or unsupported targets)
@@ -92,6 +98,8 @@ Installer env vars (script path only):
 - `glean clean` - deterministic HTML cleanup + markdown conversion
 - `glean extract` - Readability-first extraction, then cleanup + markdown conversion
 - `glean stats` - report character/token estimate deltas between input and markdown output
+- `glean update` - self-update to the latest release (compiled binaries only)
+- `glean --version` - print the current version
 
 ## No-subcommand options (`glean`)
 

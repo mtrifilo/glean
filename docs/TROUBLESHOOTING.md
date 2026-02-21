@@ -57,6 +57,17 @@
   - `bun install`
   - `bun link`
 
+## `glean update` says "running from source"
+
+- Self-update only works with compiled binaries.
+- If you installed via `bun link`, update with `git pull && bun install` instead.
+
+## `glean update` fails with a permission error
+
+- The binary path may require elevated permissions to overwrite.
+- On macOS/Linux, try `sudo glean update`.
+- On Windows, run PowerShell as Administrator.
+
 ## Clipboard not detected in interactive mode
 
 - Confirm HTML is copied in DevTools before running `glean`.
