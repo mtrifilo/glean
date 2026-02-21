@@ -230,22 +230,38 @@ V1 has been implemented and validated.
 - error messages and help text improvements
 - package/distribution workflow (`bun link`, optional single binary build)
 
-### Milestone 4 - Release and Tuning (Proposed Next Steps)
+### Milestone 4 - Release and Tuning (Complete)
 
 Phase A (interactive UX simplification) is complete.
-Open-source/release scaffolding is now in progress; remaining scope:
+Open-source/release scaffolding is complete:
 
-- add a minimal release flow:
-  - version bump scripts in `package.json` (`release:patch`, `release:minor`, `release:major`)
-  - binary build output into `dist/` via `bun build --compile`
-  - release checklist in `README.md` (test, build, smoke test)
-- add golden fixture update workflow for heuristic tuning:
-  - create `scripts/update-golden.ts` to regenerate `test/fixtures/*.expected.md`
-  - support `--mode clean|extract` and optional `--fixture <name>` targeting
-  - run this script when cleaning heuristics change, then review fixture diffs
-- add quick smoke helpers:
-  - script to run representative fixture reductions and print char/token deltas
-  - optional threshold guard to catch major regression in reduction quality
+- Release workflow with branch protection (PR-based releases, post-merge tagging)
+- Claude Code `/pr` and `/release` skills for automated workflow
+- `glean update` self-update command with SHA256 checksum verification
+- Package-manager scaffolding (Homebrew formula, Scoop manifest, automation workflow)
+- PR template with structured sections (What/Why/How/Testing/Screenshots/Scope)
+
+### Post-V1 Iterations
+
+#### v0.2.1 — Stability and Polish (patch)
+
+- Fix TUI preview overlap bug (preview text overflows into footer on small terminals)
+- Add defensive `flexShrink: 0` to all fixed-height TUI elements
+
+#### v0.3.0 — Distribution Confidence
+
+- End-to-end installer validation on all 3 platforms (macOS, Linux, Windows)
+- CI smoke test workflow (`smoke-install.yml`) triggered on release: download binary, verify checksum, run `glean --version` and `glean clean` with fixture input
+- `glean update` upgrade-path validation
+- Audit and wire final repo slug in any remaining placeholders
+
+#### v0.4.0 — Developer Experience and Heuristic Safety
+
+- Golden fixture update script (`scripts/update-golden.ts`) to regenerate `test/fixtures/*.expected.md`
+  - Support `--mode clean|extract` and optional `--fixture <name>` targeting
+- Smoke check with threshold guards (`scripts/smoke-check.ts`) — assert minimum reduction percentages per fixture
+- Integrate smoke check into CI as a required check
+- "Tuning Heuristics" section in `docs/CONTRIBUTING.md`
 
 ## Distribution Strategy (OpenCode-Style UX)
 
