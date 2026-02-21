@@ -7,6 +7,8 @@ Semantic Versioning after `1.0.0`.
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-02-21
+
 ### Added
 
 - `glean update` self-update command for compiled binaries (downloads latest release, verifies SHA256 checksum, atomic binary swap).
