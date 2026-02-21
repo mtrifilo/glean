@@ -263,6 +263,30 @@ Open-source/release scaffolding is complete:
 - Integrate smoke check into CI as a required check
 - "Tuning Heuristics" section in `docs/CONTRIBUTING.md`
 
+#### v0.5.0 — Word Document and RTF Support
+
+Auto-detect content type (HTML, RTF, DOCX) and route through the appropriate converter. The core pipeline (`cleanHtml` → `toMarkdown`) stays unchanged — a new detection + conversion layer produces HTML, then reuses everything.
+
+**Clipboard path (RTF — zero new deps):**
+- Copying from Word on macOS puts RTF on the clipboard (not .docx binary)
+- `pbpaste -Prefer rtf` retrieves RTF content (officially documented macOS flag)
+- macOS native `textutil -stdin -stdout -convert html -format rtf` converts RTF → HTML
+- Feed resulting HTML into existing pipeline
+
+**File path (.docx — mammoth.js dependency):**
+- Accept `.docx` files via `--input` flag or stdin
+- Detect by PK ZIP magic bytes (`50 4B 03 04`) or `.docx` file extension
+- `mammoth.js` (zero-dep, proven library) converts DOCX → HTML
+- Feed resulting HTML into existing pipeline
+
+**Implementation phases:**
+1. Content detection foundation — new `src/lib/contentDetect.ts` with `looksLikeHtml()`, `looksLikeRtf()`, `isDocxBytes()`, `detectFormat()`. Consolidates duplicated `looksLikeHtml()` from `runInteractive.ts` and `experimental.ts`. Add `readInputBytes()` to `io.ts` for binary file reading.
+2. RTF support (zero new deps) — new `src/lib/convert.ts` with `convertRtfToHtml()` via `textutil`. Add `readClipboardRtf()` to `io.ts`. Update interactive + TUI clipboard polling to detect RTF.
+3. DOCX support (mammoth) — add `mammoth` dep. Add `convertDocxToHtml()` to `convert.ts`. New `src/pipeline/processContent.ts` wraps detection + conversion + existing `processHtml()`. Add optional `sourceFormat`/`sourceChars` to `ContentStats`.
+4. Wire CLI + polish — update `cli.ts` `runTransform()`/`runStats()` to use `readInputBytes()` + `processContent()`. Update docs (README, CHANGELOG, llm-context). Test fixtures: `sample.docx`, `sample.rtf`, expected markdown outputs.
+
+**Detailed plan:** `.claude/plans/twinkly-plotting-nebula.md`
+
 ## Distribution Strategy (OpenCode-Style UX)
 
 Goal: provide one-command install and easy upgrades while keeping package manager options.
