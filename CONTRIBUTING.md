@@ -4,7 +4,8 @@ Thanks for your interest in contributing to Glean.
 
 For project-specific contribution guidance, start here:
 
-- `docs/CONTRIBUTING.md`
+- `docs/CONTRIBUTING.md` (code guidelines and validation checklist)
+- `docs/WORKFLOW.md` (branch, PR, and release workflow)
 
 ## Quick Start
 

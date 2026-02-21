@@ -80,7 +80,7 @@ V1 has been implemented and validated.
 - Mode and pruning are now controlled via no-subcommand flags (`--mode`, `--aggressive`) instead of interactive prompts.
 - Current-run stats are displayed immediately after processing (chars/tokens saved).
 - Persistent session totals are tracked (runs, tokens saved, chars saved).
-- `--tui` now launches a minimal real OpenTUI full-screen flow with clipboard auto-detection, processing, stats, and output preview.
+- `--tui` now launches a polished OpenTUI full-screen flow with clipboard auto-detection, processing, color-coded stats/session panels, and output preview.
 - LLM continuity docs are now in place for efficient future session handoff:
   - `docs/llm-context.md`
   - `docs/RESUME_PROMPT.md`
