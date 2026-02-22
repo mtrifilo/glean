@@ -5,14 +5,14 @@
   "type": "module",
   "private": true,
   "bin": {
-    "decant": "./src/cli.ts"
+    "decant": "./src/entry.ts"
   },
   "scripts": {
-    "clean": "bun run src/cli.ts clean",
-    "extract": "bun run src/cli.ts extract",
-    "stats": "bun run src/cli.ts stats",
+    "clean": "bun run src/entry.ts clean",
+    "extract": "bun run src/entry.ts extract",
+    "stats": "bun run src/entry.ts stats",
     "test": "bun test",
-    "build:binary": "bun build src/cli.ts --compile --outfile dist/decant",
+    "build:binary": "bun build src/entry.ts --compile --outfile dist/decant",
     "package:manifests": "bun run scripts/generate-package-manager-manifests.ts",
     "update-golden": "bun run scripts/update-golden.ts",
     "smoke-check": "bun run scripts/smoke-check.ts"

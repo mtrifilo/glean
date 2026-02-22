@@ -1,6 +1,5 @@
 import { createInterface } from "node:readline/promises";
 import { stdin as input, stdout as output } from "node:process";
-import chalk from "chalk";
 import { marked } from "marked";
 import { markedTerminal } from "marked-terminal";
 import {
@@ -52,11 +51,6 @@ let markedReady = false;
 
 function renderPreviewMarkdown(markdown: string, maxLines = 12): string {
   if (!markedReady) {
-    // Bun's chalk auto-detection can miss TTY — force 256-color when we
-    // know stdout is a terminal (interactive mode only runs in TTY).
-    if (process.stdout.isTTY && chalk.level === 0) {
-      chalk.level = 2;
-    }
     marked.use(markedTerminal({ reflowText: true, width: 72 }));
     markedReady = true;
   }
