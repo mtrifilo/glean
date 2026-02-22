@@ -61,5 +61,5 @@ printf '%s' '<article><h1>hello</h1><p>world</p></article>' | glean stats
 - Confirm one-command installers work:
   - `install` (macOS/Linux)
   - `install.ps1` (Windows)
-- Update roadmap status in `docs/plans/GLEAN_CLI_PLAN.md` if needed.
+- Update roadmap status in `docs/strategy/ROADMAP.md` if needed.
 - Collect first user-reported issues and patch quickly.

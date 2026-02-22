@@ -9,8 +9,7 @@ You are resuming work on the `glean` CLI project.
 
 Read these files first, in order:
 1) docs/llm-context.md
-2) README.md
-3) docs/plans/GLEAN_CLI_PLAN.md
+2) docs/strategy/ROADMAP.md
 
 Then:
 - Summarize current status in 5 bullets max.
@@ -30,9 +29,8 @@ You are resuming development on `glean`.
 
 Start with:
 - docs/llm-context.md
-- docs/README.md
-- README.md
-- docs/plans/GLEAN_CLI_PLAN.md
+- docs/strategy/ROADMAP.md
+- docs/specs/
 
 Then create:
 1) A concise status summary

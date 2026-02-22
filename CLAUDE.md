@@ -31,8 +31,22 @@ Stay focused on the HTML/RTF/Word → clean markdown workflow. Do not scope-cree
 
 ## Doc Layout
 
-- `docs/` — LLM workspace (specs, strategy, llm-context.md)
-- `human-docs/` — Human-focused guides (contributing, workflow, release, FAQ, troubleshooting)
+- `docs/llm-context.md` — primary LLM session bootstrap
+- `docs/strategy/ROADMAP.md` — planned iterations and open decisions
+- `docs/specs/` — feature specs and design documents
+- `docs/` — also contains human-facing guides (CONTRIBUTING, FAQ, RELEASE, TROUBLESHOOTING, etc.)
+
+## Keeping Docs Current
+
+As you work, update docs to reflect what you learn and accomplish. Do not wait until the end of a session — update incrementally to prevent drift.
+
+- **After completing a task:** Update `docs/llm-context.md` — refresh Recent Work, Checkpoint, and Priorities.
+- **After architectural changes:** Update the Architecture section and Key Files in `docs/llm-context.md`.
+- **After shipping a milestone:** Update `docs/strategy/ROADMAP.md` — mark completed items, advance the current iteration.
+- **After adding a new feature:** Update `README.md` with user-facing changes, and add a `CHANGELOG.md` entry under `[Unreleased]`.
+- **After adding a new spec:** Add it to `docs/specs/README.md`.
+
+Docs are only useful if they reflect reality. Treat doc updates as part of the task, not a separate chore.
 
 ## Validation Checklist
 

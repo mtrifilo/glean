@@ -20,7 +20,7 @@ bun test
 - Update docs when behavior or UX changes:
   - `README.md`
   - `docs/llm-context.md`
-  - `docs/plans/GLEAN_CLI_PLAN.md` (if roadmap/progress changed)
+  - `docs/strategy/ROADMAP.md` (if roadmap/progress changed)
 - Keep changes aligned with Glean's core workflow focus.
 
 ## Tuning Heuristics
