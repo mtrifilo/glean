@@ -2,7 +2,7 @@
 
 ## What is Glean?
 
-Glean converts noisy HTML (for example copied from Chrome DevTools) into concise
+Glean converts noisy HTML, RTF, and Word documents into concise
 markdown so you can provide better LLM context with fewer tokens.
 
 ## How do I install Glean with one command?
@@ -72,5 +72,5 @@ No. Standard interactive mode and CLI commands work without full-screen TUI.
 
 ## Is Glean intended to be a general context platform?
 
-Not in this repo. Glean stays focused on the DevTools HTML -> markdown workflow.
+Not in this repo. Glean stays focused on the HTML/RTF/Word -> markdown workflow.
 Broader context-platform ideas are tracked separately.

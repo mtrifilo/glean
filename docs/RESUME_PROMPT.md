@@ -19,7 +19,7 @@ Then:
 - Run relevant tests and report outcomes.
 
 Constraints:
-- Keep `glean` focused on DevTools HTML -> clean markdown workflow.
+- Keep `glean` focused on HTML/RTF/Word -> clean markdown workflow.
 - Prefer token-efficient investigation (targeted file reads, not broad scans).
 ```
 

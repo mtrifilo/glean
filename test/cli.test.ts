@@ -134,7 +134,7 @@ describe("glean cli", () => {
     expect(result.exitCode).toBe(1);
     const hasExpectedMessage =
       result.stderr.includes("No input detected") ||
-      result.stderr.includes("Input HTML is empty.");
+      result.stderr.includes("Input is empty.");
     expect(hasExpectedMessage).toBe(true);
   });
 
@@ -143,6 +143,36 @@ describe("glean cli", () => {
 
     expect(result.exitCode).toBe(1);
     expect(result.stderr).toContain("requires an interactive terminal");
+  });
+});
+
+const isMacOS = process.platform === "darwin";
+
+describe("RTF/DOC input", () => {
+  test.skipIf(!isMacOS)("clean converts RTF file via --input", async () => {
+    const result = await runCli(["clean", "-i", "test/fixtures/sample.rtf"]);
+
+    expect(result.exitCode).toBe(0);
+    expect(result.stdout).toContain("Hello World");
+  });
+
+  test.skipIf(!isMacOS)("clean converts RTF piped via stdin", async () => {
+    const rtf = await readFixture("sample.rtf");
+    const result = await runCli(["clean"], rtf);
+
+    expect(result.exitCode).toBe(0);
+    expect(result.stdout).toContain("Hello World");
+  });
+
+  test.skipIf(!isMacOS)("stats works with RTF file input", async () => {
+    const result = await runCli(["stats", "-i", "test/fixtures/sample.rtf", "--format", "json"]);
+    const parsed = JSON.parse(result.stdout) as {
+      inputChars: number;
+      outputChars: number;
+    };
+
+    expect(result.exitCode).toBe(0);
+    expect(parsed.inputChars).toBeGreaterThan(0);
   });
 });
 

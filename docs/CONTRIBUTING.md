@@ -2,11 +2,11 @@
 
 ## Project Focus
 
-`glean` exists to make DevTools HTML -> clean markdown fast and low-friction.
+`glean` exists to make HTML, RTF, and Word documents -> clean markdown fast and low-friction.
 
 Keep changes aligned with this workflow:
 
-- copy HTML
+- copy content (HTML, RTF, or Word)
 - run `glean`
 - paste concise markdown
 - understand token impact quickly

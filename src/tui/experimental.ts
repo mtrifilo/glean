@@ -1,4 +1,6 @@
-import { copyToClipboard, readClipboardText } from "../lib/io";
+import { detectFormat } from "../lib/contentDetect";
+import { convertRtfToHtml } from "../lib/convert";
+import { copyToClipboard, readClipboardRtf, readClipboardText } from "../lib/io";
 import { recordRunStats } from "../lib/sessionStats";
 import type { StatsMode, TransformOptions } from "../lib/types";
 import { processHtml, type ProcessResult } from "../pipeline/processHtml";
@@ -24,18 +26,6 @@ function defaultTransformOptions(aggressive: boolean): TransformOptions {
     maxHeadingLevel: 6,
     aggressive,
   };
-}
-
-function looksLikeHtml(value: string): boolean {
-  if (!value.trim()) {
-    return false;
-  }
-
-  if (/<[a-zA-Z][\w:-]*(\s[^>]*)?>/.test(value)) {
-    return true;
-  }
-
-  return /&lt;[a-zA-Z][\w:-]*/.test(value);
 }
 
 function previewLines(markdown: string, limit = 20): string[] {
@@ -258,10 +248,26 @@ export async function runExperimentalTui(options: TuiRunOptions): Promise<boolea
       let clipboardHtml = "";
 
       while (!clipboardHtml) {
-        const clipboard = await readClipboardText();
-        if (clipboard && looksLikeHtml(clipboard)) {
-          clipboardHtml = clipboard;
-          break;
+        const text = await readClipboardText();
+        if (text) {
+          const format = detectFormat(text);
+          if (format === "html") {
+            clipboardHtml = text;
+            break;
+          }
+          if (format === "rtf") {
+            clipboardHtml = await convertRtfToHtml(text);
+            break;
+          }
+        }
+
+        const rtf = await readClipboardRtf();
+        if (rtf) {
+          const format = detectFormat(rtf);
+          if (format === "rtf") {
+            clipboardHtml = await convertRtfToHtml(rtf);
+            break;
+          }
         }
 
         renderWaitingScreen(spinner[spin % spinner.length]);

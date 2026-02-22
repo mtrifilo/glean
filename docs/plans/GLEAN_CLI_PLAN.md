@@ -71,7 +71,7 @@ V1 has been implemented and validated.
 - Cleaning and extraction pipelines are implemented with deterministic cleanup plus Readability-first extraction in `extract` mode.
 - Fixture corpus and snapshot-style expectations are in place across blog/docs/marketing/e-commerce/article patterns.
 - Automated coverage is in place for pipeline behavior and CLI behavior.
-- Latest validation run: `bun test` passing (17 tests).
+- Latest validation run: `bun test` passing (63 tests across 5 files).
 
 ### UX Upgrade Progress (Interactive-First)
 
@@ -280,10 +280,9 @@ Auto-detect content type (HTML, RTF, DOCX) and route through the appropriate con
 - Feed resulting HTML into existing pipeline
 
 **Implementation phases:**
-1. Content detection foundation — new `src/lib/contentDetect.ts` with `looksLikeHtml()`, `looksLikeRtf()`, `isDocxBytes()`, `detectFormat()`. Consolidates duplicated `looksLikeHtml()` from `runInteractive.ts` and `experimental.ts`. Add `readInputBytes()` to `io.ts` for binary file reading.
-2. RTF support (zero new deps) — new `src/lib/convert.ts` with `convertRtfToHtml()` via `textutil`. Add `readClipboardRtf()` to `io.ts`. Update interactive + TUI clipboard polling to detect RTF.
-3. DOCX support (mammoth) — add `mammoth` dep. Add `convertDocxToHtml()` to `convert.ts`. New `src/pipeline/processContent.ts` wraps detection + conversion + existing `processHtml()`. Add optional `sourceFormat`/`sourceChars` to `ContentStats`.
-4. Wire CLI + polish — update `cli.ts` `runTransform()`/`runStats()` to use `readInputBytes()` + `processContent()`. Update docs (README, CHANGELOG, llm-context). Test fixtures: `sample.docx`, `sample.rtf`, expected markdown outputs.
+1. ~~Content detection + RTF/DOC support (zero new deps)~~ — **Complete.** `src/lib/contentDetect.ts` with `looksLikeHtml()`, `looksLikeRtf()`, `isDocBytes()`, `detectFormat()`. `src/lib/convert.ts` with `convertRtfToHtml()` and `convertDocToHtml()` via macOS `textutil`. `readClipboardRtf()` in `io.ts`. Interactive + TUI clipboard polling detects RTF. CLI `resolveHtmlInput()` handles file, pipe, and stdin RTF/DOC.
+2. DOCX support (mammoth) — add `mammoth` dep. Add `convertDocxToHtml()` to `convert.ts`. Extend `detectFormat` with `"docx"` type.
+3. Stats extension, docs, release — add optional `sourceFormat`/`sourceChars` to `ContentStats`. Update CHANGELOG. Cut release.
 
 **Detailed plan:** `.claude/plans/twinkly-plotting-nebula.md`
 

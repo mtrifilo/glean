@@ -4,6 +4,8 @@ import { Command, InvalidArgumentError } from "commander";
 import { version } from "../package.json";
 import { runUpdate } from "./commands/update";
 import { runInteractive } from "./interactive/runInteractive";
+import { detectFormat } from "./lib/contentDetect";
+import { convertDocToHtml, convertRtfToHtml } from "./lib/convert";
 import { copyToClipboard, readInput } from "./lib/io";
 import { recordRunStats } from "./lib/sessionStats";
 import type { StatsFormat, StatsMode, TransformOptions } from "./lib/types";
@@ -64,7 +66,7 @@ function parseStatsFormat(value: string): StatsFormat {
 
 function addCommonOptions(command: Command): Command {
   return command
-    .option("-i, --input <path>", "Read HTML input from a file path")
+    .option("-i, --input <path>", "Read input from a file path (HTML, RTF, or DOC)")
     .option("--copy", "Copy command output to the macOS clipboard")
     .option("--keep-links", "Preserve markdown links (default behavior)")
     .option("--strip-links", "Strip links and keep only their text")
@@ -113,14 +115,29 @@ async function maybeCopyOutput(copy: boolean | undefined, text: string): Promise
   }
 }
 
-async function runTransform(commandName: "clean" | "extract", options: CommonOptions) {
-  const input = await readInput(options.input);
-  if (!input.trim()) {
-    throw new Error("Input HTML is empty.");
+async function resolveHtmlInput(inputPath?: string): Promise<string> {
+  if (inputPath && /\.doc$/i.test(inputPath)) {
+    return convertDocToHtml(inputPath);
   }
 
+  const input = await readInput(inputPath);
+  if (!input.trim()) {
+    throw new Error("Input is empty.");
+  }
+
+  const format = detectFormat(input);
+  if (format === "rtf") {
+    return convertRtfToHtml(input);
+  }
+
+  return input;
+}
+
+async function runTransform(commandName: "clean" | "extract", options: CommonOptions) {
+  const html = await resolveHtmlInput(options.input);
+
   const transformOptions = resolveTransformOptions(options);
-  const processed = processHtml(commandName, input, transformOptions);
+  const processed = processHtml(commandName, html, transformOptions);
 
   await maybeCopyOutput(options.copy, processed.markdown);
   await recordRunStats(processed.stats);
@@ -128,16 +145,13 @@ async function runTransform(commandName: "clean" | "extract", options: CommonOpt
 }
 
 async function runStats(options: StatsOptions) {
-  const input = await readInput(options.input);
-  if (!input.trim()) {
-    throw new Error("Input HTML is empty.");
-  }
+  const html = await resolveHtmlInput(options.input);
 
   const mode = options.mode ?? "clean";
   const format = options.format ?? "md";
   const transformOptions = resolveTransformOptions(options);
 
-  const processed = processHtml(mode, input, transformOptions);
+  const processed = processHtml(mode, html, transformOptions);
 
   const output =
     format === "json"
