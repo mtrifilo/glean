@@ -86,7 +86,6 @@ async function waitForClipboardContent(): Promise<string> {
   process.stdout.write(
     [
       `${muted("Copy HTML, RTF, or Word content to your clipboard.")}`,
-      `${muted("Press Enter to retry \u00b7 q to cancel")}`,
       "",
     ].join("\n"),
   );
