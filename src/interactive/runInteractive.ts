@@ -1,5 +1,6 @@
 import { createInterface } from "node:readline/promises";
 import { stdin as input, stdout as output } from "node:process";
+import chalk from "chalk";
 import { marked } from "marked";
 import { markedTerminal } from "marked-terminal";
 import {
@@ -49,8 +50,13 @@ function percent(value: number): string {
 
 let markedReady = false;
 
-function renderPreviewMarkdown(markdown: string, limit = 12): string {
+function renderPreviewMarkdown(markdown: string, maxLines = 12): string {
   if (!markedReady) {
+    // Bun's chalk auto-detection can miss TTY — force 256-color when we
+    // know stdout is a terminal (interactive mode only runs in TTY).
+    if (process.stdout.isTTY && chalk.level === 0) {
+      chalk.level = 2;
+    }
     marked.use(markedTerminal({ reflowText: true, width: 72 }));
     markedReady = true;
   }
@@ -60,10 +66,9 @@ function renderPreviewMarkdown(markdown: string, limit = 12): string {
 
   const rendered = (marked(trimmed) as string).trimEnd();
   const lines = rendered.split("\n");
-  const total = lines.length;
 
-  if (total <= limit) return rendered;
-  return [...lines.slice(0, limit), muted(`... (${fmt(total)} lines total)`)].join("\n");
+  if (lines.length <= maxLines) return rendered;
+  return [...lines.slice(0, maxLines), "", muted("  ...")].join("\n");
 }
 
 function printIntro(mode: StatsMode, aggressive: boolean): void {
