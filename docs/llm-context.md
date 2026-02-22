@@ -1,38 +1,50 @@
-# Glean LLM Context
+# Glean — LLM Context
 
-Use this file as the primary context bootstrap for coding sessions.
+> Entry point for Claude Code sessions. Read this first.
 
-## Product Intent (Non-Negotiable)
+## Recent Work
 
-- Keep `glean` laser-focused on the HTML/RTF/DOC -> clean markdown workflow.
-- Minimize friction: fast default behavior, clipboard-first, useful stats.
-- Preserve scriptability and power-user workflows.
+- v0.5.0 released — content detection + RTF/DOC support via macOS `textutil` (zero new deps)
+- Consolidated duplicated `looksLikeHtml()` into shared `contentDetect.ts`
+- Interactive + TUI clipboard polling now detects RTF from Word/TextEdit
+- CLI `resolveHtmlInput()` handles file, pipe, and stdin RTF/DOC
+- Dev tooling (golden fixture regen, smoke check) bundled into v0.5.0
 
-## Current Status Snapshot
+## Checkpoint
 
-- CLI command is `glean` (hard switch from previous name).
-- Commands implemented: `clean`, `extract`, `stats`, `update`, plus no-subcommand interactive mode.
-- `--version` / `-V` flag available.
-- No-subcommand mode defaults to:
-  - `clean`
-  - aggressive pruning off
-- Overrides are available via:
-  - `--mode clean|extract`
-  - `--aggressive`
-- `--tui` launches a polished OpenTUI full-screen flow with color palette, bordered stat/session panels, and flex-based layout.
-- Session stats are tracked at:
-  - `~/.glean/stats.json`
-  - override with `GLEAN_STATS_PATH`
-- Open-source/release scaffolding is present:
-  - `.github` issue/PR templates and CI/release workflows
-  - installer scripts: `install`, `install.ps1`
-- RTF and DOC input supported (auto-detected, converted via macOS `textutil`):
-  - Clipboard: interactive and TUI modes detect RTF from Word/TextEdit
-  - File: `glean clean -i file.rtf` or `glean clean -i file.doc`
-  - Pipe: `cat file.rtf | glean clean`
-- Latest known automated status: tests passing (`bun test`).
+- **Current state:** v0.5.0 released. RTF/DOC input works across all paths (clipboard, file, pipe). 63 tests passing.
+- **What's working:** HTML, RTF, and DOC → clean markdown. Interactive, TUI, CLI pipe, and file input paths. Auto-detection with no user flags required.
+- **What's next:** See `docs/strategy/ROADMAP.md` — v0.6.0 (DOCX support via `mammoth.js`)
 
-## Fast Command Cheat Sheet
+## Product Intent
+
+Keep `glean` laser-focused on the HTML/RTF/DOC → clean markdown workflow. Minimize friction: fast default behavior, clipboard-first, useful stats. Preserve scriptability and power-user workflows.
+
+## Task Routing
+
+| Task | Where to look |
+|------|--------------|
+| Architecture overview | This file |
+| Roadmap & iterations | `docs/strategy/ROADMAP.md` |
+| Feature specs | `docs/specs/` |
+| Contributing guidelines | `docs/CONTRIBUTING.md` |
+| Release process | `docs/RELEASE.md` |
+| Troubleshooting | `docs/TROUBLESHOOTING.md` |
+| FAQ | `docs/FAQ.md` |
+
+## Status Snapshot
+
+| Component | Status | Notes |
+|-----------|--------|-------|
+| HTML pipeline | Stable | `clean`, `extract`, `stats` commands |
+| RTF support | Stable | Clipboard + file + pipe, macOS `textutil` |
+| DOC support | Stable | File input, macOS `textutil` |
+| DOCX support | Planned | v0.6.0 via `mammoth.js` |
+| Interactive mode | Stable | Clipboard-first, auto-detect HTML/RTF |
+| TUI mode | Stable | OpenTUI full-screen, clipboard polling |
+| Dev tooling | Stable | Golden fixtures, smoke check, CI integration |
+
+## Command Cheat Sheet
 
 ```bash
 # Default interactive flow
@@ -55,7 +67,7 @@ cat document.rtf | glean clean
 glean --tui
 ```
 
-## Architecture Drilldown (Read as Needed)
+## Architecture
 
 ### Entry and UX
 
@@ -83,10 +95,10 @@ glean --tui
 
 ### Shared utilities and state
 
-- `src/lib/rules.ts` - cleanup heuristics
 - `src/lib/contentDetect.ts` - format detection (`ContentFormat`, `detectFormat`, `looksLikeHtml`, `looksLikeRtf`, `isDocBytes`)
 - `src/lib/convert.ts` - RTF/DOC → HTML conversion via macOS `textutil` (zero deps)
 - `src/lib/io.ts` - stdin/file/clipboard I/O (includes `readClipboardRtf`)
+- `src/lib/rules.ts` - cleanup heuristics
 - `src/lib/sessionStats.ts` - persistent session metrics
 - `src/lib/types.ts` - shared types
 
@@ -103,16 +115,23 @@ glean --tui
 - `test/convert.test.ts` - RTF/DOC conversion tests (macOS-gated)
 - `test/update.test.ts` - update command unit + integration tests
 
-## Current Priorities
+## Priorities
 
-The user directs priority. See `docs/strategy/ROADMAP.md` for planned iterations.
+1. v0.6.0 — DOCX file support via `mammoth.js` (spec: `docs/specs/WORD_RTF_SUPPORT.md`)
+2. Stats extension — `sourceFormat` / `sourceChars` in `ContentStats`
 
-- v0.4.0 — Developer Experience and Heuristic Safety (Done, bundled into v0.5.0 release)
-- v0.5.0 — Content Detection + RTF/DOC Support (Done, released)
-- v0.6.0 — DOCX Support
-  - DOCX file support via `mammoth.js`
-  - Stats extension (`sourceFormat` / `sourceChars`)
-  - Full spec: `docs/specs/WORD_RTF_SUPPORT.md`
+The user directs priority. See `docs/strategy/ROADMAP.md` for full iteration plan.
+
+## Maintenance
+
+Keep this file current as you work. After completing a task, update:
+- **Recent Work** — add a bullet for what was done
+- **Checkpoint** — refresh current state and what's working
+- **Status Snapshot** — update component statuses
+- **Priorities** — reorder or replace based on what's next
+- **Architecture** — if structure changed
+
+Also update `docs/strategy/ROADMAP.md` when iterations advance or new decisions emerge.
 
 ## Scope Guardrails
 

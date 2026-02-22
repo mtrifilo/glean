@@ -1,52 +1,34 @@
 # Glean Docs
 
-This folder is designed for both humans and LLM agents to resume work quickly without loading unnecessary context.
+This folder contains both LLM-facing and human-facing documentation. Files are designed for fast session bootstrapping without loading the full codebase.
 
 ## Fast Load Order (Minimal)
 
 For most sessions, read in this order:
 
-1. `docs/llm-context.md` (current project snapshot + file map)
-2. `README.md` (usage and command details)
-3. `docs/plans/GLEAN_CLI_PLAN.md` (strategy and roadmap)
-4. Only then drill into specific source files relevant to the task
+1. `docs/llm-context.md` (current project snapshot, architecture, checkpoint)
+2. `docs/strategy/ROADMAP.md` (planned iterations and open decisions)
+3. Only then drill into specific source files relevant to the task
 
 ## Documentation Map
 
-- `docs/llm-context.md`
-  - compact, high-signal context loader for new sessions
-- `docs/RESUME_PROMPT.md`
-  - copy/paste prompt templates for restarting an LLM session efficiently
-- `docs/CONTRIBUTING.md`
-  - repo-specific contribution rules and validation checklist
-- `docs/plans/GLEAN_CLI_PLAN.md`
-  - primary implementation and roadmap plan
-- `docs/RELEASE.md`
-  - maintainer release checklist and publishing flow
-- `docs/TROUBLESHOOTING.md`
-  - common operational and environment issues
-- `docs/FAQ.md`
-  - quick answers for users and contributors
-- `docs/PACKAGE_MANAGERS.md`
-  - maintainer guide for Homebrew/Scoop/Winget distribution
+### LLM workspace
 
-## Open Source Governance Files
+- `docs/llm-context.md` — primary session bootstrap (read first)
+- `docs/strategy/ROADMAP.md` — iteration plan, open decisions, risks
+- `docs/specs/` — feature specs and design documents ([index](./specs/README.md))
 
-At repository root:
+### Human-facing guides
 
-- `LICENSE`
-- `CODE_OF_CONDUCT.md`
-- `SECURITY.md`
-- `CONTRIBUTING.md`
-- `CHANGELOG.md`
-- `install` (macOS/Linux release installer)
-- `install.ps1` (Windows release installer)
+- `docs/CONTRIBUTING.md` — contribution rules and validation checklist
+- `docs/RESUME_PROMPT.md` — copy/paste prompt templates for restarting an LLM session
+- `docs/RELEASE.md` — maintainer release checklist
+- `docs/RELEASE_RUNBOOK.md` — step-by-step release runbook
+- `docs/WORKFLOW.md` — branch strategy and PR process
+- `docs/FAQ.md` — quick answers for users and contributors
+- `docs/TROUBLESHOOTING.md` — common operational and environment issues
+- `docs/PACKAGE_MANAGERS.md` — Homebrew/Scoop distribution guide
 
-## Why this exists
+### Historical
 
-This project is optimized for token-efficient workflows.  
-These docs are intentionally layered so agents can:
-
-- load just enough context to start
-- avoid reading entire codebase up front
-- drill down into relevant files only when needed
+- `docs/plans/GLEAN_CLI_PLAN.md` — original v1 implementation plan (historical reference)

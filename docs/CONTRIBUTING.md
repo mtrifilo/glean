@@ -42,5 +42,5 @@ Before finalizing changes:
 For substantial behavior changes, update:
 
 - `README.md` for user-facing behavior
-- `docs/plans/GLEAN_CLI_PLAN.md` for roadmap/progress impact
+- `docs/strategy/ROADMAP.md` for roadmap/progress impact
 - `docs/llm-context.md` for future LLM session continuity
