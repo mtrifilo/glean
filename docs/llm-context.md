@@ -90,9 +90,8 @@ glean --tui
 
 The user directs priority. See `docs/strategy/ROADMAP.md` for planned iterations:
 
-1. v0.3.0 Phase 2 — Manual cross-platform validation (at release time)
-2. v0.4.0 — Developer Experience and Heuristic Safety
-3. v0.5.0 — Word Document and RTF Support (spec: `docs/specs/WORD_RTF_SUPPORT.md`)
+1. v0.4.0 — Developer Experience and Heuristic Safety
+2. v0.5.0 — Word Document and RTF Support (spec: `docs/specs/WORD_RTF_SUPPORT.md`)
 
 ## Scope Guardrails
 
