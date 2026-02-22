@@ -154,10 +154,11 @@ Run `decant` with no subcommand to enter interactive mode.
 - Uses defaults automatically (`clean`, aggressive off)
 - Does not prompt for mode/pruning choices during normal flow (use flags to override)
 - Detects HTML or RTF in clipboard and runs immediately (Word/TextEdit copies work automatically)
-- If clipboard has no convertible content, prompts you to copy and press Enter to retry
+- If clipboard has no convertible content, shows an animated spinner while you copy, then press Enter to retry
 - Copies parsed markdown to clipboard automatically
-- Shows current-run stats and session totals (tokens/chars saved)
-- Use `--tui` for a full-screen OpenTUI variant with styled stats panels, color-coded output, and live clipboard polling
+- Shows color-coded stats (chars/tokens saved with reduction percentages), session totals, and a truncated output preview
+- Respects `NO_COLOR` env var for plain-text fallback
+- Use `--tui` for a full-screen OpenTUI variant with bordered panels, live clipboard polling, and styled preview
 
 Session stats are persisted to `~/.decant/stats.json` by default.
 Set `DECANT_STATS_PATH` to override the stats file location.

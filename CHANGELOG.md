@@ -7,7 +7,19 @@ Semantic Versioning after `1.0.0`.
 
 ## [Unreleased]
 
-_No unreleased changes._
+### Changed
+
+- Polished interactive mode (`decant` with no subcommand) — colored output, animated spinner while waiting for clipboard, formatted stats with arrows and reduction highlights, session totals, word-wrapped markdown preview (72 chars, truncated at 16 visual lines). Matches the TUI's visual style without requiring full-screen mode.
+- Preview now shows raw markdown source with syntax highlighting (colored headings, bold markers, links, inline code, etc.) instead of rendered output. Markers like `**`, `#`, `[]()` stay visible but get colored for scannability.
+
+### Added
+
+- `src/lib/highlightMarkdown.ts` — regex-based ANSI syntax highlighting for raw markdown source (headings, bold, italic, links, inline code, code fences, blockquotes, lists, horizontal rules).
+- `src/lib/ansi.ts` — zero-dependency ANSI color utility. Respects `NO_COLOR` env var, `TERM=dumb`, and `FORCE_COLOR` per [no-color.org](https://no-color.org).
+
+### Removed
+
+- `marked` and `marked-terminal` dependencies — preview no longer renders markdown into display output.
 
 ## [0.6.1] - 2026-02-22
 
