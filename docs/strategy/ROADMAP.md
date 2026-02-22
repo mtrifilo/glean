@@ -24,34 +24,35 @@ For the full historical plan and milestone history, see `human-docs/archive/GLEA
 - [x] Integrate smoke check into CI as a required check
 - [x] "Tuning Heuristics" section in `CONTRIBUTING.md`
 
-### v0.5.0 — Word Document and RTF Support
+### v0.5.0 — Content Detection + RTF/DOC Support (Done)
 
-Auto-detect content type (HTML, RTF, DOCX) and route through the appropriate converter. The core pipeline stays unchanged — a new detection + conversion layer produces HTML, then reuses everything. Full spec: `docs/specs/WORD_RTF_SUPPORT.md`.
+Auto-detect content type (HTML, RTF, DOC) and convert via macOS `textutil` (zero new deps). The core pipeline stays unchanged — a new detection + conversion layer produces HTML, then reuses everything.
 
-**Phase 1 — Content Detection + RTF/DOC Support**
+- [x] `src/lib/contentDetect.ts` — consolidate duplicated `looksLikeHtml()`, add `looksLikeRtf()`, `isDocBytes()`, `detectFormat()`
+- [x] `src/lib/convert.ts` — `convertRtfToHtml()`, `convertDocToHtml()` via macOS `textutil`
+- [x] `readClipboardRtf()` in `io.ts`
+- [x] Wire detection into interactive + TUI clipboard polling
+- [x] Wire RTF/DOC path into `resolveHtmlInput()` in `cli.ts`
+- [x] Test fixtures + unit/integration tests for RTF/DOC path
 
-- [ ] `src/lib/contentDetect.ts` — consolidate duplicated `looksLikeHtml()`, add `looksLikeRtf()`, `isDocBytes()`, `detectFormat()`
-- [ ] `src/lib/convert.ts` — `convertRtfToHtml()`, `convertDocToHtml()` via macOS `textutil` (zero new deps)
-- [ ] `readClipboardRtf()` in `io.ts`
-- [ ] Wire detection into interactive + TUI clipboard polling
-- [ ] Wire RTF/DOC path into `runTransform()` in `cli.ts`
-- [ ] Test fixtures + unit/integration tests for RTF/DOC path
+### v0.6.0 — DOCX Support
 
-**Phase 2 — DOCX Support**
+Add DOCX file support via `mammoth.js`. Extends the content detection + conversion layer from v0.5.0. Full spec: `docs/specs/WORD_RTF_SUPPORT.md`.
+
+**Phase 1 — DOCX Conversion**
 
 - [ ] Add `mammoth` dependency
 - [ ] `isDocxBytes()` in `contentDetect.ts`, `readInputBytes()` in `io.ts`
 - [ ] `convertDocxToHtml()` in `convert.ts`
-- [ ] `src/pipeline/processContent.ts` — format-aware wrapper around `processHtml()`
 - [ ] Wire file-based DOCX path through CLI
 - [ ] Test fixtures + unit/integration tests for DOCX path
 
-**Phase 3 — Polish + Release**
+**Phase 2 — Stats Extension + Polish**
 
 - [ ] Add `sourceFormat` / `sourceChars` to `ContentStats`
 - [ ] Update dev scripts (`update-golden.ts`, `smoke-check.ts`) for new fixtures
 - [ ] Update docs (README, CHANGELOG, llm-context.md)
-- [ ] End-to-end validation, cut v0.5.0 release
+- [ ] End-to-end validation, cut v0.6.0 release
 
 ## Open Decisions
 
