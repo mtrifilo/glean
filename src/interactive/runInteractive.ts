@@ -1,10 +1,11 @@
 import { createInterface } from "node:readline/promises";
 import { stdin as input, stdout as output } from "node:process";
+import { marked } from "marked";
+import { markedTerminal } from "marked-terminal";
 import {
   accent,
   bold,
   clearLine,
-  dim,
   highlight,
   muted,
   statLabel,
@@ -46,99 +47,18 @@ function percent(value: number): string {
   return `${value.toFixed(2)}%`;
 }
 
-/**
- * Normalize raw markdown for preview display:
- * - Join continuation lines (fragments of links, sentences split mid-syntax)
- * - Collapse runs of blank lines into a single blank line
- * - Trim leading/trailing blanks
- */
-function normalizeForPreview(markdown: string): string[] {
-  const raw = markdown.trim().split("\n");
-  const joined: string[] = [];
+marked.use(markedTerminal({ reflowText: true, width: 72 }));
 
-  for (let i = 0; i < raw.length; i++) {
-    const line = raw[i];
-    // A continuation line: doesn't start a new block element and the
-    // previous line looks incomplete (e.g. ends mid-link or has unmatched brackets)
-    const prev = joined.length > 0 ? joined[joined.length - 1] : "";
-    const isContinuation =
-      line.trim() !== "" &&
-      !/^(#{1,6}\s|>\s|[-*]\s|\d+\.\s|```|---)/.test(line) &&
-      prev.trim() !== "" &&
-      (hasUnmatchedBrackets(prev) || prev.endsWith("\\"));
-
-    if (isContinuation) {
-      joined[joined.length - 1] = `${prev} ${line.trim()}`;
-    } else {
-      joined.push(line);
-    }
-  }
-
-  // Collapse consecutive blank lines
-  const collapsed: string[] = [];
-  let lastBlank = false;
-  for (const line of joined) {
-    const blank = line.trim() === "";
-    if (blank && lastBlank) continue;
-    collapsed.push(line);
-    lastBlank = blank;
-  }
-
-  // Trim leading/trailing blank lines
-  while (collapsed.length > 0 && collapsed[0].trim() === "") collapsed.shift();
-  while (collapsed.length > 0 && collapsed[collapsed.length - 1].trim() === "") collapsed.pop();
-
-  return collapsed;
-}
-
-function hasUnmatchedBrackets(line: string): boolean {
-  let depth = 0;
-  for (const ch of line) {
-    if (ch === "[") depth++;
-    else if (ch === "]") depth--;
-  }
-  return depth !== 0;
-}
-
-function highlightLine(line: string): string {
-  // Headings
-  if (/^#{1,6}\s/.test(line)) {
-    return bold(accent(line));
-  }
-  // Blockquotes
-  if (/^>\s/.test(line)) {
-    return dim(line);
-  }
-  // Horizontal rules
-  if (/^(-{3,}|\*{3,}|_{3,})\s*$/.test(line)) {
-    return muted(line);
-  }
-  // List items
-  const listMatch = line.match(/^(\s*(?:[-*]|\d+\.)\s)(.*)/);
-  if (listMatch) {
-    return accent(listMatch[1]) + highlightInline(listMatch[2]);
-  }
-  // Blank
-  if (!line.trim()) return "";
-  // Regular text
-  return highlightInline(line);
-}
-
-function highlightInline(text: string): string {
-  return text
-    .replace(/(\*\*|__)(.+?)\1/g, (_m, _d, content) => bold(content))
-    .replace(/`([^`]+)`/g, (_m, code) => muted(`\`${code}\``))
-    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_m, t, url) => `${accent(t)} ${dim(`(${url})`)}`);
-}
-
-function previewLines(markdown: string, limit = 10): string[] {
+function renderPreviewMarkdown(markdown: string, limit = 12): string {
   const trimmed = markdown.trim();
-  if (!trimmed) return [muted("(empty output)")];
-  const normalized = normalizeForPreview(trimmed);
-  const total = normalized.length;
-  const slice = normalized.slice(0, limit).map(highlightLine);
-  if (total <= limit) return slice;
-  return [...slice, muted(`... (${fmt(total)} lines total)`)];
+  if (!trimmed) return muted("(empty output)");
+
+  const rendered = (marked(trimmed) as string).trimEnd();
+  const lines = rendered.split("\n");
+  const total = lines.length;
+
+  if (total <= limit) return rendered;
+  return [...lines.slice(0, limit), muted(`... (${fmt(total)} lines total)`)].join("\n");
 }
 
 function printIntro(mode: StatsMode, aggressive: boolean): void {
@@ -236,7 +156,11 @@ function renderSession(session: {
 }
 
 function renderPreview(markdown: string): string {
-  return renderSection("Preview", previewLines(markdown));
+  return [
+    accent("Preview"),
+    muted(SEPARATOR),
+    renderPreviewMarkdown(markdown),
+  ].join("\n");
 }
 
 function renderSummary(
