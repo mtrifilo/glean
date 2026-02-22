@@ -47,9 +47,14 @@ function percent(value: number): string {
   return `${value.toFixed(2)}%`;
 }
 
-marked.use(markedTerminal({ reflowText: true, width: 72 }));
+let markedReady = false;
 
 function renderPreviewMarkdown(markdown: string, limit = 12): string {
+  if (!markedReady) {
+    marked.use(markedTerminal({ reflowText: true, width: 72 }));
+    markedReady = true;
+  }
+
   const trimmed = markdown.trim();
   if (!trimmed) return muted("(empty output)");
 
