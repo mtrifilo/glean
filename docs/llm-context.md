@@ -93,10 +93,14 @@ glean --tui
 
 ## Current Priorities
 
-The user directs priority. See `docs/strategy/ROADMAP.md` for planned iterations:
+The user directs priority. See `docs/strategy/ROADMAP.md` for planned iterations.
 
-1. v0.4.0 — Developer Experience and Heuristic Safety
-2. v0.5.0 — Word Document and RTF Support (spec: `docs/specs/WORD_RTF_SUPPORT.md`)
+- v0.4.0 — Developer Experience and Heuristic Safety (Done, merged, not released — dev tooling only)
+- v0.5.0 — Word Document and RTF Support (3 phases)
+  - Phase 1: Content detection foundation + RTF/DOC support via `textutil` (zero new deps)
+  - Phase 2: DOCX file support via `mammoth.js`
+  - Phase 3: Stats extension, docs, release
+  - Full spec: `docs/specs/WORD_RTF_SUPPORT.md`
 
 ## Scope Guardrails
 
