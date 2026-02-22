@@ -17,12 +17,12 @@ For the full historical plan and milestone history, see `human-docs/archive/GLEA
 - [x] `glean update` upgrade-path validation (v0.2.0 → v0.3.0)
 - [x] Smoke test workflow passed on all 3 platforms (linux-x64, darwin-arm64, windows-x64)
 
-### v0.4.0 — Developer Experience and Heuristic Safety
+### v0.4.0 — Developer Experience and Heuristic Safety (Done)
 
-- Golden fixture update script (`scripts/update-golden.ts`)
-- Smoke check with threshold guards (`scripts/smoke-check.ts`)
-- Integrate smoke check into CI as a required check
-- "Tuning Heuristics" section in `human-docs/CONTRIBUTING.md`
+- [x] Golden fixture update script (`scripts/update-golden.ts`)
+- [x] Smoke check with threshold guards (`scripts/smoke-check.ts`)
+- [x] Integrate smoke check into CI as a required check
+- [x] "Tuning Heuristics" section in `CONTRIBUTING.md`
 
 ### v0.5.0 — Word Document and RTF Support
 
