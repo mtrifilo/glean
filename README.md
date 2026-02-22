@@ -1,5 +1,9 @@
 # decant
 
+[![CI](https://img.shields.io/github/actions/workflow/status/mtrifilo/decant/ci.yml?branch=main&label=build)](https://github.com/mtrifilo/decant/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/mtrifilo/decant?color=blue)](https://github.com/mtrifilo/decant/releases/latest)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green)](./LICENSE)
+
 Token-efficient document-to-markdown for LLMs. Local, fast, interactive.
 
 ## Just `decant`
