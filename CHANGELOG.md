@@ -7,6 +7,8 @@ Semantic Versioning after `1.0.0`.
 
 ## [Unreleased]
 
+## [0.8.0] - 2026-02-22
+
 ### Added
 
 - PDF file support via `unpdf` — cross-platform, text-based PDF extraction.
