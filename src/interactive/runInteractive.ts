@@ -4,6 +4,7 @@ import {
   accent,
   bold,
   clearLine,
+  dim,
   highlight,
   muted,
   statLabel,
@@ -45,16 +46,48 @@ function percent(value: number): string {
   return `${value.toFixed(2)}%`;
 }
 
+function highlightMarkdownLine(line: string): string {
+  // Headings: # … → accent + bold
+  if (/^#{1,6}\s/.test(line)) {
+    return bold(accent(line));
+  }
+  // Blockquotes: > … → dim
+  if (/^>\s/.test(line)) {
+    return dim(line);
+  }
+  // Horizontal rules
+  if (/^(-{3,}|\*{3,}|_{3,})\s*$/.test(line)) {
+    return muted(line);
+  }
+  // List bullets: -, *, or 1. → accent bullet, rest normal
+  const listMatch = line.match(/^(\s*(?:[-*]|\d+\.)\s)(.*)/);
+  if (listMatch) {
+    return accent(listMatch[1]) + highlightInline(listMatch[2]);
+  }
+  // Empty lines
+  if (!line.trim()) return "";
+  // Everything else: inline highlighting
+  return highlightInline(line);
+}
+
+function highlightInline(text: string): string {
+  return text
+    // Bold: **text** or __text__
+    .replace(/(\*\*|__)(.+?)\1/g, (_m, _d, content) => bold(content))
+    // Inline code: `code`
+    .replace(/`([^`]+)`/g, (_m, code) => muted(`\`${code}\``))
+    // Links: [text](url) → text visible, url dimmed
+    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_m, text, url) => `${text} ${dim(`(${url})`)}`);
+}
+
 function previewLines(markdown: string, limit = 8): string[] {
   const trimmed = markdown.trim();
-  if (!trimmed) return ["(empty output)"];
+  if (!trimmed) return [muted("(empty output)")];
   const lines = trimmed.split("\n");
   const total = lines.length;
-  if (total <= limit) return lines.map((l) => muted(l));
-  return [
-    ...lines.slice(0, limit).map((l) => muted(l)),
-    muted(`... (${fmt(total)} lines total)`),
-  ];
+  const slice = lines.slice(0, limit).map(highlightMarkdownLine);
+  if (total <= limit) return slice;
+  return [...slice, muted(`... (${fmt(total)} lines total)`)];
 }
 
 function printIntro(mode: StatsMode, aggressive: boolean): void {
