@@ -26,6 +26,7 @@ Use this file as the primary context bootstrap for coding sessions.
 - Open-source/release scaffolding is present:
   - `.github` issue/PR templates and CI/release workflows
   - installer scripts: `install`, `install.ps1`
+- **Latest release:** v0.3.0
 - Latest known automated status: tests passing (`bun test`).
 
 ## Fast Command Cheat Sheet
@@ -90,7 +91,7 @@ glean --tui
 
 The user directs priority. See `docs/strategy/ROADMAP.md` for planned iterations:
 
-1. v0.3.0 Phase 2 — Manual cross-platform validation (at release time)
+1. v0.3.0 Phase 2 — Manual cross-platform installer + update validation (v0.3.0 released, ready to validate)
 2. v0.4.0 — Developer Experience and Heuristic Safety
 3. v0.5.0 — Word Document and RTF Support (spec: `docs/specs/WORD_RTF_SUPPORT.md`)
 
