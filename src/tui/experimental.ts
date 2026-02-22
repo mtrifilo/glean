@@ -123,7 +123,7 @@ export async function runExperimentalTui(options: TuiRunOptions): Promise<boolea
           }),
           // Helper text
           Text({
-            content: "Copy HTML from Chrome DevTools",
+            content: "Copy HTML, RTF, or Word content",
             fg: MUTED,
           }),
           Text({
