@@ -83,3 +83,29 @@ export async function readClipboardText(): Promise<string | null> {
   }
 }
 
+export async function readClipboardRtf(): Promise<string | null> {
+  if (process.platform !== "darwin") {
+    return null;
+  }
+
+  try {
+    const proc = Bun.spawn(["pbpaste", "-Prefer", "rtf"], {
+      stdout: "pipe",
+      stderr: "pipe",
+    });
+
+    const [exitCode, output] = await Promise.all([
+      proc.exited,
+      new Response(proc.stdout).text(),
+    ]);
+
+    if (exitCode !== 0) {
+      return null;
+    }
+
+    return output;
+  } catch {
+    return null;
+  }
+}
+

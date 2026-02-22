@@ -1,6 +1,8 @@
 import { createInterface } from "node:readline/promises";
 import { stdin as input, stdout as output } from "node:process";
-import { copyToClipboard, readClipboardText } from "../lib/io";
+import { detectFormat } from "../lib/contentDetect";
+import { convertRtfToHtml } from "../lib/convert";
+import { copyToClipboard, readClipboardRtf, readClipboardText } from "../lib/io";
 import { recordRunStats } from "../lib/sessionStats";
 import type { StatsMode, TransformOptions } from "../lib/types";
 import { processHtml } from "../pipeline/processHtml";
@@ -22,18 +24,6 @@ function defaultTransformOptions(aggressive: boolean): TransformOptions {
   };
 }
 
-function looksLikeHtml(value: string): boolean {
-  if (!value.trim()) {
-    return false;
-  }
-
-  if (/<[a-zA-Z][\w:-]*(\s[^>]*)?>/.test(value)) {
-    return true;
-  }
-
-  return /&lt;[a-zA-Z][\w:-]*/.test(value);
-}
-
 function percent(value: number): string {
   return `${value.toFixed(2)}%`;
 }
@@ -49,18 +39,33 @@ function printIntro(): void {
   process.stdout.write(`${intro.join("\n")}`);
 }
 
-async function waitForClipboardHtml(): Promise<string> {
-  const firstClipboardRead = await readClipboardText();
-  if (firstClipboardRead && looksLikeHtml(firstClipboardRead)) {
-    return firstClipboardRead;
+async function resolveClipboard(): Promise<string | null> {
+  const text = await readClipboardText();
+  if (text) {
+    const format = detectFormat(text);
+    if (format === "html") return text;
+    if (format === "rtf") return convertRtfToHtml(text);
   }
+
+  const rtf = await readClipboardRtf();
+  if (rtf) {
+    const format = detectFormat(rtf);
+    if (format === "rtf") return convertRtfToHtml(rtf);
+  }
+
+  return null;
+}
+
+async function waitForClipboardContent(): Promise<string> {
+  const first = await resolveClipboard();
+  if (first) return first;
 
   const rl = createInterface({ input, output });
   try {
     while (true) {
       const answer = (
         await rl.question(
-          "No HTML-like content in clipboard. Copy HTML from DevTools, then press Enter to retry (q to cancel): ",
+          "No convertible content in clipboard. Copy HTML from DevTools or content from Word, then press Enter to retry (q to cancel): ",
         )
       )
         .trim()
@@ -70,12 +75,10 @@ async function waitForClipboardHtml(): Promise<string> {
         throw new Error("Interactive mode canceled.");
       }
 
-      const clipboardText = await readClipboardText();
-      if (clipboardText && looksLikeHtml(clipboardText)) {
-        return clipboardText;
-      }
+      const resolved = await resolveClipboard();
+      if (resolved) return resolved;
 
-      process.stdout.write("Still no HTML-like clipboard content detected.\n");
+      process.stdout.write("Still no convertible clipboard content detected.\n");
     }
   } finally {
     rl.close();
@@ -121,7 +124,7 @@ export async function runInteractive(options: InteractiveOptions): Promise<void>
   }
 
   printIntro();
-  const html = await waitForClipboardHtml();
+  const html = await waitForClipboardContent();
 
   if (!html.trim()) {
     throw new Error("No HTML was provided in clipboard.");
