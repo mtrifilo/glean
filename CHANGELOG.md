@@ -7,9 +7,19 @@ Semantic Versioning after `1.0.0`.
 
 ## [Unreleased]
 
+### Added
+
+- DOCX file support via `mammoth.js` — cross-platform, no macOS dependency required.
+  - File: `decant clean -i file.docx`.
+  - Auto-detected by ZIP magic bytes in content detection layer.
+- `--verbose` flag on `clean`, `extract`, and `stats` commands — shows conversion warnings (e.g. mammoth messages during DOCX processing).
+- `readInputBytes()` binary I/O helper for file-based binary format reading.
+
 ### Changed
 
 - **Project renamed from `glean` to `decant`** — CLI command, binary names, env vars (`GLEAN_*` → `DECANT_*`), config paths (`~/.glean/` → `~/.decant/`), GitHub URLs, installers, CI workflows, and all documentation updated. Historical changelog entries below are preserved as-is.
+- `--input` help text updated to indicate DOCX support alongside HTML, RTF, and DOC.
+- Content detection now recognizes DOCX (ZIP) magic bytes (`isDocxBytes()`).
 
 ## [0.5.0] - 2026-02-21
 

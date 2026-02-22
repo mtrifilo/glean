@@ -9,6 +9,25 @@ export function hasPipedStdin(): boolean {
   }
 }
 
+export async function readInputBytes(inputPath?: string): Promise<Uint8Array> {
+  if (inputPath) {
+    const file = Bun.file(inputPath);
+    if (!(await file.exists())) {
+      throw new Error(`Input file not found: ${inputPath}`);
+    }
+
+    return new Uint8Array(await file.arrayBuffer());
+  }
+
+  if (!hasPipedStdin()) {
+    throw new Error(
+      "No input detected. Pipe input through stdin or pass --input <path>.",
+    );
+  }
+
+  return new Uint8Array(await new Response(Bun.stdin.stream()).arrayBuffer());
+}
+
 export async function readInput(inputPath?: string): Promise<string> {
   if (inputPath) {
     const file = Bun.file(inputPath);

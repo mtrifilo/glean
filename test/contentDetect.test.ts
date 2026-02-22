@@ -2,6 +2,7 @@ import { describe, expect, test } from "bun:test";
 import {
   detectFormat,
   isDocBytes,
+  isDocxBytes,
   looksLikeHtml,
   looksLikeRtf,
 } from "../src/lib/contentDetect";
@@ -69,6 +70,32 @@ describe("isDocBytes", () => {
   });
 });
 
+describe("isDocxBytes", () => {
+  test("detects ZIP magic bytes", () => {
+    const zip = new Uint8Array([0x50, 0x4b, 0x03, 0x04, 0x00, 0x00]);
+    expect(isDocxBytes(zip)).toBe(true);
+  });
+
+  test("returns false for too-short buffer", () => {
+    const short = new Uint8Array([0x50, 0x4b]);
+    expect(isDocxBytes(short)).toBe(false);
+  });
+
+  test("returns false for wrong bytes", () => {
+    const wrong = new Uint8Array([0x00, 0x00, 0x00, 0x00]);
+    expect(isDocxBytes(wrong)).toBe(false);
+  });
+
+  test("returns false for empty buffer", () => {
+    expect(isDocxBytes(new Uint8Array(0))).toBe(false);
+  });
+
+  test("returns false for OLE2 (DOC) bytes", () => {
+    const ole2 = new Uint8Array([0xd0, 0xcf, 0x11, 0xe0, 0xa1, 0xb1, 0x1a, 0xe1]);
+    expect(isDocxBytes(ole2)).toBe(false);
+  });
+});
+
 describe("detectFormat", () => {
   test("detects HTML from string", () => {
     expect(detectFormat("<div>hello</div>")).toBe("html");
@@ -109,5 +136,15 @@ describe("detectFormat", () => {
   test("returns unknown from Uint8Array with plain text", () => {
     const plainBytes = new TextEncoder().encode("just text");
     expect(detectFormat(plainBytes)).toBe("unknown");
+  });
+
+  test("detects DOCX from Uint8Array (ZIP magic)", () => {
+    const zipBytes = new Uint8Array([0x50, 0x4b, 0x03, 0x04, 0x00, 0x00]);
+    expect(detectFormat(zipBytes)).toBe("docx");
+  });
+
+  test("DOC (OLE2) takes priority over DOCX (ZIP)", () => {
+    const docMagic = new Uint8Array([0xd0, 0xcf, 0x11, 0xe0, 0xa1, 0xb1, 0x1a, 0xe1]);
+    expect(detectFormat(docMagic)).toBe("doc");
   });
 });

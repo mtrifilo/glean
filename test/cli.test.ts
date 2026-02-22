@@ -146,6 +146,42 @@ describe("decant cli", () => {
   });
 });
 
+describe("DOCX input", () => {
+  test("clean converts DOCX file via --input", async () => {
+    const expected = (await readFixture("sample.docx.expected.md")).trim();
+    const result = await runCli(["clean", "-i", "test/fixtures/sample.docx"]);
+
+    expect(result.exitCode).toBe(0);
+    expect(result.stdout).toBe(expected);
+  });
+
+  test("extract converts DOCX file", async () => {
+    const result = await runCli(["extract", "-i", "test/fixtures/sample.docx"]);
+
+    expect(result.exitCode).toBe(0);
+    expect(result.stdout).toContain("Sample Document");
+    expect(result.stdout).toContain("Section One");
+  });
+
+  test("stats works with DOCX file input", async () => {
+    const result = await runCli(["stats", "-i", "test/fixtures/sample.docx", "--format", "json"]);
+    const parsed = JSON.parse(result.stdout) as {
+      inputChars: number;
+      outputChars: number;
+    };
+
+    expect(result.exitCode).toBe(0);
+    expect(parsed.inputChars).toBeGreaterThan(0);
+  });
+
+  test("--verbose flag is accepted", async () => {
+    const result = await runCli(["clean", "-i", "test/fixtures/sample.docx", "--verbose"]);
+
+    expect(result.exitCode).toBe(0);
+    expect(result.stdout).toContain("Sample Document");
+  });
+});
+
 const isMacOS = process.platform === "darwin";
 
 describe("RTF/DOC input", () => {
