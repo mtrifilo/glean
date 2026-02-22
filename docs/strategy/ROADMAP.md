@@ -54,6 +54,26 @@ Add DOCX file support via `mammoth.js`. Extends the content detection + conversi
 - [ ] Update docs (README, CHANGELOG, llm-context.md)
 - [ ] End-to-end validation, cut v0.6.0 release
 
+### v0.6.1 — Rename to `whet`
+
+Rename the project from `glean` to `whet` ("to sharpen"). The name `glean` conflicts with Meta's [facebookincubator/glean](https://github.com/facebookincubator/glean) code indexing system. `whet` is short, memorable, and the metaphor fits — sharpening documents for LLM consumption.
+
+This is a full sweep across the entire project:
+
+- [ ] CLI command: `glean` → `whet`
+- [ ] Package name in `package.json`
+- [ ] Namespace: `.glean/` → `.whet/`, `GLEAN_*` env vars → `WHET_*`
+- [ ] All code references, imports, comments
+- [ ] README, CHANGELOG, all docs
+- [ ] Installer scripts (`install`, `install.ps1`)
+- [ ] Homebrew tap (`homebrew-tap`) and Scoop bucket (`scoop-bucket`)
+- [ ] GitHub repo rename (`mtrifilo/glean` → `mtrifilo/whet`)
+- [ ] GitHub releases, CI workflows
+- [ ] Binary artifact names
+- [ ] Update `glean update` → `whet update` self-update logic
+
+Should land before major new features ship to avoid a rename after the tool gains broader adoption.
+
 #### Tier 1 — Core Differentiators
 
 *What makes people try Glean. Table-stakes format support plus the LLM-workflow and UX features no other tool offers.*
