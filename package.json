@@ -1,6 +1,6 @@
 {
   "name": "glean",
-  "version": "0.3.0",
+  "version": "0.5.0",
   "description": "CLI to clean noisy HTML and convert it to markdown for LLM context.",
   "type": "module",
   "private": true,
