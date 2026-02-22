@@ -1,6 +1,6 @@
 # Glean Roadmap (Active)
 
-For the full historical plan and milestone history, see `human-docs/archive/GLEAN_CLI_PLAN_V1.md`.
+For the full historical plan and milestone history, see `docs/plans/GLEAN_CLI_PLAN.md`.
 
 ## Post-v1 Iterations
 
@@ -53,6 +53,97 @@ Add DOCX file support via `mammoth.js`. Extends the content detection + conversi
 - [ ] Update dev scripts (`update-golden.ts`, `smoke-check.ts`) for new fixtures
 - [ ] Update docs (README, CHANGELOG, llm-context.md)
 - [ ] End-to-end validation, cut v0.6.0 release
+
+### v0.7.0 — PDF Support
+
+Extract text from PDF files. PDFs are one of the most common document types people need to feed into LLMs. Likely requires a library like `pdf-parse` or `pdfjs-dist`. Needs to handle text-based PDFs; scanned/image PDFs can defer to OCR support in a later iteration.
+
+### v0.8.0 — URL Fetching
+
+Fetch and convert web pages directly (`glean clean --url https://...`). Skips the copy-paste-from-browser step entirely — the single biggest friction point in the current workflow. Needs to handle fetching, stripping chrome/nav/footer, and feeding the content HTML into the existing pipeline.
+
+### v0.9.0 — TUI Enhancements
+
+Major upgrade to the full-screen TUI (`--tui`). Preserves the zero-friction clipboard-first default while layering in interactivity. Currently the TUI is single-shot with a plain text preview — this iteration makes it a polished, re-usable workspace.
+
+- **URL detection in clipboard** — polling loop detects URLs and auto-fetches + converts (requires v0.8.0 URL fetching). No new flags — just paste a URL instead of HTML.
+- **Syntax-highlighted markdown preview** — color headings, bold, code blocks, links, lists, and blockquotes using regex-based highlighting with OpenTUI's per-text `fg` colors.
+- **Scrollable preview** — replace the 20-line hard cap with `j`/`k` or arrow key scrolling so users can inspect the full output.
+- **Option toggling without restarting** — press `a` to toggle aggressive mode, `m` to switch clean/extract, and re-process instantly from the results screen (input stays in memory).
+- **Continuous mode** — after processing, return to the waiting screen for the next clipboard change instead of exiting. Process multiple items in sequence. Press `q` to exit when done.
+- **Keyboard shortcut bar** — persistent contextual footer showing available keys (e.g. `[a] aggressive  [m] mode  [↑↓] scroll  [q] quit`). Updates based on current screen state.
+
+### v0.10.0 — Token Budget
+
+Add `--max-tokens N` flag to truncate or intelligently trim output to fit a context window. Extremely practical for LLM workflows where users need to stay within a token limit. Consider smart truncation strategies (sentence boundaries, section boundaries) vs. hard cutoff.
+
+### v0.11.0 — Image OCR
+
+Extract text from images (PNG, JPG, TIFF, etc.) using OCR. Covers screenshots, photos of documents, scanned PDFs, and other image-based text. Evaluate options like `tesseract.js` (local, zero external deps) vs. cloud OCR APIs.
+
+### v0.12.0 — Batch Processing
+
+Process multiple files or an entire directory at once (`glean clean -i ./docs/`). Output individual markdown files or concatenated output. Enables bulk conversion workflows — becomes a force multiplier as format support grows.
+
+### v0.13.0 — Config File
+
+Support a `.gleanrc` or `.glean/config.toml` for persisting default options. As the option surface grows (max-tokens, aggressive, output format, etc.), users shouldn't have to repeat flags every time. Support project-level and user-level config with sensible merge behavior.
+
+### v0.14.0 — PowerPoint / Keynote Support
+
+Extract text from presentation files (.pptx, .key). Slide decks are a common source of text content in professional settings. Evaluate `pptx-parser` or similar libraries. Keynote may be convertible via macOS `textutil` or Automator.
+
+### v0.15.0 — Section Filtering
+
+Extract specific sections of a document by heading name, heading level, or CSS selector instead of converting the entire document. Useful for pulling a single chapter, section, or content block from a large document.
+
+### v0.16.0 — Output Formats
+
+Add `--format json` for structured output (title, body, metadata, stats) and `--format text` for plain text (no markdown syntax). JSON output enables programmatic integration with other tools and pipelines.
+
+### v0.17.0 — EPUB Support
+
+Extract text from EPUB e-books. EPUBs are ZIP archives containing XHTML — the existing HTML pipeline can be reused once content is unpacked. Evaluate lightweight EPUB parsing libraries or direct ZIP + XHTML extraction.
+
+### v0.18.0 — Chunking for RAG
+
+Split long documents into sized chunks for RAG ingestion pipelines (`--chunk-size 1000 --chunk-overlap 100`). Output as multiple files or JSON array. Critical for users building retrieval-augmented generation systems.
+
+### v0.19.0 — Output to File
+
+Smart output-to-file with auto-naming (`glean clean -i report.pdf -o` → `report.md`). Support explicit output path (`-o output.md`) and auto-derived names. For batch processing, output to a mirrored directory structure.
+
+### v0.20.0 — Email Support (.eml / .mbox)
+
+Extract body text from saved email files. Handles both individual `.eml` files and `.mbox` archives. Needs to handle MIME multipart (HTML + plain text alternatives), strip signatures/quoted replies, and handle attachments gracefully.
+
+### v0.21.0 — Diff Mode
+
+Show a before/after comparison of what was removed during cleaning (`glean clean -i page.html --diff`). Useful for understanding what the pipeline is stripping and for tuning options. Consider side-by-side vs. unified diff output.
+
+### v0.22.0 — Verbose Stats
+
+Extended stats breakdown beyond token/char counts — section count, heading structure, image count, link count, table count, estimated reading time. Useful for understanding document structure at a glance.
+
+### v0.23.0 — Quality Score
+
+Estimate how "clean" the output is — ratio of meaningful content to boilerplate, formatting noise, or repeated patterns. Helps users decide whether to use `clean` vs. `extract`, or whether `--aggressive` is needed.
+
+### v0.24.0 — LaTeX Support
+
+Convert LaTeX `.tex` files to clean markdown. Academic papers and technical documents commonly use LaTeX. Since `.tex` is already plain text, this is primarily a syntax transformation (stripping preambles, converting commands to markdown equivalents). Evaluate `pandoc` as a conversion backend vs. custom parsing.
+
+### v0.25.0 — CSV/TSV to Markdown Tables
+
+Convert tabular data files (CSV, TSV) into markdown tables. Useful for feeding spreadsheet exports and data files into LLMs in a readable format. Handle edge cases like large files (truncation/sampling), quoted fields, and encoding detection.
+
+### v0.26.0 — Prompt Wrapping
+
+Wrap output in a user-defined template (`--wrap "Summarize the following document:\n\n{content}"`). Supports template strings with `{content}`, `{filename}`, `{stats}` placeholders. Saves a manual step when feeding output directly into LLM prompts.
+
+### v0.27.0 — Watch Mode
+
+Monitor the clipboard or a directory for new content and auto-convert as it appears (`glean --watch` or `glean --watch-dir ./inbox/`). Enables continuous workflows where users repeatedly copy content and want it cleaned automatically. Note: approaches `ctxkit` scope boundary — evaluate whether this belongs here or in a separate tool.
 
 ## Open Decisions
 
