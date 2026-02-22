@@ -9,6 +9,12 @@ Semantic Versioning after `1.0.0`.
 
 _No unreleased changes._
 
+## [0.6.1] - 2026-02-22
+
+### Fixed
+
+- Lifetime session stats (runs, tokens saved) no longer reset after upgrading from the pre-rename `glean` builds. On first run, stats from `~/.glean/stats.json` are merged into `~/.decant/stats.json` and the legacy file is removed.
+
 ## [0.6.0] - 2026-02-22
 
 ### Added
