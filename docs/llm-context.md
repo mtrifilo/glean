@@ -4,8 +4,8 @@
 
 ## Recent Work
 
+- v0.8.0 in progress — PDF text extraction via `unpdf` (MIT, cross-platform). Added `isPdfBytes()`, `convertPdfToHtml()`, wired into CLI `resolveHtmlInput()`. Test fixture + full test coverage (detection, conversion, CLI integration).
 - v0.7.0 shipped — interactive mode polish (colors, spinner, formatted stats, word-wrapped preview) + raw markdown syntax highlighting replacing `marked`/`marked-terminal`. Added `src/lib/highlightMarkdown.ts`, `src/lib/ansi.ts`, `test/preview.test.ts`.
-- README badges added (CI, release, license)
 - TUI file drop research — documented terminal drag-and-drop across iTerm2/Kitty/WezTerm/Ghostty, studied OpenCode's implementation, wrote spec at `docs/specs/TUI_FILE_DROP.md` (v0.11.0)
 - v0.6.1 — renamed project from `glean` to `decant` (CLI, env vars, paths, docs, CI, installers)
 - v0.6.0 — DOCX file support via `mammoth.js`, source tracking in stats, `--verbose` flag
@@ -13,13 +13,13 @@
 
 ## Checkpoint
 
-- **Current state:** v0.7.0 shipped. Interactive mode polished with colors, spinner, raw-markdown syntax-highlighted preview. 93 tests passing, 2 skipped, across 6 test files (174 expect() calls).
-- **What's working:** HTML, RTF, DOC, and DOCX → clean markdown. Interactive mode has visual parity with TUI (colors, formatted stats, syntax-highlighted preview). All CLI paths working. Preview uses custom regex highlighter (no external rendering deps).
-- **What's next:** See `docs/strategy/ROADMAP.md` — next up is PDF support (v0.8.0).
+- **Current state:** v0.8.0 PDF support implemented. 108 tests passing (106 + 2 skipped), 201 expect() calls across 6 test files.
+- **What's working:** HTML, RTF, DOC, DOCX, and PDF → clean markdown. PDF uses `unpdf` for text extraction, cross-platform. Scanned/image PDFs return a placeholder comment (OCR deferred to v0.22.0).
+- **What's next:** See `docs/strategy/ROADMAP.md` — next up is URL fetching (v0.9.0).
 
 ## Product Intent
 
-Keep `decant` laser-focused on the HTML/RTF/DOC/DOCX → clean markdown workflow. Minimize friction: fast default behavior, clipboard-first, useful stats. Preserve scriptability and power-user workflows.
+Keep `decant` laser-focused on the HTML/RTF/DOC/DOCX/PDF → clean markdown workflow. Minimize friction: fast default behavior, clipboard-first, useful stats. Preserve scriptability and power-user workflows.
 
 ## Task Routing
 
@@ -41,6 +41,7 @@ Keep `decant` laser-focused on the HTML/RTF/DOC/DOCX → clean markdown workflow
 | RTF support | Stable | Clipboard + file + pipe, macOS `textutil` |
 | DOC support | Stable | File input, macOS `textutil` |
 | DOCX support | Stable | File input via `mammoth.js`, cross-platform |
+| PDF support | Stable | File input via `unpdf`, cross-platform, text-based |
 | Interactive mode | Stable | Clipboard-first, auto-detect HTML/RTF |
 | TUI mode | Stable | OpenTUI full-screen, clipboard polling |
 | Dev tooling | Stable | Golden fixtures, smoke check, CI integration |
@@ -67,6 +68,10 @@ cat document.rtf | decant clean
 # DOCX input (cross-platform)
 decant clean -i document.docx
 decant clean -i document.docx --verbose
+
+# PDF input (cross-platform, text-based)
+decant clean -i document.pdf
+decant clean -i document.pdf --verbose
 
 # Full-screen TUI path
 decant --tui
@@ -104,8 +109,8 @@ decant --tui
 
 - `src/lib/ansi.ts` - zero-dep ANSI color helpers (accent, success, muted, highlight, bold, dim; respects `NO_COLOR` and `FORCE_COLOR`)
 - `src/lib/highlightMarkdown.ts` - regex-based ANSI syntax highlighting for raw markdown source
-- `src/lib/contentDetect.ts` - format detection (`ContentFormat`, `detectFormat`, `looksLikeHtml`, `looksLikeRtf`, `isDocBytes`, `isDocxBytes`)
-- `src/lib/convert.ts` - RTF/DOC → HTML via macOS `textutil`, DOCX → HTML via `mammoth.js`
+- `src/lib/contentDetect.ts` - format detection (`ContentFormat`, `detectFormat`, `looksLikeHtml`, `looksLikeRtf`, `isDocBytes`, `isDocxBytes`, `isPdfBytes`)
+- `src/lib/convert.ts` - RTF/DOC → HTML via macOS `textutil`, DOCX → HTML via `mammoth.js`, PDF → HTML via `unpdf`
 - `src/lib/io.ts` - stdin/file/clipboard I/O (`readInput`, `readInputBytes`, `readClipboardRtf`)
 - `src/lib/rules.ts` - cleanup heuristics
 - `src/lib/sessionStats.ts` - persistent session metrics
@@ -119,16 +124,16 @@ decant --tui
 ### Validation
 
 - `test/pipeline.test.ts` - pipeline behavior
-- `test/cli.test.ts` - command-level behavior (includes RTF + DOCX integration tests)
-- `test/contentDetect.test.ts` - content detection unit tests (HTML, RTF, DOC, DOCX)
-- `test/convert.test.ts` - RTF/DOC conversion tests (macOS-gated) + DOCX conversion tests (cross-platform)
+- `test/cli.test.ts` - command-level behavior (includes RTF, DOCX, PDF integration tests)
+- `test/contentDetect.test.ts` - content detection unit tests (HTML, RTF, DOC, DOCX, PDF)
+- `test/convert.test.ts` - RTF/DOC conversion tests (macOS-gated) + DOCX + PDF conversion tests (cross-platform)
 - `test/preview.test.ts` - preview rendering tests (syntax highlighting, truncation, inline patterns)
 - `test/update.test.ts` - update command unit + integration tests
 
 ## Priorities
 
-1. v0.8.0 — PDF support
-2. v0.9.0 — URL fetching
+1. v0.9.0 — URL fetching
+2. v0.10.0 — Token budget
 
 The user directs priority. See `docs/strategy/ROADMAP.md` for full iteration plan.
 

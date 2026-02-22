@@ -7,6 +7,17 @@ Semantic Versioning after `1.0.0`.
 
 ## [Unreleased]
 
+### Added
+
+- PDF file support via `unpdf` — cross-platform, text-based PDF extraction.
+  - File: `decant clean -i file.pdf`.
+  - Auto-detected by PDF magic bytes (`%PDF`) in content detection layer.
+  - Scanned/image-only PDFs return a placeholder comment (OCR planned for v0.22.0).
+- `isPdfBytes()` in content detection for PDF magic byte identification.
+- `convertPdfToHtml()` in convert module — extracts text, wraps in `<p>` tags.
+- `--verbose` logs page count to stderr for PDF files.
+- `sourceFormat: "pdf"` and `sourceChars` in stats JSON output for PDF inputs.
+
 ## [0.7.0] - 2026-02-22
 
 ### Changed

@@ -5,7 +5,7 @@ import { version } from "../package.json";
 import { runUpdate } from "./commands/update";
 import { runInteractive } from "./interactive/runInteractive";
 import { detectFormat } from "./lib/contentDetect";
-import { convertDocToHtml, convertDocxToHtml, convertRtfToHtml } from "./lib/convert";
+import { convertDocToHtml, convertDocxToHtml, convertPdfToHtml, convertRtfToHtml } from "./lib/convert";
 import { copyToClipboard, readInput, readInputBytes } from "./lib/io";
 import { recordRunStats } from "./lib/sessionStats";
 import type { StatsFormat, StatsMode, TransformOptions } from "./lib/types";
@@ -67,7 +67,7 @@ function parseStatsFormat(value: string): StatsFormat {
 
 function addCommonOptions(command: Command): Command {
   return command
-    .option("-i, --input <path>", "Read input from a file path (HTML, RTF, DOC, or DOCX)")
+    .option("-i, --input <path>", "Read input from a file path (HTML, RTF, DOC, DOCX, or PDF)")
     .option("--copy", "Copy command output to the macOS clipboard")
     .option("--keep-links", "Preserve markdown links (default behavior)")
     .option("--strip-links", "Strip links and keep only their text")
@@ -126,6 +126,13 @@ async function resolveHtmlInput(
   inputPath?: string,
   options?: { verbose?: boolean },
 ): Promise<ResolvedInput> {
+  if (inputPath && /\.pdf$/i.test(inputPath)) {
+    const bytes = await readInputBytes(inputPath);
+    const sourceChars = bytes.length;
+    const html = await convertPdfToHtml(bytes, { verbose: options?.verbose });
+    return { html, source: { sourceFormat: "pdf", sourceChars } };
+  }
+
   if (inputPath && /\.docx$/i.test(inputPath)) {
     const bytes = await readInputBytes(inputPath);
     const html = await convertDocxToHtml(bytes, { verbose: options?.verbose });

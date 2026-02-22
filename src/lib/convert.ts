@@ -1,4 +1,5 @@
 import mammoth from "mammoth";
+import { extractText, getDocumentProxy } from "unpdf";
 
 function assertMacOS(): void {
   if (process.platform !== "darwin") {
@@ -82,6 +83,43 @@ export async function convertDocxToHtml(
     const message = error instanceof Error ? error.message : String(error);
     throw new Error(
       `DOCX conversion failed: ${message}. Ensure the file is a valid .docx document.`,
+    );
+  }
+}
+
+function escapeHtml(text: string): string {
+  return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+export async function convertPdfToHtml(
+  buffer: Uint8Array,
+  options?: { verbose?: boolean },
+): Promise<string> {
+  try {
+    const doc = await getDocumentProxy(buffer);
+
+    if (options?.verbose) {
+      process.stderr.write(`pdf: ${doc.numPages} page(s)\n`);
+    }
+
+    const result = await extractText(doc, { mergePages: false });
+    const text = (result.text as string[]).join("\n\n");
+
+    if (!text.trim()) {
+      return "<!-- PDF contained no extractable text (scanned/image PDF?) -->";
+    }
+
+    const paragraphs = text.split(/\n\n+/);
+    const htmlParagraphs = paragraphs
+      .map((p) => p.trim())
+      .filter((p) => p.length > 0)
+      .map((p) => `<p>${escapeHtml(p).replace(/\n/g, "<br>")}</p>`);
+
+    return htmlParagraphs.join("\n");
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    throw new Error(
+      `PDF conversion failed: ${message}. Ensure the file is a valid PDF document.`,
     );
   }
 }

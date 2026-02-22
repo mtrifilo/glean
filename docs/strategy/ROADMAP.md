@@ -88,9 +88,29 @@ Polished interactive mode UX and replaced rendered markdown preview with raw-sou
 
 *What makes people try Decant. Table-stakes format support plus the LLM-workflow and UX features no other tool offers.*
 
-### v0.8.0 — PDF Support
+### v0.8.0 — PDF Support (Done)
 
-Extract text from PDF files. PDFs are one of the most common document types people need to feed into LLMs. Likely requires a library like `pdf-parse` or `pdfjs-dist`. Needs to handle text-based PDFs; scanned/image PDFs can defer to OCR support in a later iteration.
+Extract text from PDF files and convert to clean markdown. PDFs are one of the most common document types people need to feed into LLMs. Scanned/image PDFs defer to OCR support (v0.22.0).
+
+**Library:** [`unpdf`](https://github.com/unjs/unpdf) — MIT license, 1.8 MB, zero runtime deps, explicit Bun support, ships an optimized serverless build of Mozilla's PDF.js.
+
+**Phase 1 — Core PDF Pipeline (Done)**
+
+- [x] Add `unpdf` dependency
+- [x] `isPdfBytes()` in `contentDetect.ts` — detect PDF magic bytes (`%PDF` / `25 50 44 46`)
+- [x] Update `ContentFormat` type to include `"pdf"`
+- [x] `convertPdfToHtml()` in `convert.ts` — extract text via `extractText()`, split on double-newlines into `<p>` tags
+- [x] Wire `.pdf` extension routing in `resolveHtmlInput()` in `cli.ts`
+- [x] Wire PDF detection in `detectFormat()` — check PDF magic before ZIP magic to avoid collision
+- [x] Test fixture (`sample.pdf`) + detection, conversion, and CLI integration tests
+- [x] `--verbose` support — logs page count to stderr
+- [x] Empty/scanned PDFs return placeholder HTML comment
+- [x] Update README, CHANGELOG, llm-context.md, ROADMAP
+
+**Design notes:**
+- Text-to-HTML conversion is intentionally simple — paragraph splitting only. Fancier structure inference (headings from font size, table detection from positional data) can be revisited if real-world PDFs produce poor output.
+- `unpdf` exposes the full PDF.js API via `getDocumentProxy()` if we ever need low-level access to font sizes, positions, or marked content for structure inference.
+- `getDocumentProxy()` detaches the input ArrayBuffer — byte length must be captured before calling conversion.
 
 ### v0.9.0 — URL Fetching
 
