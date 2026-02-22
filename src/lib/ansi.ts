@@ -6,7 +6,7 @@
 const enabled =
   !process.env.NO_COLOR &&
   process.env.TERM !== "dumb" &&
-  process.stdout.isTTY === true;
+  (process.stdout.isTTY === true || "FORCE_COLOR" in process.env);
 
 const wrap = (open: string, close: string) =>
   enabled ? (s: string) => `${open}${s}${close}` : (s: string) => s;

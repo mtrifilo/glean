@@ -4,15 +4,16 @@
 
 ## Recent Work
 
-- Polished interactive mode UX — ANSI colors, animated spinner, formatted stats with arrows/highlights, session totals, truncated 20-line preview. Matches TUI visual style without full-screen mode. Added `src/lib/ansi.ts` (zero-dep, respects `NO_COLOR`).
+- Replaced `marked`/`marked-terminal` rendered preview with regex-based raw markdown syntax highlighting (`src/lib/highlightMarkdown.ts`). Preview now shows raw markdown source with ANSI colors (headings=accent+bold, bold markers=muted, links=accent+muted, inline code=highlight, etc.). Removed `marked` and `marked-terminal` dependencies. Simplified `src/entry.ts` (removed FORCE_COLOR bootstrap). Updated `ansi.ts` to respect `FORCE_COLOR` env var.
+- Polished interactive mode UX — ANSI colors, animated spinner, formatted stats with arrows/highlights, session totals, word-wrapped preview at 72 chars. Added `src/lib/ansi.ts` (zero-dep, respects `NO_COLOR`), and `test/preview.test.ts`.
 - v0.6.1 — renamed project from `glean` to `decant` (CLI, env vars, paths, docs, CI, installers)
 - v0.6.0 — DOCX file support via `mammoth.js`, source tracking in stats, `--verbose` flag
 - v0.5.0 — content detection + RTF/DOC support via macOS `textutil` (zero new deps)
 
 ## Checkpoint
 
-- **Current state:** v0.6.1 shipped. Interactive mode polished with ANSI colors, spinner, formatted stats. 77 tests passing.
-- **What's working:** HTML, RTF, DOC, and DOCX → clean markdown. Interactive mode now has visual parity with TUI (colors, formatted stats, preview). All CLI paths working.
+- **Current state:** v0.6.1 shipped. Interactive mode polished with colors, spinner, raw-markdown syntax-highlighted preview. 93 tests passing (77 original + 16 preview).
+- **What's working:** HTML, RTF, DOC, and DOCX → clean markdown. Interactive mode has visual parity with TUI (colors, formatted stats, syntax-highlighted preview). All CLI paths working. Preview uses custom regex highlighter (no external rendering deps).
 - **What's next:** v0.7.0 — PDF support.
 
 ## Product Intent
@@ -74,12 +75,14 @@ decant --tui
 
 ### Entry and UX
 
+- `src/entry.ts`
+  - bootstrap entry point — imports `./cli.ts`
 - `src/cli.ts`
   - command registration, root options, no-subcommand flow, `resolveHtmlInput()` for format detection + conversion
 - `src/commands/update.ts`
   - self-update logic (platform detection, GitHub release fetch, checksum verify, atomic swap)
 - `src/interactive/runInteractive.ts`
-  - clipboard-first interactive logic and summary output (detects HTML + RTF on clipboard)
+  - clipboard-first interactive logic, ANSI-colored stats, syntax-highlighted preview with word-wrap
 - `src/tui/experimental.ts`
   - polished OpenTUI full-screen flow used by `--tui` (detects HTML + RTF on clipboard)
 
@@ -98,7 +101,8 @@ decant --tui
 
 ### Shared utilities and state
 
-- `src/lib/ansi.ts` - zero-dep ANSI color helpers (accent, success, muted, highlight, bold, dim; respects `NO_COLOR`)
+- `src/lib/ansi.ts` - zero-dep ANSI color helpers (accent, success, muted, highlight, bold, dim; respects `NO_COLOR` and `FORCE_COLOR`)
+- `src/lib/highlightMarkdown.ts` - regex-based ANSI syntax highlighting for raw markdown source
 - `src/lib/contentDetect.ts` - format detection (`ContentFormat`, `detectFormat`, `looksLikeHtml`, `looksLikeRtf`, `isDocBytes`, `isDocxBytes`)
 - `src/lib/convert.ts` - RTF/DOC → HTML via macOS `textutil`, DOCX → HTML via `mammoth.js`
 - `src/lib/io.ts` - stdin/file/clipboard I/O (`readInput`, `readInputBytes`, `readClipboardRtf`)
@@ -117,6 +121,7 @@ decant --tui
 - `test/cli.test.ts` - command-level behavior (includes RTF + DOCX integration tests)
 - `test/contentDetect.test.ts` - content detection unit tests (HTML, RTF, DOC, DOCX)
 - `test/convert.test.ts` - RTF/DOC conversion tests (macOS-gated) + DOCX conversion tests (cross-platform)
+- `test/preview.test.ts` - preview rendering tests (syntax highlighting, truncation, inline patterns)
 - `test/update.test.ts` - update command unit + integration tests
 
 ## Priorities

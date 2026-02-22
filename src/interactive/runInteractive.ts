@@ -1,7 +1,5 @@
 import { createInterface } from "node:readline/promises";
 import { stdin as input, stdout as output } from "node:process";
-import { marked } from "marked";
-import { markedTerminal } from "marked-terminal";
 import {
   accent,
   bold,
@@ -12,6 +10,7 @@ import {
   statValue,
   success,
 } from "../lib/ansi";
+import { highlightMarkdown } from "../lib/highlightMarkdown";
 import { detectFormat } from "../lib/contentDetect";
 import { convertRtfToHtml } from "../lib/convert";
 import { copyToClipboard, readClipboardRtf, readClipboardText } from "../lib/io";
@@ -50,8 +49,6 @@ function percent(value: number): string {
 const PREVIEW_WIDTH = 72;
 const PREVIEW_MAX_LINES = 16;
 
-let markedReady = false;
-
 /**
  * Word-wrap a single line to a max width, preserving ANSI escape codes
  * (which are zero-width). Leading indent is preserved on continuation lines.
@@ -86,29 +83,13 @@ export function renderPreviewMarkdown(
   markdown: string,
   maxLines = PREVIEW_MAX_LINES,
 ): string {
-  if (!markedReady) {
-    const ext = markedTerminal({ reflowText: true, width: PREVIEW_WIDTH });
-    // Fix marked-terminal bug: its `text` renderer reads raw `.text`
-    // instead of parsing `.tokens`, so inline formatting (bold, links)
-    // inside tight list items is lost. Override to parse tokens.
-    const origText = ext.renderer.text;
-    ext.renderer.text = function (token: any) {
-      if (typeof token === "object" && token.tokens) {
-        return origText.call(this, this.parser.parseInline(token.tokens));
-      }
-      return origText.call(this, token);
-    };
-    marked.use(ext);
-    markedReady = true;
-  }
-
   const trimmed = markdown.trim();
   if (!trimmed) return muted("(empty output)");
 
-  const rendered = (marked(trimmed) as string).trimEnd();
+  const highlighted = highlightMarkdown(trimmed);
 
-  // Word-wrap all lines to PREVIEW_WIDTH (marked-terminal skips list items)
-  const visual = rendered
+  // Word-wrap all lines to PREVIEW_WIDTH
+  const visual = highlighted
     .split("\n")
     .flatMap((line) => wrapLine(line, PREVIEW_WIDTH));
 

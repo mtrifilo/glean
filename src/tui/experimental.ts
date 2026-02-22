@@ -1,5 +1,6 @@
 import { detectFormat } from "../lib/contentDetect";
 import { convertRtfToHtml } from "../lib/convert";
+import { highlightMarkdown } from "../lib/highlightMarkdown";
 import { copyToClipboard, readClipboardRtf, readClipboardText } from "../lib/io";
 import { recordRunStats } from "../lib/sessionStats";
 import type { StatsMode, TransformOptions } from "../lib/types";
@@ -227,7 +228,7 @@ export async function runExperimentalTui(options: TuiRunOptions): Promise<boolea
               minHeight: 1,
             },
             Text({
-              content: previewLines(processed.markdown).join("\n"),
+              content: previewLines(highlightMarkdown(processed.markdown)).join("\n"),
               wrapMode: "word",
             }),
           ),
