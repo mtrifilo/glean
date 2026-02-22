@@ -1,10 +1,10 @@
 # glean
 
-Get markdown from HTML for your LLM as fast as possible.
+Get markdown from HTML, RTF, or Word documents for your LLM as fast as possible.
 
 ## Just `glean`
 
-Run `glean` to transform your buffer's HTML into clean Markdown. Then paste the markdown into your agent.
+Run `glean` to transform your clipboard content (HTML, RTF, or Word) into clean Markdown. Then paste the markdown into your agent.
 
 ```bash
 glean
@@ -109,7 +109,7 @@ Installer env vars (script path only):
 
 ## Common options (`clean`, `extract`, `stats`)
 
-- `-i, --input <path>` read HTML from file instead of stdin
+- `-i, --input <path>` read from file instead of stdin (HTML, RTF, or DOC)
 - `--copy` copy output to clipboard using `pbcopy` (macOS)
 - `--keep-links` preserve markdown links (default)
 - `--strip-links` keep link text, remove URLs
@@ -130,8 +130,8 @@ Run `glean` with no subcommand to enter interactive mode.
 
 - Uses defaults automatically (`clean`, aggressive off)
 - Does not prompt for mode/pruning choices during normal flow (use flags to override)
-- Detects HTML in clipboard and runs immediately
-- If clipboard has no HTML, prompts you to copy HTML first and press Enter to retry
+- Detects HTML or RTF in clipboard and runs immediately (Word/TextEdit copies work automatically)
+- If clipboard has no convertible content, prompts you to copy and press Enter to retry
 - Copies parsed markdown to clipboard automatically
 - Shows current-run stats and session totals (tokens/chars saved)
 - Use `--tui` for a full-screen OpenTUI variant with styled stats panels, color-coded output, and live clipboard polling
@@ -156,6 +156,13 @@ pbpaste | glean clean --copy
 
 # Run extract mode against a local HTML snippet
 glean extract -i snippet.html
+
+# Clean an RTF or DOC file (macOS — auto-detected)
+glean clean -i document.rtf
+glean clean -i document.doc
+
+# Pipe RTF through stdin
+cat document.rtf | glean clean
 
 # Compare reductions as JSON
 glean stats -i snippet.html --format json
