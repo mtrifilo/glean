@@ -52,13 +52,10 @@ function previewLines(markdown: string, limit = 20): string[] {
 }
 
 function printIntro(mode: StatsMode, aggressive: boolean): void {
-  const lines = [
-    "",
-    `${bold(accent("decant"))} ${muted("\u00b7")} ${muted("interactive mode")}`,
-    `${muted("Mode:")} ${bold(statValue(mode))}    ${muted("Aggressive:")} ${bold(statValue(aggressive ? "on" : "off"))}`,
-    "",
-  ];
-  process.stdout.write(lines.join("\n"));
+  process.stdout.write(
+    `\n${bold(accent("decant"))} ${muted("\u00b7")} ${muted("interactive mode")}\n` +
+    `${muted("Mode:")} ${bold(statValue(mode))}    ${muted("Aggressive:")} ${bold(statValue(aggressive ? "on" : "off"))}\n\n`,
+  );
 }
 
 async function resolveClipboard(): Promise<string | null> {
@@ -84,10 +81,7 @@ async function waitForClipboardContent(): Promise<string> {
 
   // Show waiting state with helper text
   process.stdout.write(
-    [
-      `${muted("Copy HTML, RTF, or Word content to your clipboard.")}`,
-      "",
-    ].join("\n"),
+    `${muted("Copy HTML, RTF, or Word content to your clipboard.")}\n\n`,
   );
 
   // Start spinner on the prompt line
