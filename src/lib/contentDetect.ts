@@ -1,4 +1,4 @@
-export type ContentFormat = "html" | "rtf" | "doc" | "docx" | "unknown";
+export type ContentFormat = "html" | "rtf" | "doc" | "docx" | "pdf" | "unknown";
 
 export function looksLikeHtml(value: string): boolean {
   if (!value.trim()) {
@@ -18,6 +18,8 @@ export function looksLikeRtf(value: string): boolean {
 
 const OLE2_MAGIC = new Uint8Array([0xd0, 0xcf, 0x11, 0xe0, 0xa1, 0xb1, 0x1a, 0xe1]);
 
+const PDF_MAGIC = new Uint8Array([0x25, 0x50, 0x44, 0x46]); // %PDF
+
 // ZIP magic matches all ZIP-based formats (DOCX, EPUB, XLSX, etc.).
 // Currently only DOCX is supported — refine when adding other ZIP formats.
 const ZIP_MAGIC = new Uint8Array([0x50, 0x4b, 0x03, 0x04]);
@@ -29,6 +31,20 @@ export function isDocxBytes(buffer: Uint8Array): boolean {
 
   for (let i = 0; i < ZIP_MAGIC.length; i++) {
     if (buffer[i] !== ZIP_MAGIC[i]) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+export function isPdfBytes(buffer: Uint8Array): boolean {
+  if (buffer.length < PDF_MAGIC.length) {
+    return false;
+  }
+
+  for (let i = 0; i < PDF_MAGIC.length; i++) {
+    if (buffer[i] !== PDF_MAGIC[i]) {
       return false;
     }
   }
@@ -54,6 +70,9 @@ export function detectFormat(input: string | Uint8Array): ContentFormat {
   if (input instanceof Uint8Array) {
     if (isDocBytes(input)) {
       return "doc";
+    }
+    if (isPdfBytes(input)) {
+      return "pdf";
     }
     if (isDocxBytes(input)) {
       return "docx";

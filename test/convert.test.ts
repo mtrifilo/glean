@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { convertDocToHtml, convertDocxToHtml, convertRtfToHtml } from "../src/lib/convert";
+import { convertDocToHtml, convertDocxToHtml, convertPdfToHtml, convertRtfToHtml } from "../src/lib/convert";
 
 const isMacOS = process.platform === "darwin";
 
@@ -51,6 +51,30 @@ describe("convertDocxToHtml", () => {
   test("rejects invalid buffer", async () => {
     const invalid = new Uint8Array([0x00, 0x01, 0x02, 0x03]);
     await expect(convertDocxToHtml(invalid)).rejects.toThrow("DOCX conversion failed");
+  });
+});
+
+describe("convertPdfToHtml", () => {
+  test("converts sample.pdf to HTML containing expected text", async () => {
+    const buffer = new Uint8Array(await Bun.file("test/fixtures/sample.pdf").arrayBuffer());
+    const html = await convertPdfToHtml(buffer);
+
+    expect(html).toContain("Introduction to Testing");
+    expect(html).toContain("Key Features");
+    expect(html).toContain("decant CLI tool");
+  });
+
+  test("returns HTML with <p> structure", async () => {
+    const buffer = new Uint8Array(await Bun.file("test/fixtures/sample.pdf").arrayBuffer());
+    const html = await convertPdfToHtml(buffer);
+
+    expect(html).toContain("<p>");
+    expect(html).toContain("</p>");
+  });
+
+  test("rejects invalid buffer", async () => {
+    const invalid = new Uint8Array([0x00, 0x01, 0x02, 0x03]);
+    await expect(convertPdfToHtml(invalid)).rejects.toThrow("PDF conversion failed");
   });
 });
 

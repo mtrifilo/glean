@@ -188,6 +188,47 @@ describe("DOCX input", () => {
   });
 });
 
+describe("PDF input", () => {
+  test("clean converts PDF file via --input", async () => {
+    const result = await runCli(["clean", "-i", "test/fixtures/sample.pdf"]);
+
+    expect(result.exitCode).toBe(0);
+    expect(result.stdout).toContain("Introduction to Testing");
+    expect(result.stdout).toContain("Key Features");
+  });
+
+  test("extract converts PDF file via --input", async () => {
+    const result = await runCli(["extract", "-i", "test/fixtures/sample.pdf"]);
+
+    expect(result.exitCode).toBe(0);
+    expect(result.stdout).toContain("Introduction to Testing");
+    expect(result.stdout).toContain("decant CLI tool");
+  });
+
+  test("stats works with PDF file input and includes source metadata", async () => {
+    const result = await runCli(["stats", "-i", "test/fixtures/sample.pdf", "--format", "json"]);
+    const parsed = JSON.parse(result.stdout) as {
+      inputChars: number;
+      outputChars: number;
+      sourceFormat?: string;
+      sourceChars?: number;
+    };
+
+    expect(result.exitCode).toBe(0);
+    expect(parsed.inputChars).toBeGreaterThan(0);
+    expect(parsed.sourceFormat).toBe("pdf");
+    expect(parsed.sourceChars).toBeGreaterThan(0);
+  });
+
+  test("--verbose flag is accepted", async () => {
+    const result = await runCli(["clean", "-i", "test/fixtures/sample.pdf", "--verbose"]);
+
+    expect(result.exitCode).toBe(0);
+    expect(result.stdout).toContain("Introduction to Testing");
+    expect(result.stderr).toContain("page(s)");
+  });
+});
+
 const isMacOS = process.platform === "darwin";
 
 describe("RTF/DOC input", () => {

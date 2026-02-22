@@ -3,6 +3,7 @@ import {
   detectFormat,
   isDocBytes,
   isDocxBytes,
+  isPdfBytes,
   looksLikeHtml,
   looksLikeRtf,
 } from "../src/lib/contentDetect";
@@ -96,6 +97,27 @@ describe("isDocxBytes", () => {
   });
 });
 
+describe("isPdfBytes", () => {
+  test("detects PDF magic bytes (%PDF)", () => {
+    const pdf = new Uint8Array([0x25, 0x50, 0x44, 0x46, 0x2d, 0x31, 0x2e, 0x34]);
+    expect(isPdfBytes(pdf)).toBe(true);
+  });
+
+  test("returns false for too-short buffer", () => {
+    const short = new Uint8Array([0x25, 0x50]);
+    expect(isPdfBytes(short)).toBe(false);
+  });
+
+  test("returns false for wrong bytes", () => {
+    const wrong = new Uint8Array([0x00, 0x00, 0x00, 0x00]);
+    expect(isPdfBytes(wrong)).toBe(false);
+  });
+
+  test("returns false for empty buffer", () => {
+    expect(isPdfBytes(new Uint8Array(0))).toBe(false);
+  });
+});
+
 describe("detectFormat", () => {
   test("detects HTML from string", () => {
     expect(detectFormat("<div>hello</div>")).toBe("html");
@@ -146,5 +168,19 @@ describe("detectFormat", () => {
   test("DOC (OLE2) takes priority over DOCX (ZIP)", () => {
     const docMagic = new Uint8Array([0xd0, 0xcf, 0x11, 0xe0, 0xa1, 0xb1, 0x1a, 0xe1]);
     expect(detectFormat(docMagic)).toBe("doc");
+  });
+
+  test("detects PDF from Uint8Array", () => {
+    const pdfBytes = new Uint8Array([0x25, 0x50, 0x44, 0x46, 0x2d, 0x31, 0x2e, 0x34]);
+    expect(detectFormat(pdfBytes)).toBe("pdf");
+  });
+
+  test("PDF doesn't collide with DOC or DOCX", () => {
+    const pdfBytes = new Uint8Array([0x25, 0x50, 0x44, 0x46]);
+    const docBytes = new Uint8Array([0xd0, 0xcf, 0x11, 0xe0, 0xa1, 0xb1, 0x1a, 0xe1]);
+    const docxBytes = new Uint8Array([0x50, 0x4b, 0x03, 0x04]);
+    expect(detectFormat(pdfBytes)).toBe("pdf");
+    expect(detectFormat(docBytes)).toBe("doc");
+    expect(detectFormat(docxBytes)).toBe("docx");
   });
 });
