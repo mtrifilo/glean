@@ -7,6 +7,10 @@ Semantic Versioning after `1.0.0`.
 
 ## [Unreleased]
 
+_No unreleased changes._
+
+## [0.6.0] - 2026-02-22
+
 ### Added
 
 - DOCX file support via `mammoth.js` — cross-platform, no macOS dependency required.
