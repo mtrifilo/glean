@@ -7,6 +7,8 @@ Semantic Versioning after `1.0.0`.
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-02-22
+
 ### Changed
 
 - Polished interactive mode (`decant` with no subcommand) — colored output, animated spinner while waiting for clipboard, formatted stats with arrows and reduction highlights, session totals, word-wrapped markdown preview (72 chars, truncated at 16 visual lines). Matches the TUI's visual style without requiring full-screen mode.
