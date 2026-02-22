@@ -45,10 +45,16 @@ function percent(value: number): string {
   return `${value.toFixed(2)}%`;
 }
 
-function previewLines(markdown: string, limit = 20): string[] {
-  const lines = markdown.trim() ? markdown.trim().split("\n") : ["(empty output)"];
-  if (lines.length <= limit) return lines;
-  return [...lines.slice(0, limit), "..."];
+function previewLines(markdown: string, limit = 8): string[] {
+  const trimmed = markdown.trim();
+  if (!trimmed) return ["(empty output)"];
+  const lines = trimmed.split("\n");
+  const total = lines.length;
+  if (total <= limit) return lines.map((l) => muted(l));
+  return [
+    ...lines.slice(0, limit).map((l) => muted(l)),
+    muted(`... (${fmt(total)} lines total)`),
+  ];
 }
 
 function printIntro(mode: StatsMode, aggressive: boolean): void {
