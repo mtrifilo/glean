@@ -1,20 +1,42 @@
 # glean
 
-Get markdown from HTML, RTF, or Word documents for your LLM as fast as possible.
+Token-efficient document-to-markdown for LLMs. Local, fast, interactive.
 
 ## Just `glean`
 
-Run `glean` to transform your clipboard content (HTML, RTF, or Word) into clean Markdown. Then paste the markdown into your agent.
+Copy content from anywhere — a web page, a Word doc, an RTF file — then run `glean`. Clean markdown lands on your clipboard, ready to paste into your agent.
 
 ```bash
 glean
-
 ```
 
 ## Why this exists
 
-Copying HTML from browser DevTools usually includes wrapper markup, styling attributes, nav/footer blocks, and other page furniture that burns tokens in chat context windows.  
-This tool keeps the meaningful content and drops most of the noise.
+Most document-to-markdown tools stop at conversion. Glean focuses on what happens next: feeding that content into an LLM.
+
+Every document carries noise — wrapper markup, nav blocks, styling attributes, boilerplate footers. That noise burns context window tokens and dilutes the signal your model sees. Glean strips it out and tells you exactly how much you saved.
+
+**Token-aware output.** Glean doesn't just convert — it measures. Every run reports character and token reduction so you know how efficiently your content fits a context window.
+
+**Interactive, clipboard-first.** No flags, no file paths for the common case. Copy content, run `glean`, paste clean markdown. The full-screen TUI (`--tui`) adds live clipboard detection, color-coded stats, and styled preview panels.
+
+**Local and fast.** Single binary, zero runtime dependencies, works offline. Install with one command, update with `glean update`. No API keys, no cloud, no Python environment.
+
+**Scriptable.** Pipes work exactly how you'd expect: `pbpaste | glean clean | pbcopy`. JSON stats output, file input, and all options are flag-driven for easy automation.
+
+## What's ahead
+
+Glean's roadmap is focused on the space between document conversion and LLM consumption — the workflow intelligence that no other tool provides:
+
+- **Token budget** (`--max-tokens`) — trim output to fit a context window
+- **TUI workspace** — syntax-highlighted preview, scrollable output, option toggling, continuous mode
+- **Diff mode** — see exactly what the pipeline removed
+- **Quality scoring** — know how clean your output is before you paste it
+- **Chunking for RAG** — split documents into sized chunks for retrieval pipelines
+- **URL fetching** — skip the clipboard, convert web pages directly
+- **PDF, DOCX, and more** — expanding format support beyond HTML/RTF/DOC
+
+See the full [roadmap](docs/strategy/ROADMAP.md) for details.
 
 ## Install (fastest paths)
 
@@ -176,10 +198,10 @@ glean --tui
 For fast session resume and context-efficient drilldown:
 
 - `docs/llm-context.md` - compact project snapshot for LLM bootstrapping
+- `docs/strategy/ROADMAP.md` - iteration plan and open decisions
+- `docs/specs/` - feature specs and design documents
 - `docs/RESUME_PROMPT.md` - copy/paste resume prompt templates
-- `docs/CONTRIBUTING.md` - repo-specific implementation and validation rules
 - `docs/README.md` - docs index and recommended load order
-- `docs/plans/GLEAN_CLI_PLAN.md` - implementation and roadmap source of truth
 
 ## Open Source Docs
 
