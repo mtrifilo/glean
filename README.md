@@ -190,7 +190,7 @@ decant clean -i document.rtf
 decant clean -i document.doc
 
 # Clean a DOCX file (cross-platform)
-glean clean -i document.docx
+decant clean -i document.docx
 
 # Pipe RTF through stdin
 cat document.rtf | decant clean

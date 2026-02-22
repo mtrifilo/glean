@@ -4,17 +4,18 @@
 
 ## Recent Work
 
-- Replaced `marked`/`marked-terminal` rendered preview with regex-based raw markdown syntax highlighting (`src/lib/highlightMarkdown.ts`). Preview now shows raw markdown source with ANSI colors (headings=accent+bold, bold markers=muted, links=accent+muted, inline code=highlight, etc.). Removed `marked` and `marked-terminal` dependencies. Simplified `src/entry.ts` (removed FORCE_COLOR bootstrap). Updated `ansi.ts` to respect `FORCE_COLOR` env var.
-- Polished interactive mode UX — ANSI colors, animated spinner, formatted stats with arrows/highlights, session totals, word-wrapped preview at 72 chars. Added `src/lib/ansi.ts` (zero-dep, respects `NO_COLOR`), and `test/preview.test.ts`.
+- v0.7.0 shipped — interactive mode polish (colors, spinner, formatted stats, word-wrapped preview) + raw markdown syntax highlighting replacing `marked`/`marked-terminal`. Added `src/lib/highlightMarkdown.ts`, `src/lib/ansi.ts`, `test/preview.test.ts`.
+- README badges added (CI, release, license)
+- TUI file drop research — documented terminal drag-and-drop across iTerm2/Kitty/WezTerm/Ghostty, studied OpenCode's implementation, wrote spec at `docs/specs/TUI_FILE_DROP.md` (v0.11.0)
 - v0.6.1 — renamed project from `glean` to `decant` (CLI, env vars, paths, docs, CI, installers)
 - v0.6.0 — DOCX file support via `mammoth.js`, source tracking in stats, `--verbose` flag
 - v0.5.0 — content detection + RTF/DOC support via macOS `textutil` (zero new deps)
 
 ## Checkpoint
 
-- **Current state:** v0.6.1 shipped. Interactive mode polished with colors, spinner, raw-markdown syntax-highlighted preview. 93 tests passing (77 original + 16 preview).
+- **Current state:** v0.7.0 shipped. Interactive mode polished with colors, spinner, raw-markdown syntax-highlighted preview. 93 tests passing, 2 skipped, across 6 test files (174 expect() calls).
 - **What's working:** HTML, RTF, DOC, and DOCX → clean markdown. Interactive mode has visual parity with TUI (colors, formatted stats, syntax-highlighted preview). All CLI paths working. Preview uses custom regex highlighter (no external rendering deps).
-- **What's next:** v0.7.0 — PDF support.
+- **What's next:** See `docs/strategy/ROADMAP.md` — next up is PDF support (v0.8.0).
 
 ## Product Intent
 
@@ -126,7 +127,8 @@ decant --tui
 
 ## Priorities
 
-1. v0.7.0 — PDF support
+1. v0.8.0 — PDF support
+2. v0.9.0 — URL fetching
 
 The user directs priority. See `docs/strategy/ROADMAP.md` for full iteration plan.
 
