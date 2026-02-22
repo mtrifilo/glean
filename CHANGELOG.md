@@ -14,12 +14,14 @@ Semantic Versioning after `1.0.0`.
   - Auto-detected by ZIP magic bytes in content detection layer.
 - `--verbose` flag on `clean`, `extract`, and `stats` commands — shows conversion warnings (e.g. mammoth messages during DOCX processing).
 - `readInputBytes()` binary I/O helper for file-based binary format reading.
+- `sourceFormat` and `sourceChars` fields in stats JSON output — tracks the original input format and size before conversion to HTML. Only included for non-HTML formats (RTF, DOC, DOCX).
 
 ### Changed
 
 - **Project renamed from `glean` to `decant`** — CLI command, binary names, env vars (`GLEAN_*` → `DECANT_*`), config paths (`~/.glean/` → `~/.decant/`), GitHub URLs, installers, CI workflows, and all documentation updated. Historical changelog entries below are preserved as-is.
 - `--input` help text updated to indicate DOCX support alongside HTML, RTF, and DOC.
 - Content detection now recognizes DOCX (ZIP) magic bytes (`isDocxBytes()`).
+- Stats markdown output header changed from `glean` to `decant`.
 
 ## [0.5.0] - 2026-02-21
 

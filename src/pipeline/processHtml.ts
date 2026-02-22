@@ -1,7 +1,7 @@
 import type { ContentStats, StatsMode, TransformOptions } from "../lib/types";
 import { cleanHtml } from "./cleanHtml";
 import { extractContent } from "./extractContent";
-import { buildStats } from "./stats";
+import { type SourceInfo, buildStats } from "./stats";
 import { toMarkdown } from "./toMarkdown";
 
 export interface ProcessResult {
@@ -13,6 +13,7 @@ export function processHtml(
   mode: StatsMode,
   inputHtml: string,
   options: TransformOptions,
+  source?: SourceInfo,
 ): ProcessResult {
   const cleanedHtml =
     mode === "extract"
@@ -20,7 +21,7 @@ export function processHtml(
       : cleanHtml(inputHtml, options).cleanedHtml;
 
   const markdown = toMarkdown(cleanedHtml, options);
-  const stats = buildStats(mode, inputHtml, markdown);
+  const stats = buildStats(mode, inputHtml, markdown, source);
 
   return { markdown, stats };
 }

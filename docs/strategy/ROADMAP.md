@@ -47,10 +47,10 @@ Add DOCX file support via `mammoth.js`. Extends the content detection + conversi
 - [x] Wire file-based DOCX path through CLI (`--verbose` flag for mammoth warnings)
 - [x] Test fixtures + unit/integration tests for DOCX path
 
-**Phase 2 — Stats Extension + Polish**
+**Phase 2 — Stats Extension + Polish (Done)**
 
-- [ ] Add `sourceFormat` / `sourceChars` to `ContentStats`
-- [ ] Update dev scripts (`update-golden.ts`, `smoke-check.ts`) for new fixtures
+- [x] Add `sourceFormat` / `sourceChars` to `ContentStats`
+- [x] Dev scripts unchanged — DOCX fixtures use a different path than HTML fixtures
 - [x] Update docs (README, CHANGELOG, llm-context.md)
 - [ ] End-to-end validation, cut v0.6.0 release
 

@@ -14,9 +14,9 @@
 
 ## Checkpoint
 
-- **Current state:** v0.6.0 Phase 1 complete. DOCX conversion working end-to-end. 75 tests passing.
-- **What's working:** HTML, RTF, DOC, and DOCX → clean markdown. Interactive, TUI, CLI pipe, and file input paths. Auto-detection with no user flags required.
-- **What's next:** v0.6.0 Phase 2 — `sourceFormat`/`sourceChars` in ContentStats, dev script updates, cut release.
+- **Current state:** v0.6.0 Phase 1 + Phase 2 complete. DOCX conversion + source tracking in stats. 77 tests passing.
+- **What's working:** HTML, RTF, DOC, and DOCX → clean markdown. Stats include `sourceFormat`/`sourceChars` for non-HTML inputs. Interactive, TUI, CLI pipe, and file input paths.
+- **What's next:** Cut v0.6.0 release, then v0.7.0 — PDF support.
 
 ## Product Intent
 
@@ -123,7 +123,7 @@ decant --tui
 
 ## Priorities
 
-1. v0.6.0 Phase 2 — `sourceFormat`/`sourceChars` in ContentStats, dev script updates, cut release
+1. Cut v0.6.0 release
 2. v0.7.0 — PDF support
 
 The user directs priority. See `docs/strategy/ROADMAP.md` for full iteration plan.

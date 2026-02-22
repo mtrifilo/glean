@@ -10,7 +10,7 @@ import { copyToClipboard, readInput, readInputBytes } from "./lib/io";
 import { recordRunStats } from "./lib/sessionStats";
 import type { StatsFormat, StatsMode, TransformOptions } from "./lib/types";
 import { processHtml } from "./pipeline/processHtml";
-import { formatStatsMarkdown } from "./pipeline/stats";
+import { type SourceInfo, formatStatsMarkdown } from "./pipeline/stats";
 
 interface CommonOptions {
   input?: string;
@@ -117,17 +117,24 @@ async function maybeCopyOutput(copy: boolean | undefined, text: string): Promise
   }
 }
 
+interface ResolvedInput {
+  html: string;
+  source: SourceInfo;
+}
+
 async function resolveHtmlInput(
   inputPath?: string,
   options?: { verbose?: boolean },
-): Promise<string> {
+): Promise<ResolvedInput> {
   if (inputPath && /\.docx$/i.test(inputPath)) {
     const bytes = await readInputBytes(inputPath);
-    return convertDocxToHtml(bytes, { verbose: options?.verbose });
+    const html = await convertDocxToHtml(bytes, { verbose: options?.verbose });
+    return { html, source: { sourceFormat: "docx", sourceChars: bytes.length } };
   }
 
   if (inputPath && /\.doc$/i.test(inputPath)) {
-    return convertDocToHtml(inputPath);
+    const html = await convertDocToHtml(inputPath);
+    return { html, source: { sourceFormat: "doc" } };
   }
 
   const input = await readInput(inputPath);
@@ -137,17 +144,18 @@ async function resolveHtmlInput(
 
   const format = detectFormat(input);
   if (format === "rtf") {
-    return convertRtfToHtml(input);
+    const html = await convertRtfToHtml(input);
+    return { html, source: { sourceFormat: "rtf", sourceChars: input.length } };
   }
 
-  return input;
+  return { html: input, source: {} };
 }
 
 async function runTransform(commandName: "clean" | "extract", options: CommonOptions) {
-  const html = await resolveHtmlInput(options.input, { verbose: options.verbose });
+  const { html, source } = await resolveHtmlInput(options.input, { verbose: options.verbose });
 
   const transformOptions = resolveTransformOptions(options);
-  const processed = processHtml(commandName, html, transformOptions);
+  const processed = processHtml(commandName, html, transformOptions, source);
 
   await maybeCopyOutput(options.copy, processed.markdown);
   await recordRunStats(processed.stats);
@@ -155,13 +163,13 @@ async function runTransform(commandName: "clean" | "extract", options: CommonOpt
 }
 
 async function runStats(options: StatsOptions) {
-  const html = await resolveHtmlInput(options.input, { verbose: options.verbose });
+  const { html, source } = await resolveHtmlInput(options.input, { verbose: options.verbose });
 
   const mode = options.mode ?? "clean";
   const format = options.format ?? "md";
   const transformOptions = resolveTransformOptions(options);
 
-  const processed = processHtml(mode, html, transformOptions);
+  const processed = processHtml(mode, html, transformOptions, source);
 
   const output =
     format === "json"
