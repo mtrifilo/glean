@@ -34,4 +34,6 @@ export interface ContentStats {
   charReductionPct: number;
   tokenReduction: number;
   tokenReductionPct: number;
+  sourceFormat?: string;
+  sourceChars?: number;
 }

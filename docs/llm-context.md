@@ -4,22 +4,23 @@
 
 ## Recent Work
 
+- v0.6.0 Phase 1 — DOCX file support via `mammoth.js` (cross-platform, no macOS dependency)
+- Added `isDocxBytes()` ZIP magic detection, `readInputBytes()` binary I/O, `convertDocxToHtml()` conversion
+- CLI `resolveHtmlInput()` handles `.docx` files with new `--verbose` flag for mammoth warnings
+- Test fixtures (`sample.docx` + golden output) and unit/integration tests for DOCX path
+- Binary build verified — mammoth bundles cleanly with `bun build --compile`
 - v0.6.1 — renamed project from `glean` to `decant` (CLI, env vars, paths, docs, CI, installers)
-- v0.5.0 released — content detection + RTF/DOC support via macOS `textutil` (zero new deps)
-- Consolidated duplicated `looksLikeHtml()` into shared `contentDetect.ts`
-- Interactive + TUI clipboard polling now detects RTF from Word/TextEdit
-- CLI `resolveHtmlInput()` handles file, pipe, and stdin RTF/DOC
-- Dev tooling (golden fixture regen, smoke check) bundled into v0.5.0
+- v0.5.0 — content detection + RTF/DOC support via macOS `textutil` (zero new deps)
 
 ## Checkpoint
 
-- **Current state:** v0.6.1 rename complete. All code, tests, CI, installers, and docs updated from `glean` to `decant`. 63 tests passing.
-- **What's working:** HTML, RTF, and DOC → clean markdown. Interactive, TUI, CLI pipe, and file input paths. Auto-detection with no user flags required.
-- **What's next:** See `docs/strategy/ROADMAP.md` — v0.6.0 (DOCX support via `mammoth.js`)
+- **Current state:** v0.6.0 Phase 1 + Phase 2 complete. DOCX conversion + source tracking in stats. 77 tests passing.
+- **What's working:** HTML, RTF, DOC, and DOCX → clean markdown. Stats include `sourceFormat`/`sourceChars` for non-HTML inputs. Interactive, TUI, CLI pipe, and file input paths.
+- **What's next:** Cut v0.6.0 release, then v0.7.0 — PDF support.
 
 ## Product Intent
 
-Keep `decant` laser-focused on the HTML/RTF/DOC → clean markdown workflow. Minimize friction: fast default behavior, clipboard-first, useful stats. Preserve scriptability and power-user workflows.
+Keep `decant` laser-focused on the HTML/RTF/DOC/DOCX → clean markdown workflow. Minimize friction: fast default behavior, clipboard-first, useful stats. Preserve scriptability and power-user workflows.
 
 ## Task Routing
 
@@ -40,7 +41,7 @@ Keep `decant` laser-focused on the HTML/RTF/DOC → clean markdown workflow. Min
 | HTML pipeline | Stable | `clean`, `extract`, `stats` commands |
 | RTF support | Stable | Clipboard + file + pipe, macOS `textutil` |
 | DOC support | Stable | File input, macOS `textutil` |
-| DOCX support | Planned | v0.6.0 via `mammoth.js` |
+| DOCX support | Stable | File input via `mammoth.js`, cross-platform |
 | Interactive mode | Stable | Clipboard-first, auto-detect HTML/RTF |
 | TUI mode | Stable | OpenTUI full-screen, clipboard polling |
 | Dev tooling | Stable | Golden fixtures, smoke check, CI integration |
@@ -63,6 +64,10 @@ decant stats -i snippet.html --format json
 # RTF/DOC input (macOS — auto-detected)
 decant clean -i document.rtf
 cat document.rtf | decant clean
+
+# DOCX input (cross-platform)
+decant clean -i document.docx
+decant clean -i document.docx --verbose
 
 # Full-screen TUI path
 decant --tui
@@ -96,9 +101,9 @@ decant --tui
 
 ### Shared utilities and state
 
-- `src/lib/contentDetect.ts` - format detection (`ContentFormat`, `detectFormat`, `looksLikeHtml`, `looksLikeRtf`, `isDocBytes`)
-- `src/lib/convert.ts` - RTF/DOC → HTML conversion via macOS `textutil` (zero deps)
-- `src/lib/io.ts` - stdin/file/clipboard I/O (includes `readClipboardRtf`)
+- `src/lib/contentDetect.ts` - format detection (`ContentFormat`, `detectFormat`, `looksLikeHtml`, `looksLikeRtf`, `isDocBytes`, `isDocxBytes`)
+- `src/lib/convert.ts` - RTF/DOC → HTML via macOS `textutil`, DOCX → HTML via `mammoth.js`
+- `src/lib/io.ts` - stdin/file/clipboard I/O (`readInput`, `readInputBytes`, `readClipboardRtf`)
 - `src/lib/rules.ts` - cleanup heuristics
 - `src/lib/sessionStats.ts` - persistent session metrics
 - `src/lib/types.ts` - shared types
@@ -111,15 +116,15 @@ decant --tui
 ### Validation
 
 - `test/pipeline.test.ts` - pipeline behavior
-- `test/cli.test.ts` - command-level behavior (includes RTF integration tests)
-- `test/contentDetect.test.ts` - content detection unit tests
-- `test/convert.test.ts` - RTF/DOC conversion tests (macOS-gated)
+- `test/cli.test.ts` - command-level behavior (includes RTF + DOCX integration tests)
+- `test/contentDetect.test.ts` - content detection unit tests (HTML, RTF, DOC, DOCX)
+- `test/convert.test.ts` - RTF/DOC conversion tests (macOS-gated) + DOCX conversion tests (cross-platform)
 - `test/update.test.ts` - update command unit + integration tests
 
 ## Priorities
 
-1. v0.6.0 — DOCX file support via `mammoth.js` (spec: `docs/specs/WORD_RTF_SUPPORT.md`)
-2. Stats extension — `sourceFormat` / `sourceChars` in `ContentStats`
+1. Cut v0.6.0 release
+2. v0.7.0 — PDF support
 
 The user directs priority. See `docs/strategy/ROADMAP.md` for full iteration plan.
 

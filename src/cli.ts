@@ -5,12 +5,12 @@ import { version } from "../package.json";
 import { runUpdate } from "./commands/update";
 import { runInteractive } from "./interactive/runInteractive";
 import { detectFormat } from "./lib/contentDetect";
-import { convertDocToHtml, convertRtfToHtml } from "./lib/convert";
-import { copyToClipboard, readInput } from "./lib/io";
+import { convertDocToHtml, convertDocxToHtml, convertRtfToHtml } from "./lib/convert";
+import { copyToClipboard, readInput, readInputBytes } from "./lib/io";
 import { recordRunStats } from "./lib/sessionStats";
 import type { StatsFormat, StatsMode, TransformOptions } from "./lib/types";
 import { processHtml } from "./pipeline/processHtml";
-import { formatStatsMarkdown } from "./pipeline/stats";
+import { type SourceInfo, formatStatsMarkdown } from "./pipeline/stats";
 
 interface CommonOptions {
   input?: string;
@@ -22,6 +22,7 @@ interface CommonOptions {
   preserveTables?: boolean;
   maxHeadingLevel?: number;
   aggressive?: boolean;
+  verbose?: boolean;
 }
 
 interface StatsOptions extends CommonOptions {
@@ -66,7 +67,7 @@ function parseStatsFormat(value: string): StatsFormat {
 
 function addCommonOptions(command: Command): Command {
   return command
-    .option("-i, --input <path>", "Read input from a file path (HTML, RTF, or DOC)")
+    .option("-i, --input <path>", "Read input from a file path (HTML, RTF, DOC, or DOCX)")
     .option("--copy", "Copy command output to the macOS clipboard")
     .option("--keep-links", "Preserve markdown links (default behavior)")
     .option("--strip-links", "Strip links and keep only their text")
@@ -79,7 +80,8 @@ function addCommonOptions(command: Command): Command {
       parseHeadingLevel,
       6,
     )
-    .option("--aggressive", "Apply stronger pruning heuristics");
+    .option("--aggressive", "Apply stronger pruning heuristics")
+    .option("--verbose", "Show conversion warnings (e.g. from DOCX processing)");
 }
 
 function resolveTransformOptions(options: CommonOptions): TransformOptions {
@@ -115,9 +117,24 @@ async function maybeCopyOutput(copy: boolean | undefined, text: string): Promise
   }
 }
 
-async function resolveHtmlInput(inputPath?: string): Promise<string> {
+interface ResolvedInput {
+  html: string;
+  source: SourceInfo;
+}
+
+async function resolveHtmlInput(
+  inputPath?: string,
+  options?: { verbose?: boolean },
+): Promise<ResolvedInput> {
+  if (inputPath && /\.docx$/i.test(inputPath)) {
+    const bytes = await readInputBytes(inputPath);
+    const html = await convertDocxToHtml(bytes, { verbose: options?.verbose });
+    return { html, source: { sourceFormat: "docx", sourceChars: bytes.length } };
+  }
+
   if (inputPath && /\.doc$/i.test(inputPath)) {
-    return convertDocToHtml(inputPath);
+    const html = await convertDocToHtml(inputPath);
+    return { html, source: { sourceFormat: "doc" } };
   }
 
   const input = await readInput(inputPath);
@@ -127,17 +144,18 @@ async function resolveHtmlInput(inputPath?: string): Promise<string> {
 
   const format = detectFormat(input);
   if (format === "rtf") {
-    return convertRtfToHtml(input);
+    const html = await convertRtfToHtml(input);
+    return { html, source: { sourceFormat: "rtf", sourceChars: input.length } };
   }
 
-  return input;
+  return { html: input, source: {} };
 }
 
 async function runTransform(commandName: "clean" | "extract", options: CommonOptions) {
-  const html = await resolveHtmlInput(options.input);
+  const { html, source } = await resolveHtmlInput(options.input, { verbose: options.verbose });
 
   const transformOptions = resolveTransformOptions(options);
-  const processed = processHtml(commandName, html, transformOptions);
+  const processed = processHtml(commandName, html, transformOptions, source);
 
   await maybeCopyOutput(options.copy, processed.markdown);
   await recordRunStats(processed.stats);
@@ -145,13 +163,13 @@ async function runTransform(commandName: "clean" | "extract", options: CommonOpt
 }
 
 async function runStats(options: StatsOptions) {
-  const html = await resolveHtmlInput(options.input);
+  const { html, source } = await resolveHtmlInput(options.input, { verbose: options.verbose });
 
   const mode = options.mode ?? "clean";
   const format = options.format ?? "md";
   const transformOptions = resolveTransformOptions(options);
 
-  const processed = processHtml(mode, html, transformOptions);
+  const processed = processHtml(mode, html, transformOptions, source);
 
   const output =
     format === "json"

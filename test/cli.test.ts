@@ -112,12 +112,14 @@ describe("decant cli", () => {
       outputChars: number;
       inputTokensEstimate: number;
       outputTokensEstimate: number;
+      sourceFormat?: string;
     };
 
     expect(result.exitCode).toBe(0);
     expect(parsed.mode).toBe("clean");
     expect(parsed.outputChars).toBeLessThan(parsed.inputChars);
     expect(parsed.outputTokensEstimate).toBeLessThan(parsed.inputTokensEstimate);
+    expect(parsed.sourceFormat).toBeUndefined();
   });
 
   test("strip-links removes markdown links", async () => {
@@ -143,6 +145,46 @@ describe("decant cli", () => {
 
     expect(result.exitCode).toBe(1);
     expect(result.stderr).toContain("requires an interactive terminal");
+  });
+});
+
+describe("DOCX input", () => {
+  test("clean converts DOCX file via --input", async () => {
+    const expected = (await readFixture("sample.docx.expected.md")).trim();
+    const result = await runCli(["clean", "-i", "test/fixtures/sample.docx"]);
+
+    expect(result.exitCode).toBe(0);
+    expect(result.stdout).toBe(expected);
+  });
+
+  test("extract converts DOCX file", async () => {
+    const result = await runCli(["extract", "-i", "test/fixtures/sample.docx"]);
+
+    expect(result.exitCode).toBe(0);
+    expect(result.stdout).toContain("Sample Document");
+    expect(result.stdout).toContain("Section One");
+  });
+
+  test("stats works with DOCX file input and includes source metadata", async () => {
+    const result = await runCli(["stats", "-i", "test/fixtures/sample.docx", "--format", "json"]);
+    const parsed = JSON.parse(result.stdout) as {
+      inputChars: number;
+      outputChars: number;
+      sourceFormat?: string;
+      sourceChars?: number;
+    };
+
+    expect(result.exitCode).toBe(0);
+    expect(parsed.inputChars).toBeGreaterThan(0);
+    expect(parsed.sourceFormat).toBe("docx");
+    expect(parsed.sourceChars).toBeGreaterThan(0);
+  });
+
+  test("--verbose flag is accepted", async () => {
+    const result = await runCli(["clean", "-i", "test/fixtures/sample.docx", "--verbose"]);
+
+    expect(result.exitCode).toBe(0);
+    expect(result.stdout).toContain("Sample Document");
   });
 });
 

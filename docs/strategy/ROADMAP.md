@@ -39,19 +39,19 @@ Auto-detect content type (HTML, RTF, DOC) and convert via macOS `textutil` (zero
 
 Add DOCX file support via `mammoth.js`. Extends the content detection + conversion layer from v0.5.0. Full spec: `docs/specs/WORD_RTF_SUPPORT.md`.
 
-**Phase 1 — DOCX Conversion**
+**Phase 1 — DOCX Conversion (Done)**
 
-- [ ] Add `mammoth` dependency
-- [ ] `isDocxBytes()` in `contentDetect.ts`, `readInputBytes()` in `io.ts`
-- [ ] `convertDocxToHtml()` in `convert.ts`
-- [ ] Wire file-based DOCX path through CLI
-- [ ] Test fixtures + unit/integration tests for DOCX path
+- [x] Add `mammoth` dependency
+- [x] `isDocxBytes()` in `contentDetect.ts`, `readInputBytes()` in `io.ts`
+- [x] `convertDocxToHtml()` in `convert.ts`
+- [x] Wire file-based DOCX path through CLI (`--verbose` flag for mammoth warnings)
+- [x] Test fixtures + unit/integration tests for DOCX path
 
-**Phase 2 — Stats Extension + Polish**
+**Phase 2 — Stats Extension + Polish (Done)**
 
-- [ ] Add `sourceFormat` / `sourceChars` to `ContentStats`
-- [ ] Update dev scripts (`update-golden.ts`, `smoke-check.ts`) for new fixtures
-- [ ] Update docs (README, CHANGELOG, llm-context.md)
+- [x] Add `sourceFormat` / `sourceChars` to `ContentStats`
+- [x] Dev scripts unchanged — DOCX fixtures use a different path than HTML fixtures
+- [x] Update docs (README, CHANGELOG, llm-context.md)
 - [ ] End-to-end validation, cut v0.6.0 release
 
 ### v0.6.1 — Rename to `decant` (Done)
@@ -70,8 +70,8 @@ Full sweep across the entire project:
 - [x] GitHub issue/PR templates, CI workflows
 - [x] Binary artifact names
 - [x] `decant update` self-update logic
-- [ ] GitHub repo rename (`mtrifilo/glean` → `mtrifilo/decant`) — post-merge manual step
-- [ ] Homebrew tap and Scoop bucket repo updates — post-merge manual step
+- [x] GitHub repo rename (`mtrifilo/glean` → `mtrifilo/decant`) — done, old URL auto-redirects
+- [x] Homebrew tap and Scoop bucket repo updates — `decant.rb` and `decant.json` live, old files removed
 
 #### Tier 1 — Core Differentiators
 

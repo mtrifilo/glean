@@ -17,10 +17,16 @@ export function estimateTokens(text: string): number {
   return Math.max(1, Math.round((byChars + byWords) / 2));
 }
 
+export interface SourceInfo {
+  sourceFormat?: string;
+  sourceChars?: number;
+}
+
 export function buildStats(
   mode: StatsMode,
   input: string,
   output: string,
+  source?: SourceInfo,
 ): ContentStats {
   const inputChars = input.length;
   const outputChars = output.length;
@@ -34,7 +40,7 @@ export function buildStats(
   const tokenReductionPct =
     inputTokensEstimate === 0 ? 0 : (tokenReduction / inputTokensEstimate) * 100;
 
-  return {
+  const stats: ContentStats = {
     mode,
     inputChars,
     outputChars,
@@ -45,17 +51,38 @@ export function buildStats(
     tokenReduction,
     tokenReductionPct: roundToTwo(tokenReductionPct),
   };
+
+  if (source?.sourceFormat) {
+    stats.sourceFormat = source.sourceFormat;
+  }
+  if (source?.sourceChars != null) {
+    stats.sourceChars = source.sourceChars;
+  }
+
+  return stats;
 }
 
 export function formatStatsMarkdown(stats: ContentStats): string {
-  return [
+  const lines = [
     `# decant stats (${stats.mode})`,
     "",
+  ];
+
+  if (stats.sourceFormat && stats.sourceFormat !== "html") {
+    lines.push(`- source_format: ${stats.sourceFormat}`);
+    if (stats.sourceChars != null) {
+      lines.push(`- source_chars: ${stats.sourceChars}`);
+    }
+  }
+
+  lines.push(
     `- input_chars: ${stats.inputChars}`,
     `- output_chars: ${stats.outputChars}`,
     `- char_reduction: ${stats.charReduction} (${stats.charReductionPct}%)`,
     `- input_tokens_estimate: ${stats.inputTokensEstimate}`,
     `- output_tokens_estimate: ${stats.outputTokensEstimate}`,
     `- token_reduction: ${stats.tokenReduction} (${stats.tokenReductionPct}%)`,
-  ].join("\n");
+  );
+
+  return lines.join("\n");
 }

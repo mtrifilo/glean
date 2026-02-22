@@ -235,32 +235,32 @@ Deliverables:
 
 Zero new dependencies. RTF clipboard is macOS-only; RTF/DOC file conversion works anywhere `textutil` is available.
 
-### Phase 2 — DOCX Support (planned for v0.6.0)
+### Phase 2 — DOCX Support (Done)
 
-**Branch:** TBD
-
-Deliverables:
-- [ ] Add `mammoth` dependency
-- [ ] `isDocxBytes()` in `contentDetect.ts`
-- [ ] `readInputBytes()` in `io.ts`
-- [ ] `convertDocxToHtml()` in `convert.ts`
-- [ ] Surface mammoth conversion warnings via `--verbose` flag
-- [ ] Wire file-based DOCX path through CLI
-- [ ] `test/fixtures/sample.docx` + expected output
-- [ ] Unit + integration tests for DOCX path
-
-### Phase 3 — Stats Extension + Polish (planned for v0.6.0)
-
-**Branch:** TBD
+**Branch:** `feat/docx-support`
 
 Deliverables:
-- [ ] Add `sourceFormat` / `sourceChars` to `ContentStats`
-- [ ] Update stats display to show source format when not HTML
-- [ ] Update `update-golden.ts` and `smoke-check.ts` for new fixtures
-- [ ] Update README.md (usage examples for DOCX)
-- [ ] Update CHANGELOG.md
-- [ ] Update `docs/llm-context.md`
-- [ ] End-to-end validation of all input paths
+- [x] Add `mammoth` dependency
+- [x] `isDocxBytes()` in `contentDetect.ts`
+- [x] `readInputBytes()` in `io.ts`
+- [x] `convertDocxToHtml()` in `convert.ts`
+- [x] Surface mammoth conversion warnings via `--verbose` flag
+- [x] Wire file-based DOCX path through CLI
+- [x] `test/fixtures/sample.docx` + expected output
+- [x] Unit + integration tests for DOCX path
+
+### Phase 3 — Stats Extension + Polish (Done)
+
+**Branch:** `feat/docx-support`
+
+Deliverables:
+- [x] Add `sourceFormat` / `sourceChars` to `ContentStats`
+- [x] Update stats display to show source format when not HTML
+- [x] Dev scripts unchanged — DOCX fixtures use a different path than HTML fixtures
+- [x] Update README.md (usage examples for DOCX)
+- [x] Update CHANGELOG.md
+- [x] Update `docs/llm-context.md`
+- [x] End-to-end validation of all input paths
 - [ ] Cut v0.6.0 release
 
 ## Decided

@@ -34,7 +34,7 @@ Decant's roadmap is focused on the space between document conversion and LLM con
 - **Quality scoring** — know how clean your output is before you paste it
 - **Chunking for RAG** — split documents into sized chunks for retrieval pipelines
 - **URL fetching** — skip the clipboard, convert web pages directly
-- **PDF, DOCX, and more** — expanding format support beyond HTML/RTF/DOC
+- **PDF and more** — expanding format support beyond HTML/RTF/DOC/DOCX
 
 See the full [roadmap](docs/strategy/ROADMAP.md) for details.
 
@@ -131,7 +131,7 @@ Installer env vars (script path only):
 
 ## Common options (`clean`, `extract`, `stats`)
 
-- `-i, --input <path>` read from file instead of stdin (HTML, RTF, or DOC)
+- `-i, --input <path>` read from file instead of stdin (HTML, RTF, DOC, or DOCX)
 - `--copy` copy output to clipboard using `pbcopy` (macOS)
 - `--keep-links` preserve markdown links (default)
 - `--strip-links` keep link text, remove URLs
@@ -140,6 +140,7 @@ Installer env vars (script path only):
 - `--no-preserve-tables` remove table output
 - `--max-heading-level <1-6>` clamp heading depth
 - `--aggressive` stronger pruning heuristics
+- `--verbose` show conversion warnings (e.g. from DOCX processing)
 
 ## Stats-only options
 
@@ -182,6 +183,9 @@ decant extract -i snippet.html
 # Clean an RTF or DOC file (macOS — auto-detected)
 decant clean -i document.rtf
 decant clean -i document.doc
+
+# Clean a DOCX file (cross-platform)
+glean clean -i document.docx
 
 # Pipe RTF through stdin
 cat document.rtf | decant clean

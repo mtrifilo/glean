@@ -96,4 +96,21 @@ describe("stats", () => {
     expect(stats.charReductionPct).toBeGreaterThan(0);
     expect(stats.tokenReductionPct).toBeGreaterThan(0);
   });
+
+  test("stats include source info when provided", () => {
+    const stats = buildStats("clean", "<p>hello</p>", "hello", {
+      sourceFormat: "docx",
+      sourceChars: 5000,
+    });
+
+    expect(stats.sourceFormat).toBe("docx");
+    expect(stats.sourceChars).toBe(5000);
+  });
+
+  test("stats omit source info when not provided", () => {
+    const stats = buildStats("clean", "<p>hello</p>", "hello");
+
+    expect(stats.sourceFormat).toBeUndefined();
+    expect(stats.sourceChars).toBeUndefined();
+  });
 });

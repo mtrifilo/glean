@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { convertDocToHtml, convertRtfToHtml } from "../src/lib/convert";
+import { convertDocToHtml, convertDocxToHtml, convertRtfToHtml } from "../src/lib/convert";
 
 const isMacOS = process.platform === "darwin";
 
@@ -26,6 +26,31 @@ describe("convertDocToHtml", () => {
     // textutil exits 0 but produces no stdout for missing files
     const html = await convertDocToHtml("/tmp/nonexistent-file.doc");
     expect(html.trim()).toBe("");
+  });
+});
+
+describe("convertDocxToHtml", () => {
+  test("converts sample.docx to HTML", async () => {
+    const buffer = new Uint8Array(await Bun.file("test/fixtures/sample.docx").arrayBuffer());
+    const html = await convertDocxToHtml(buffer);
+
+    expect(html).toContain("Sample Document");
+    expect(html).toContain("Section One");
+    expect(html).toContain("bold formatting");
+  });
+
+  test("returns HTML with expected structure", async () => {
+    const buffer = new Uint8Array(await Bun.file("test/fixtures/sample.docx").arrayBuffer());
+    const html = await convertDocxToHtml(buffer);
+
+    expect(html).toContain("<h1>");
+    expect(html).toContain("<h2>");
+    expect(html).toContain("<strong>");
+  });
+
+  test("rejects invalid buffer", async () => {
+    const invalid = new Uint8Array([0x00, 0x01, 0x02, 0x03]);
+    await expect(convertDocxToHtml(invalid)).rejects.toThrow("DOCX conversion failed");
   });
 });
 
