@@ -104,9 +104,27 @@ jobs:
           cd release-artifacts
           shasum -a 256 * > checksums.txt
 
+      - name: Checkout for changelog
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.tag || github.ref }}
+          sparse-checkout: CHANGELOG.md
+          sparse-checkout-cone-mode: false
+
+      - name: Extract release notes from changelog
+        id: notes
+        run: |
+          TAG="${{ github.event_name == 'workflow_dispatch' && github.event.inputs.tag || github.ref_name }}"
+          VERSION="${TAG#v}"
+          # Extract the section for this version (between its heading and the next version heading)
+          NOTES=$(awk "/^## \\[${VERSION}\\]/{found=1; next} /^## \\[/{if(found) exit} found{print}" CHANGELOG.md)
+          # Write to file to preserve formatting
+          echo "$NOTES" > release-notes.md
+
       - name: Publish release assets
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.tag || github.ref_name }}
+          body_path: release-notes.md
           files: |
             release-artifacts/*

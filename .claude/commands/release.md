@@ -54,5 +54,16 @@ Follow these steps:
 
 11. Report the result:
     - Provide the PR URL
-    - Remind the user that after the PR merges and they tag + push, `.github/workflows/release.yml` will build and publish binaries and `.github/workflows/package-managers.yml` will update Homebrew/Scoop manifests
+    - Remind the user that after the PR merges, they need to tag + push, then update the release notes:
+      ```
+      git checkout main && git pull
+      git tag vX.Y.Z
+      git push origin vX.Y.Z
+      ```
+    - Remind the user that `.github/workflows/release.yml` will build and publish binaries and `.github/workflows/package-managers.yml` will update Homebrew/Scoop manifests
     - Provide the future release link: `https://github.com/<owner>/<repo>/releases/tag/vX.Y.Z`
+
+12. After the user confirms the tag is pushed and the release workflow has completed, update the GitHub release description with the changelog entries for this version:
+    - Extract the relevant section from `CHANGELOG.md` (everything under `[X.Y.Z]` until the next version heading)
+    - Use `gh release edit vX.Y.Z --notes "..."` to set the release body
+    - Confirm the release page looks correct
