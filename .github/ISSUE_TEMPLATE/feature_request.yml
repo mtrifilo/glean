@@ -1,5 +1,5 @@
 name: Feature request
-description: Suggest an improvement aligned with Glean's workflow.
+description: Suggest an improvement aligned with Decant's workflow.
 title: "[Feature]: "
 labels:
   - enhancement
@@ -8,7 +8,7 @@ body:
     attributes:
       value: |
         Please describe the problem first, then the proposed solution.
-        Glean is focused on DevTools HTML -> clean markdown workflows.
+        Decant is focused on DevTools HTML -> clean markdown workflows.
 
   - type: textarea
     id: problem
@@ -40,7 +40,7 @@ body:
     id: scope
     attributes:
       label: Scope fit
-      description: Explain why this belongs in Glean's core scope.
+      description: Explain why this belongs in Decant's core scope.
       placeholder: |
         This improves the HTML -> markdown context workflow by ...
     validations:

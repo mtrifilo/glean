@@ -57,18 +57,18 @@ jobs:
           bun -e "
           import { existsSync, renameSync, rmSync } from 'node:fs';
           import { join } from 'node:path';
-          const sourceCandidates = ['dist/glean.exe', 'dist/glean'];
+          const sourceCandidates = ['dist/decant.exe', 'dist/decant'];
           const source = sourceCandidates.find((file) => existsSync(file));
           if (!source) {
             throw new Error('Built binary not found in dist/.');
           }
-          const osName = process.env.GLEAN_OS_NAME;
-          const archName = process.env.GLEAN_ARCH_NAME;
-          const ext = process.env.GLEAN_BINARY_EXT ?? (source.endsWith('.exe') ? '.exe' : '');
+          const osName = process.env.DECANT_OS_NAME;
+          const archName = process.env.DECANT_ARCH_NAME;
+          const ext = process.env.DECANT_BINARY_EXT ?? (source.endsWith('.exe') ? '.exe' : '');
           if (!osName || !archName) {
             throw new Error('Missing target platform metadata for artifact rename.');
           }
-          const target = join('dist', 'glean-' + osName + '-' + archName + ext);
+          const target = join('dist', 'decant-' + osName + '-' + archName + ext);
           if (existsSync(target)) {
             rmSync(target);
           }
@@ -76,15 +76,15 @@ jobs:
           console.log('Prepared artifact:', target);
           "
         env:
-          GLEAN_OS_NAME: ${{ matrix.os_name }}
-          GLEAN_ARCH_NAME: ${{ matrix.arch_name }}
-          GLEAN_BINARY_EXT: ${{ matrix.binary_ext }}
+          DECANT_OS_NAME: ${{ matrix.os_name }}
+          DECANT_ARCH_NAME: ${{ matrix.arch_name }}
+          DECANT_BINARY_EXT: ${{ matrix.binary_ext }}
 
       - name: Upload binary artifact
         uses: actions/upload-artifact@v4
         with:
           name: binaries-${{ matrix.os_name }}-${{ matrix.arch_name }}
-          path: dist/glean-*
+          path: dist/decant-*
           if-no-files-found: error
 
   publish-release:

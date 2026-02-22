@@ -8,7 +8,7 @@ interface CliRunResult {
 }
 
 function uniqueStatsPath(): string {
-  return `${process.cwd()}/.tmp/glean-test-${Date.now()}-${Math.random()
+  return `${process.cwd()}/.tmp/decant-test-${Date.now()}-${Math.random()
     .toString(16)
     .slice(2)}.json`;
 }
@@ -24,7 +24,7 @@ async function runCli(args: string[], input?: string, statsPath?: string): Promi
     stderr: "pipe",
     env: {
       ...process.env,
-      GLEAN_STATS_PATH: resolvedStatsPath,
+      DECANT_STATS_PATH: resolvedStatsPath,
     },
   });
 
@@ -60,7 +60,7 @@ async function readFixture(name: string): Promise<string> {
   return Bun.file(`test/fixtures/${name}`).text();
 }
 
-describe("glean cli", () => {
+describe("decant cli", () => {
   test("clean reads from file and matches snapshot", async () => {
     const expected = (await readFixture("blog.expected.md")).trim();
     const result = await runCli(["clean", "-i", "test/fixtures/blog.html"]);

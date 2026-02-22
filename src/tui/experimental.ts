@@ -84,7 +84,7 @@ export async function runExperimentalTui(options: TuiRunOptions): Promise<boolea
       width: "100%" as const,
       height: "100%" as const,
       flexDirection: "column" as const,
-      title: "glean",
+      title: "decant",
       titleAlignment: "left" as const,
     };
 

@@ -1,4 +1,4 @@
-# Glean Docs
+# Decant Docs
 
 This folder contains both LLM-facing and human-facing documentation. Files are designed for fast session bootstrapping without loading the full codebase.
 

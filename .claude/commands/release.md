@@ -1,4 +1,4 @@
-Release a new version of Glean.
+Release a new version of Decant.
 
 **Important:** `main` has branch protection requiring CI status checks. You cannot push directly to main. Releases must go through a PR.
 

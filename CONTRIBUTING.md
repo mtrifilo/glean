@@ -1,6 +1,6 @@
 # Contributing
 
-Thanks for your interest in contributing to Glean.
+Thanks for your interest in contributing to Decant.
 
 For project-specific contribution guidance, start here:
 
@@ -21,11 +21,11 @@ bun test
   - `README.md`
   - `docs/llm-context.md`
   - `docs/strategy/ROADMAP.md` (if roadmap/progress changed)
-- Keep changes aligned with Glean's core workflow focus.
+- Keep changes aligned with Decant's core workflow focus.
 
 ## Tuning Heuristics
 
-Glean's cleaning pipeline uses heuristic rules in `src/lib/rules.ts` and `src/pipeline/cleanHtml.ts`. When changing these, follow this workflow to avoid regressions:
+Decant's cleaning pipeline uses heuristic rules in `src/lib/rules.ts` and `src/pipeline/cleanHtml.ts`. When changing these, follow this workflow to avoid regressions:
 
 ### Workflow
 

@@ -1,6 +1,6 @@
 # Troubleshooting
 
-## `glean: command not found`
+## `decant: command not found`
 
 - Run `bun link` from the repository root.
 - Ensure Bun bin path is in your shell PATH:
@@ -8,16 +8,16 @@
 
 ## Installer says repository is missing
 
-- The installer needs `GLEAN_REPO` set to `mtrifilo/glean`.
+- The installer needs `DECANT_REPO` set to `mtrifilo/decant`.
 - Example:
-  - `curl -fsSL https://raw.githubusercontent.com/mtrifilo/glean/main/install | GLEAN_REPO=mtrifilo/glean bash`
+  - `curl -fsSL https://raw.githubusercontent.com/mtrifilo/decant/main/install | DECANT_REPO=mtrifilo/decant bash`
 
 ## Installer cannot find matching release asset
 
 - Confirm your release includes platform binaries named like:
-  - `glean-darwin-arm64`
-  - `glean-linux-x64`
-  - `glean-windows-x64.exe`
+  - `decant-darwin-arm64`
+  - `decant-linux-x64`
+  - `decant-windows-x64.exe`
 - Confirm you are installing from the intended repository and release tag.
 
 ## Homebrew install issues
@@ -25,7 +25,7 @@
 - Confirm tap setup:
   - `brew tap mtrifilo/tap https://github.com/mtrifilo/homebrew-tap`
 - Then install:
-  - `brew install mtrifilo/tap/glean`
+  - `brew install mtrifilo/tap/decant`
 - On unsupported architectures, Homebrew formula will direct you to source install.
 
 ## Scoop install issues
@@ -33,7 +33,7 @@
 - Confirm bucket setup:
   - `scoop bucket add mtrifilo https://github.com/mtrifilo/scoop-bucket`
 - Then install:
-  - `scoop install mtrifilo/glean`
+  - `scoop install mtrifilo/decant`
 - If Scoop blocks execution, ensure your PowerShell execution policy allows Scoop usage.
 
 ## macOS x64 install support
@@ -57,20 +57,20 @@
   - `bun install`
   - `bun link`
 
-## `glean update` says "running from source"
+## `decant update` says "running from source"
 
 - Self-update only works with compiled binaries.
 - If you installed via `bun link`, update with `git pull && bun install` instead.
 
-## `glean update` fails with a permission error
+## `decant update` fails with a permission error
 
 - The binary path may require elevated permissions to overwrite.
-- On macOS/Linux, try `sudo glean update`.
+- On macOS/Linux, try `sudo decant update`.
 - On Windows, run PowerShell as Administrator.
 
 ## Clipboard not detected in interactive mode
 
-- Confirm HTML is copied in DevTools before running `glean`.
+- Confirm HTML is copied in DevTools before running `decant`.
 - In interactive mode, press Enter to re-check clipboard after copying.
 - On non-macOS systems, clipboard workflows may differ from `pbcopy`/`pbpaste`.
 
@@ -82,8 +82,8 @@
 ## `--tui` fails to start
 
 - `--tui` requires an interactive TTY.
-- If OpenTUI initialization fails, Glean should fall back to standard interactive mode.
-- Try plain `glean` to continue without full-screen TUI.
+- If OpenTUI initialization fails, Decant should fall back to standard interactive mode.
+- Try plain `decant` to continue without full-screen TUI.
 
 ## Output seems too aggressive
 
@@ -94,11 +94,11 @@
 ## Output is empty or missing expected content
 
 - Verify the copied HTML actually contains target content (not just wrappers).
-- Try `glean extract` for article-heavy content with lots of page chrome.
+- Try `decant extract` for article-heavy content with lots of page chrome.
 - Compare `clean` vs `extract` outputs and choose the better result.
 
 ## Stats file location
 
-- Default: `~/.glean/stats.json`
+- Default: `~/.decant/stats.json`
 - Override path:
-  - `GLEAN_STATS_PATH=/custom/path/stats.json glean`
+  - `DECANT_STATS_PATH=/custom/path/stats.json decant`

@@ -2,7 +2,7 @@
 
 ## Supported Versions
 
-Glean is currently pre-1.0. Security fixes are prioritized for the latest
+Decant is currently pre-1.0. Security fixes are prioritized for the latest
 release line.
 
 | Version | Supported |
@@ -17,7 +17,7 @@ Please report vulnerabilities privately. Do not open a public issue.
 Recommended path:
 
 1. Use GitHub private vulnerability reporting:
-   - `https://github.com/mtrifilo/glean/security/advisories/new`
+   - `https://github.com/mtrifilo/decant/security/advisories/new`
 2. If you cannot access that flow, open a minimal public issue titled:
    - `Security contact request`
    - Do not include vulnerability details.

@@ -49,7 +49,7 @@ export function buildStats(
 
 export function formatStatsMarkdown(stats: ContentStats): string {
   return [
-    `# glean stats (${stats.mode})`,
+    `# decant stats (${stats.mode})`,
     "",
     `- input_chars: ${stats.inputChars}`,
     `- output_chars: ${stats.outputChars}`,

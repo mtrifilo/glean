@@ -28,4 +28,4 @@
 
 ## Scope check
 
-- [ ] This PR stays aligned with Glean's core DevTools HTML -> markdown workflow
+- [ ] This PR stays aligned with Decant's core DevTools HTML -> markdown workflow

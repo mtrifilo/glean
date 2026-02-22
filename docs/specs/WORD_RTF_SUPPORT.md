@@ -6,7 +6,7 @@ Auto-detect content type (HTML, RTF, DOC, DOCX) and route through the appropriat
 
 ## Motivation
 
-Users frequently copy content from Word documents and paste it into their workflow. On macOS, copying from Word puts RTF on the clipboard — not HTML — so Glean currently rejects it. Supporting RTF clipboard input (zero new deps) and DOCX file input (one new dep) covers the two most common Word-to-markdown paths.
+Users frequently copy content from Word documents and paste it into their workflow. On macOS, copying from Word puts RTF on the clipboard — not HTML — so Decant currently rejects it. Supporting RTF clipboard input (zero new deps) and DOCX file input (one new dep) covers the two most common Word-to-markdown paths.
 
 ## Architecture
 
@@ -214,7 +214,7 @@ These are additive — no breaking changes to existing stats output.
 
 ### Integration tests
 
-- `cli.test.ts`: `echo '<rtf>' | glean clean` and `glean clean --input sample.docx`
+- `cli.test.ts`: `echo '<rtf>' | decant clean` and `decant clean --input sample.docx`
 - Interactive mode: clipboard polling with RTF content (mock-based)
 
 ## Implementation Phases

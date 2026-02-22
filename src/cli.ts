@@ -165,7 +165,7 @@ async function runStats(options: StatsOptions) {
 const program = new Command();
 
 program
-  .name("glean")
+  .name("decant")
   .description("Clean noisy HTML and convert it into markdown context.")
   .version(version, "-V, --version")
   .option(
@@ -217,7 +217,7 @@ addCommonOptions(
 
 program
   .command("update")
-  .description("Update glean to the latest version.")
+  .description("Update decant to the latest version.")
   .option("--force", "Reinstall even if already on the latest version")
   .action(async function (this: Command) {
     await runUpdate(this.opts<{ force?: boolean }>());
@@ -250,7 +250,7 @@ try {
   await program.parseAsync();
 } catch (error) {
   const message =
-    error instanceof Error ? error.message : "Unexpected failure while running glean.";
+    error instanceof Error ? error.message : "Unexpected failure while running decant.";
   process.stderr.write(`${message}\n`);
   process.exit(1);
 }

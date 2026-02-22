@@ -2,7 +2,7 @@
 
 ## Our Commitment
 
-We are committed to making participation in the Glean project a harassment-free
+We are committed to making participation in the Decant project a harassment-free
 experience for everyone, regardless of age, body size, visible or invisible
 disability, ethnicity, sex characteristics, gender identity and expression,
 level of experience, education, socioeconomic status, nationality, personal

@@ -1,9 +1,10 @@
-# Glean — LLM Context
+# Decant — LLM Context
 
 > Entry point for Claude Code sessions. Read this first.
 
 ## Recent Work
 
+- v0.6.1 — renamed project from `glean` to `decant` (CLI, env vars, paths, docs, CI, installers)
 - v0.5.0 released — content detection + RTF/DOC support via macOS `textutil` (zero new deps)
 - Consolidated duplicated `looksLikeHtml()` into shared `contentDetect.ts`
 - Interactive + TUI clipboard polling now detects RTF from Word/TextEdit
@@ -12,13 +13,13 @@
 
 ## Checkpoint
 
-- **Current state:** v0.5.0 released. RTF/DOC input works across all paths (clipboard, file, pipe). 63 tests passing.
+- **Current state:** v0.6.1 rename complete. All code, tests, CI, installers, and docs updated from `glean` to `decant`. 63 tests passing.
 - **What's working:** HTML, RTF, and DOC → clean markdown. Interactive, TUI, CLI pipe, and file input paths. Auto-detection with no user flags required.
 - **What's next:** See `docs/strategy/ROADMAP.md` — v0.6.0 (DOCX support via `mammoth.js`)
 
 ## Product Intent
 
-Keep `glean` laser-focused on the HTML/RTF/DOC → clean markdown workflow. Minimize friction: fast default behavior, clipboard-first, useful stats. Preserve scriptability and power-user workflows.
+Keep `decant` laser-focused on the HTML/RTF/DOC → clean markdown workflow. Minimize friction: fast default behavior, clipboard-first, useful stats. Preserve scriptability and power-user workflows.
 
 ## Task Routing
 
@@ -48,23 +49,23 @@ Keep `glean` laser-focused on the HTML/RTF/DOC → clean markdown workflow. Mini
 
 ```bash
 # Default interactive flow
-glean
+decant
 
 # Clipboard pipeline (script-friendly)
-pbpaste | glean clean | pbcopy
+pbpaste | decant clean | pbcopy
 
 # Extraction-first with stronger pruning
-pbpaste | glean extract --aggressive | pbcopy
+pbpaste | decant extract --aggressive | pbcopy
 
 # Stats
-glean stats -i snippet.html --format json
+decant stats -i snippet.html --format json
 
 # RTF/DOC input (macOS — auto-detected)
-glean clean -i document.rtf
-cat document.rtf | glean clean
+decant clean -i document.rtf
+cat document.rtf | decant clean
 
 # Full-screen TUI path
-glean --tui
+decant --tui
 ```
 
 ## Architecture
@@ -135,6 +136,6 @@ Also update `docs/strategy/ROADMAP.md` when iterations advance or new decisions 
 
 ## Scope Guardrails
 
-- Do not turn `glean` into a broad multi-source context platform.
+- Do not turn `decant` into a broad multi-source context platform.
 - Keep this repo optimized for the single high-value workflow above.
 - A broader TUI/power-CLI platform is planned separately (`ctxkit` concept).

@@ -1,8 +1,8 @@
 blank_issues_enabled: false
 contact_links:
   - name: Report a security vulnerability (private)
-    url: https://github.com/mtrifilo/glean/security/advisories/new
+    url: https://github.com/mtrifilo/decant/security/advisories/new
     about: Use GitHub private vulnerability reporting.
   - name: Code of Conduct private report request
-    url: https://github.com/mtrifilo/glean/issues/new?title=Code%20of%20Conduct%20report%20request
+    url: https://github.com/mtrifilo/decant/issues/new?title=Code%20of%20Conduct%20report%20request
     about: Do not include incident details. A maintainer will follow up privately.

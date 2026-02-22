@@ -102,17 +102,17 @@ function normalizeStore(value: unknown, nowIso: string): StatsStore {
 }
 
 function resolveStatsPath(): string {
-  const override = process.env.GLEAN_STATS_PATH?.trim();
+  const override = process.env.DECANT_STATS_PATH?.trim();
   if (override) {
     return override;
   }
 
   const xdgStateHome = process.env.XDG_STATE_HOME?.trim();
   if (xdgStateHome) {
-    return join(xdgStateHome, "glean", "stats.json");
+    return join(xdgStateHome, "decant", "stats.json");
   }
 
-  return join(homedir(), ".glean", "stats.json");
+  return join(homedir(), ".decant", "stats.json");
 }
 
 function todayKey(): string {
