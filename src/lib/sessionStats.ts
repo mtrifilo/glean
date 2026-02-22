@@ -1,3 +1,4 @@
+import { existsSync } from "node:fs";
 import { homedir } from "node:os";
 import { dirname, join } from "node:path";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
@@ -129,13 +130,65 @@ function applyRun(target: AggregateStats, runStats: ContentStats): void {
   target.tokensSaved += runStats.tokenReduction;
 }
 
+function mergeAggregate(a: AggregateStats, b: AggregateStats): AggregateStats {
+  return {
+    runs: a.runs + b.runs,
+    inputChars: a.inputChars + b.inputChars,
+    outputChars: a.outputChars + b.outputChars,
+    charsSaved: a.charsSaved + b.charsSaved,
+    inputTokensEstimate: a.inputTokensEstimate + b.inputTokensEstimate,
+    outputTokensEstimate: a.outputTokensEstimate + b.outputTokensEstimate,
+    tokensSaved: a.tokensSaved + b.tokensSaved,
+  };
+}
+
+function mergeStores(target: StatsStore, source: StatsStore): StatsStore {
+  const merged = { ...target };
+  merged.lifetime = mergeAggregate(target.lifetime, source.lifetime);
+  merged.createdAt =
+    source.createdAt < target.createdAt ? source.createdAt : target.createdAt;
+  const allDays = new Set([
+    ...Object.keys(target.daily),
+    ...Object.keys(source.daily),
+  ]);
+  for (const day of allDays) {
+    const a = target.daily[day] ?? emptyAggregate();
+    const b = source.daily[day] ?? emptyAggregate();
+    merged.daily[day] = mergeAggregate(a, b);
+  }
+  return merged;
+}
+
+/** Resolve the pre-rename stats path (~/.glean/stats.json). */
+function legacyStatsPath(): string {
+  return join(homedir(), ".glean", "stats.json");
+}
+
 async function loadStore(path: string, nowIso: string): Promise<StatsStore> {
+  let store: StatsStore;
   try {
     const raw = await readFile(path, "utf8");
-    return normalizeStore(JSON.parse(raw), nowIso);
+    store = normalizeStore(JSON.parse(raw), nowIso);
   } catch {
-    return createEmptyStore(nowIso);
+    store = createEmptyStore(nowIso);
   }
+
+  // One-time migration: merge stats from the pre-rename ~/.glean/stats.json
+  const legacy = legacyStatsPath();
+  if (path !== legacy && existsSync(legacy)) {
+    try {
+      const raw = await readFile(legacy, "utf8");
+      const legacyStore = normalizeStore(JSON.parse(raw), nowIso);
+      store = mergeStores(store, legacyStore);
+      // Remove legacy file so we only migrate once
+      const { unlink } = await import("node:fs/promises");
+      await unlink(legacy);
+    } catch {
+      // Ignore migration errors — don't block normal operation
+    }
+  }
+
+  return store;
 }
 
 async function saveStore(path: string, store: StatsStore): Promise<boolean> {
