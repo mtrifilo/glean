@@ -1,4 +1,6 @@
-# Glean - HTML to Markdown Context Cleaner CLI Plan (Bun)
+# Decant - HTML to Markdown Context Cleaner CLI Plan (Bun)
+
+> **Note:** This project was originally named "glean" and was renamed to "decant" in v0.6.1. This file is preserved with its original filename for historical reference. Code references below have been updated to the current name.
 
 ## Problem Statement
 
@@ -22,7 +24,7 @@ We need a CLI tool that converts copied HTML into clean, compact markdown focuse
 ## Desired Workflow (To-Be)
 
 1. Copy element HTML from DevTools as usual.
-2. Run a command like `pbpaste | glean clean`.
+2. Run a command like `pbpaste | decant clean`.
 3. Get clean markdown output with only useful content.
 4. Paste concise markdown into LLM chat for better context density.
 
@@ -65,7 +67,7 @@ Re-evaluate a Go port only after we validate extraction quality and workflows wi
 
 V1 has been implemented and validated.
 
-- Bun + TypeScript CLI scaffold is complete (`package.json`, `tsconfig.json`, local `glean` bin entry).
+- Bun + TypeScript CLI scaffold is complete (`package.json`, `tsconfig.json`, local `decant` bin entry).
 - Core commands are implemented: `clean`, `extract`, and `stats`.
 - Input/output paths are implemented: stdin, `--input`, stdout, and macOS clipboard via `--copy`.
 - Cleaning and extraction pipelines are implemented with deterministic cleanup plus Readability-first extraction in `extract` mode.
@@ -75,7 +77,7 @@ V1 has been implemented and validated.
 
 ### UX Upgrade Progress (Interactive-First)
 
-- `glean` with no subcommand now launches an interactive clipboard-first flow.
+- `decant` with no subcommand now launches an interactive clipboard-first flow.
 - Interactive flow runs automatically with defaults (`clean`, aggressive off) and auto-copies parsed markdown to clipboard.
 - Mode and pruning are now controlled via no-subcommand flags (`--mode`, `--aggressive`) instead of interactive prompts.
 - Current-run stats are displayed immediately after processing (chars/tokens saved).
@@ -98,13 +100,13 @@ V1 has been implemented and validated.
 
 ### Core Commands
 
-- `glean clean`  
+- `decant clean`  
   Clean HTML and output markdown (default command behavior).
 
-- `glean extract`  
+- `decant extract`  
   Extract likely main-content nodes before markdown conversion.
 
-- `glean stats`  
+- `decant stats`  
   Show token and size deltas (input chars/tokens vs output chars/tokens).
 
 ### Input/Output Modes
@@ -204,7 +206,7 @@ V1 has been implemented and validated.
 
 ### Manual Smoke Tests
 
-- `pbpaste | glean clean | pbcopy`
+- `pbpaste | decant clean | pbcopy`
 - Compare raw HTML vs output in LLM context usefulness.
 
 ## Milestone Plan
@@ -237,7 +239,7 @@ Open-source/release scaffolding is complete:
 
 - Release workflow with branch protection (PR-based releases, post-merge tagging)
 - Claude Code `/pr` and `/release` skills for automated workflow
-- `glean update` self-update command with SHA256 checksum verification
+- `decant update` self-update command with SHA256 checksum verification
 - Package-manager scaffolding (Homebrew formula, Scoop manifest, automation workflow)
 - PR template with structured sections (What/Why/How/Testing/Screenshots/Scope)
 
@@ -251,8 +253,8 @@ Open-source/release scaffolding is complete:
 #### v0.3.0 — Distribution Confidence
 
 - End-to-end installer validation on all 3 platforms (macOS, Linux, Windows)
-- CI smoke test workflow (`smoke-install.yml`) triggered on release: download binary, verify checksum, run `glean --version` and `glean clean` with fixture input
-- `glean update` upgrade-path validation
+- CI smoke test workflow (`smoke-install.yml`) triggered on release: download binary, verify checksum, run `decant --version` and `decant clean` with fixture input
+- `decant update` upgrade-path validation
 - Audit and wire final repo slug in any remaining placeholders
 
 #### v0.4.0 — Developer Experience and Heuristic Safety
@@ -307,7 +309,7 @@ Goal: provide one-command install and easy upgrades while keeping package manage
 
 - Primary: install script (`curl -fsSL ... | bash`) for macOS/Linux.
 - Primary (Windows): PowerShell installer (`irm ... | iex`).
-- Secondary: Homebrew tap (`brew install <tap>/glean`).
+- Secondary: Homebrew tap (`brew install <tap>/decant`).
 - Tertiary: npm/bun global package for JS-native users.
 
 ### Installer Behavior
@@ -315,17 +317,17 @@ Goal: provide one-command install and easy upgrades while keeping package manage
 - Detect OS/architecture and choose correct release artifact.
 - Verify checksums before placing binary.
 - Respect install dir priority:
-  - `GLEAN_INSTALL_DIR`
+  - `DECANT_INSTALL_DIR`
   - `XDG_BIN_DIR`
   - `~/bin`
-  - `~/.glean/bin`
+  - `~/.decant/bin`
 - Print post-install checks:
-  - `glean --version`
-  - `glean`
+  - `decant --version`
+  - `decant`
 
 ### Upgrade Experience
 
-- Add `glean self-update` (or `glean upgrade`) command:
+- Add `decant self-update` (or `decant upgrade`) command:
   - checks latest release
   - downloads matching binary
   - verifies checksum
@@ -369,10 +371,10 @@ Goal: provide one-command install and easy upgrades while keeping package manage
 pbpaste | bun run src/cli.ts clean | pbcopy
 
 # No-subcommand interactive mode (default clean, aggressive off)
-glean
+decant
 
 # No-subcommand interactive mode with overrides
-glean --mode extract --aggressive
+decant --mode extract --aggressive
 
 # Clean from file
 bun run src/cli.ts clean -i snippet.html > snippet.md
@@ -381,7 +383,7 @@ bun run src/cli.ts clean -i snippet.html > snippet.md
 pbpaste | bun run src/cli.ts stats
 
 # After linking the local CLI package
-pbpaste | glean clean | pbcopy
+pbpaste | decant clean | pbcopy
 ```
 
 ## Open Decisions (Post-V1)
@@ -393,7 +395,7 @@ pbpaste | glean clean | pbcopy
 
 ## Definition of Done (v1)
 
-- Bun-based CLI is installable locally (`bun link`) with a working `glean` command.
+- Bun-based CLI is installable locally (`bun link`) with a working `decant` command.
 - User can paste copied DevTools HTML and get concise markdown quickly.
 - Token reduction and readability improvements are measurable.
 - README includes setup, examples, and troubleshooting.

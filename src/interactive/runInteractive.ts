@@ -31,8 +31,8 @@ function percent(value: number): string {
 function printIntro(): void {
   const intro = [
     "",
-    "glean interactive mode",
-    "Clipboard-first flow: copy content (HTML, RTF, or Word), run glean, paste clean markdown.",
+    "decant interactive mode",
+    "Clipboard-first flow: copy content (HTML, RTF, or Word), run decant, paste clean markdown.",
     "",
   ];
 

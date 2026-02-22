@@ -1,18 +1,18 @@
 {
-  "name": "glean",
+  "name": "decant",
   "version": "0.5.0",
   "description": "CLI to clean noisy HTML and convert it to markdown for LLM context.",
   "type": "module",
   "private": true,
   "bin": {
-    "glean": "./src/cli.ts"
+    "decant": "./src/cli.ts"
   },
   "scripts": {
     "clean": "bun run src/cli.ts clean",
     "extract": "bun run src/cli.ts extract",
     "stats": "bun run src/cli.ts stats",
     "test": "bun test",
-    "build:binary": "bun build src/cli.ts --compile --outfile dist/glean",
+    "build:binary": "bun build src/cli.ts --compile --outfile dist/decant",
     "package:manifests": "bun run scripts/generate-package-manager-manifests.ts",
     "update-golden": "bun run scripts/update-golden.ts",
     "smoke-check": "bun run scripts/smoke-check.ts"

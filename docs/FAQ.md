@@ -1,42 +1,42 @@
 # FAQ
 
-## What is Glean?
+## What is Decant?
 
-Glean converts noisy HTML, RTF, and Word documents into concise
+Decant converts noisy HTML, RTF, and Word documents into concise
 markdown so you can provide better LLM context with fewer tokens.
 
-## How do I install Glean with one command?
+## How do I install Decant with one command?
 
 Use the installer scripts documented in `README.md`:
 
 - macOS/Linux: `install`
 - Windows: `install.ps1`
 
-Set `GLEAN_REPO=mtrifilo/glean` for this repository.
+Set `DECANT_REPO=mtrifilo/decant` for this repository.
 
-## Is Glean available in package managers?
+## Is Decant available in package managers?
 
 Yes.
 
 - Homebrew tap:
   - `brew tap mtrifilo/tap https://github.com/mtrifilo/homebrew-tap`
-  - `brew install mtrifilo/tap/glean`
+  - `brew install mtrifilo/tap/decant`
 - Scoop bucket:
   - `scoop bucket add mtrifilo https://github.com/mtrifilo/scoop-bucket`
-  - `scoop install mtrifilo/glean`
+  - `scoop install mtrifilo/decant`
 
 Current prebuilt targets are `darwin-arm64`, `linux-x64`, and `windows-x64`.
 
-## How do I update Glean?
+## How do I update Decant?
 
 If you installed a compiled binary (via installer, Homebrew, or Scoop), run:
 
 ```bash
-glean update
+decant update
 ```
 
 This checks GitHub for the latest release, verifies the download checksum, and
-replaces the binary in place. Use `glean update --force` to reinstall even if
+replaces the binary in place. Use `decant update --force` to reinstall even if
 already on the latest version.
 
 If you are running from source, use `git pull && bun install` instead.
@@ -62,15 +62,15 @@ you can override with:
 
 ## Where are run/session stats stored?
 
-- Default: `~/.glean/stats.json`
-- Override with `GLEAN_STATS_PATH`
+- Default: `~/.decant/stats.json`
+- Override with `DECANT_STATS_PATH`
 
-## Does Glean require OpenTUI?
+## Does Decant require OpenTUI?
 
 No. Standard interactive mode and CLI commands work without full-screen TUI.
 `--tui` enables the OpenTUI path.
 
-## Is Glean intended to be a general context platform?
+## Is Decant intended to be a general context platform?
 
-Not in this repo. Glean stays focused on the HTML/RTF/Word -> markdown workflow.
+Not in this repo. Decant stays focused on the HTML/RTF/Word -> markdown workflow.
 Broader context-platform ideas are tracked separately.

@@ -1,13 +1,13 @@
-# Contributing to Glean
+# Contributing to Decant
 
 ## Project Focus
 
-`glean` exists to make HTML, RTF, and Word documents -> clean markdown fast and low-friction.
+`decant` exists to make HTML, RTF, and Word documents -> clean markdown fast and low-friction.
 
 Keep changes aligned with this workflow:
 
 - copy content (HTML, RTF, or Word)
-- run `glean`
+- run `decant`
 - paste concise markdown
 - understand token impact quickly
 
@@ -33,9 +33,9 @@ Before finalizing changes:
 
 ## Naming and State
 
-- Canonical command name: `glean`
-- Session state path namespace: `.glean`
-- Environment override for stats path: `GLEAN_STATS_PATH`
+- Canonical command name: `decant`
+- Session state path namespace: `.decant`
+- Environment override for stats path: `DECANT_STATS_PATH`
 
 ## Documentation Expectations
 

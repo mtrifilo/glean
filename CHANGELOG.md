@@ -7,6 +7,10 @@ Semantic Versioning after `1.0.0`.
 
 ## [Unreleased]
 
+### Changed
+
+- **Project renamed from `glean` to `decant`** — CLI command, binary names, env vars (`GLEAN_*` → `DECANT_*`), config paths (`~/.glean/` → `~/.decant/`), GitHub URLs, installers, CI workflows, and all documentation updated. Historical changelog entries below are preserved as-is.
+
 ## [0.5.0] - 2026-02-21
 
 ### Added

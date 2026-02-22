@@ -1,6 +1,6 @@
-# Glean — Claude Code Bootstrap
+# Decant — Claude Code Bootstrap
 
-Glean is a CLI tool that converts HTML, RTF, and Word documents into clean, token-efficient markdown.
+Decant is a CLI tool that converts HTML, RTF, and Word documents into clean, token-efficient markdown.
 
 ## Session Start
 
@@ -15,15 +15,15 @@ Do not assume what's next — the user directs priority.
 ```bash
 bun test              # Run test suite
 bun run build:binary  # Build single binary
-glean                 # Interactive mode (clipboard-first)
-pbpaste | glean clean | pbcopy  # Pipe workflow
+decant                 # Interactive mode (clipboard-first)
+pbpaste | decant clean | pbcopy  # Pipe workflow
 ```
 
 ## Naming Conventions
 
-- CLI command: `glean`
-- Namespace: `.glean` (e.g. `~/.glean/stats.json`)
-- Env var: `GLEAN_STATS_PATH`
+- CLI command: `decant`
+- Namespace: `.decant` (e.g. `~/.decant/stats.json`)
+- Env var: `DECANT_STATS_PATH`
 
 ## Scope Guardrails
 
@@ -53,7 +53,7 @@ Docs are only useful if they reflect reality. Treat doc updates as part of the t
 Before finalizing any change:
 
 1. `bun test` passes
-2. Smoke-test a relevant command (`glean`, `glean clean`, `glean --tui`)
+2. Smoke-test a relevant command (`decant`, `decant clean`, `decant --tui`)
 3. Update `docs/llm-context.md` if architecture or behavior changed
 4. Update `README.md` if user-facing behavior changed
 5. Update `CHANGELOG.md` under `[Unreleased]` for notable changes

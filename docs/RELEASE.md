@@ -1,6 +1,6 @@
 # Release Guide
 
-This guide describes how to cut and publish a new Glean release.
+This guide describes how to cut and publish a new Decant release.
 
 ## Preconditions
 
@@ -25,10 +25,10 @@ This guide describes how to cut and publish a new Glean release.
 5. Run validation:
    - `bun test`
    - smoke checks for:
-     - `glean`
-     - `glean clean`
-     - `glean stats`
-     - `glean --tui`
+     - `decant`
+     - `decant clean`
+     - `decant stats`
+     - `decant --tui`
 6. Commit and push the release branch:
    ```bash
    git add package.json CHANGELOG.md
@@ -51,8 +51,8 @@ This guide describes how to cut and publish a new Glean release.
 ## Smoke Commands
 
 ```bash
-printf '%s' '<article><h1>hello</h1><p>world</p></article>' | glean clean
-printf '%s' '<article><h1>hello</h1><p>world</p></article>' | glean stats
+printf '%s' '<article><h1>hello</h1><p>world</p></article>' | decant clean
+printf '%s' '<article><h1>hello</h1><p>world</p></article>' | decant stats
 ```
 
 ## Post-Release

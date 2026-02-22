@@ -1,5 +1,5 @@
 name: Bug report
-description: Report a reproducible problem in Glean.
+description: Report a reproducible problem in Decant.
 title: "[Bug]: "
 labels:
   - bug
@@ -13,8 +13,8 @@ body:
   - type: input
     id: version
     attributes:
-      label: Glean version
-      description: Output of `glean --version` if available.
+      label: Decant version
+      description: Output of `decant --version` if available.
       placeholder: "v0.1.0"
     validations:
       required: false
@@ -37,7 +37,7 @@ body:
       description: Provide exact commands and/or clipboard workflow steps.
       placeholder: |
         1. Copy HTML from Chrome DevTools
-        2. Run `glean --tui`
+        2. Run `decant --tui`
         3. ...
     validations:
       required: true

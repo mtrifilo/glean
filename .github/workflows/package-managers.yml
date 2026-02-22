@@ -64,8 +64,8 @@ jobs:
         with:
           name: package-manager-manifests-${{ env.RELEASE_TAG }}
           path: |
-            packaging/homebrew/glean.rb
-            packaging/scoop/glean.json
+            packaging/homebrew/decant.rb
+            packaging/scoop/decant.json
 
       - name: Publish Homebrew formula
         if: steps.preflight.outputs.publish_enabled == 'true'
@@ -74,18 +74,18 @@ jobs:
         run: |
           git clone "https://x-access-token:${PACKAGE_MANAGER_PAT}@github.com/${HOMEBREW_TAP_REPO}.git" homebrew-tap
           mkdir -p homebrew-tap/Formula
-          cp packaging/homebrew/glean.rb homebrew-tap/Formula/glean.rb
+          cp packaging/homebrew/decant.rb homebrew-tap/Formula/decant.rb
 
           cd homebrew-tap
-          if git diff --quiet -- Formula/glean.rb; then
+          if git diff --quiet -- Formula/decant.rb; then
             echo "No Homebrew formula changes."
             exit 0
           fi
 
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add Formula/glean.rb
-          git commit -m "glean ${RELEASE_TAG}"
+          git add Formula/decant.rb
+          git commit -m "decant ${RELEASE_TAG}"
           git push
 
       - name: Publish Scoop manifest
@@ -95,16 +95,16 @@ jobs:
         run: |
           git clone "https://x-access-token:${PACKAGE_MANAGER_PAT}@github.com/${SCOOP_BUCKET_REPO}.git" scoop-bucket
           mkdir -p scoop-bucket/bucket
-          cp packaging/scoop/glean.json scoop-bucket/bucket/glean.json
+          cp packaging/scoop/decant.json scoop-bucket/bucket/decant.json
 
           cd scoop-bucket
-          if git diff --quiet -- bucket/glean.json; then
+          if git diff --quiet -- bucket/decant.json; then
             echo "No Scoop manifest changes."
             exit 0
           fi
 
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add bucket/glean.json
-          git commit -m "glean ${RELEASE_TAG}"
+          git add bucket/decant.json
+          git commit -m "decant ${RELEASE_TAG}"
           git push

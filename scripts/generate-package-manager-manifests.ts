@@ -23,8 +23,8 @@ interface CliArgs {
 
 function parseArgs(argv: string[]): CliArgs {
   const parsed: CliArgs = {
-    owner: process.env.GLEAN_GITHUB_OWNER ?? "mtrifilo",
-    repo: process.env.GLEAN_GITHUB_REPO ?? "glean",
+    owner: process.env.DECANT_GITHUB_OWNER ?? "mtrifilo",
+    repo: process.env.DECANT_GITHUB_REPO ?? "decant",
   };
 
   for (let index = 0; index < argv.length; index += 1) {
@@ -80,11 +80,11 @@ function shaFromDigest(asset: ReleaseAsset): string | null {
 
 async function fetchJson<T>(url: string): Promise<T> {
   const headers: Record<string, string> = {
-    "User-Agent": "glean-package-manager-generator",
+    "User-Agent": "decant-package-manager-generator",
     Accept: "application/vnd.github+json",
   };
 
-  const token = process.env.GITHUB_TOKEN ?? process.env.GH_TOKEN ?? process.env.GLEAN_GITHUB_TOKEN;
+  const token = process.env.GITHUB_TOKEN ?? process.env.GH_TOKEN ?? process.env.DECANT_GITHUB_TOKEN;
   if (token) {
     headers.Authorization = `Bearer ${token}`;
   }
@@ -99,10 +99,10 @@ async function fetchJson<T>(url: string): Promise<T> {
 
 async function downloadSha256(url: string): Promise<string> {
   const headers: Record<string, string> = {
-    "User-Agent": "glean-package-manager-generator",
+    "User-Agent": "decant-package-manager-generator",
   };
 
-  const token = process.env.GITHUB_TOKEN ?? process.env.GH_TOKEN ?? process.env.GLEAN_GITHUB_TOKEN;
+  const token = process.env.GITHUB_TOKEN ?? process.env.GH_TOKEN ?? process.env.DECANT_GITHUB_TOKEN;
   if (token) {
     headers.Authorization = `Bearer ${token}`;
   }
@@ -144,7 +144,7 @@ function renderHomebrewFormula(input: {
   linuxX64Sha: string;
   sourceTarballSha: string;
 }): string {
-  return `class Glean < Formula
+  return `class Decant < Formula
   desc "Clean noisy HTML into compact markdown for LLM context"
   homepage "https://github.com/${input.owner}/${input.repo}"
   license "MIT"
@@ -170,9 +170,9 @@ function renderHomebrewFormula(input: {
   def install
     binary_name =
       if OS.mac? && Hardware::CPU.arm?
-        "glean-darwin-arm64"
+        "decant-darwin-arm64"
       elsif OS.linux? && Hardware::CPU.intel?
-        "glean-linux-x64"
+        "decant-linux-x64"
       else
         odie <<~EOS
           Prebuilt binaries are currently available for:
@@ -186,11 +186,11 @@ function renderHomebrewFormula(input: {
         EOS
       end
 
-    bin.install binary_name => "glean"
+    bin.install binary_name => "decant"
   end
 
   test do
-    assert_match "Usage: glean", shell_output("#{bin}/glean --help")
+    assert_match "Usage: decant", shell_output("#{bin}/decant --help")
   end
 end
 `;
@@ -214,14 +214,14 @@ function renderScoopManifest(input: {
         hash: input.windowsX64Sha,
       },
     },
-    bin: "glean-windows-x64.exe",
+    bin: "decant-windows-x64.exe",
     checkver: {
       github: `https://github.com/${input.owner}/${input.repo}`,
     },
     autoupdate: {
       architecture: {
         "64bit": {
-          url: `https://github.com/${input.owner}/${input.repo}/releases/download/v$version/glean-windows-x64.exe`,
+          url: `https://github.com/${input.owner}/${input.repo}/releases/download/v$version/decant-windows-x64.exe`,
         },
       },
     },
@@ -244,9 +244,9 @@ async function main(): Promise<void> {
   const releaseUrl = `https://api.github.com/repos/${args.owner}/${args.repo}/releases/tags/${tag}`;
   const release = await fetchJson<ReleasePayload>(releaseUrl);
 
-  const darwinArmAsset = requireAsset(release.assets, "glean-darwin-arm64");
-  const linuxX64Asset = requireAsset(release.assets, "glean-linux-x64");
-  const windowsX64Asset = requireAsset(release.assets, "glean-windows-x64.exe");
+  const darwinArmAsset = requireAsset(release.assets, "decant-darwin-arm64");
+  const linuxX64Asset = requireAsset(release.assets, "decant-linux-x64");
+  const windowsX64Asset = requireAsset(release.assets, "decant-windows-x64.exe");
 
   const [darwinArmSha, linuxX64Sha, windowsX64Sha, sourceTarballSha] = await Promise.all([
     resolveSha(darwinArmAsset),
@@ -280,10 +280,10 @@ async function main(): Promise<void> {
   await mkdir(homebrewDir, { recursive: true });
   await mkdir(scoopDir, { recursive: true });
 
-  await writeFile(join(homebrewDir, "glean.rb"), formula, "utf8");
-  await writeFile(join(scoopDir, "glean.json"), scoopManifest, "utf8");
+  await writeFile(join(homebrewDir, "decant.rb"), formula, "utf8");
+  await writeFile(join(scoopDir, "decant.json"), scoopManifest, "utf8");
 
-  process.stdout.write(`Generated:\n- ${join(homebrewDir, "glean.rb")}\n- ${join(scoopDir, "glean.json")}\n`);
+  process.stdout.write(`Generated:\n- ${join(homebrewDir, "decant.rb")}\n- ${join(scoopDir, "decant.json")}\n`);
 }
 
 await main();

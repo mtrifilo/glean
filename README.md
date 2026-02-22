@@ -1,32 +1,32 @@
-# glean
+# decant
 
 Token-efficient document-to-markdown for LLMs. Local, fast, interactive.
 
-## Just `glean`
+## Just `decant`
 
-Copy content from anywhere — a web page, a Word doc, an RTF file — then run `glean`. Clean markdown lands on your clipboard, ready to paste into your agent.
+Copy content from anywhere — a web page, a Word doc, an RTF file — then run `decant`. Clean markdown lands on your clipboard, ready to paste into your agent.
 
 ```bash
-glean
+decant
 ```
 
 ## Why this exists
 
-Most document-to-markdown tools stop at conversion. Glean focuses on what happens next: feeding that content into an LLM.
+Most document-to-markdown tools stop at conversion. Decant focuses on what happens next: feeding that content into an LLM.
 
-Every document carries noise — wrapper markup, nav blocks, styling attributes, boilerplate footers. That noise burns context window tokens and dilutes the signal your model sees. Glean strips it out and tells you exactly how much you saved.
+Every document carries noise — wrapper markup, nav blocks, styling attributes, boilerplate footers. That noise burns context window tokens and dilutes the signal your model sees. Decant strips it out and tells you exactly how much you saved.
 
-**Token-aware output.** Glean doesn't just convert — it measures. Every run reports character and token reduction so you know how efficiently your content fits a context window.
+**Token-aware output.** Decant doesn't just convert — it measures. Every run reports character and token reduction so you know how efficiently your content fits a context window.
 
-**Interactive, clipboard-first.** No flags, no file paths for the common case. Copy content, run `glean`, paste clean markdown. The full-screen TUI (`--tui`) adds live clipboard detection, color-coded stats, and styled preview panels.
+**Interactive, clipboard-first.** No flags, no file paths for the common case. Copy content, run `decant`, paste clean markdown. The full-screen TUI (`--tui`) adds live clipboard detection, color-coded stats, and styled preview panels.
 
-**Local and fast.** Single binary, zero runtime dependencies, works offline. Install with one command, update with `glean update`. No API keys, no cloud, no Python environment.
+**Local and fast.** Single binary, zero runtime dependencies, works offline. Install with one command, update with `decant update`. No API keys, no cloud, no Python environment.
 
-**Scriptable.** Pipes work exactly how you'd expect: `pbpaste | glean clean | pbcopy`. JSON stats output, file input, and all options are flag-driven for easy automation.
+**Scriptable.** Pipes work exactly how you'd expect: `pbpaste | decant clean | pbcopy`. JSON stats output, file input, and all options are flag-driven for easy automation.
 
 ## What's ahead
 
-Glean's roadmap is focused on the space between document conversion and LLM consumption — the workflow intelligence that no other tool provides:
+Decant's roadmap is focused on the space between document conversion and LLM consumption — the workflow intelligence that no other tool provides:
 
 - **Token budget** (`--max-tokens`) — trim output to fit a context window
 - **TUI workspace** — syntax-highlighted preview, scrollable output, option toggling, continuous mode
@@ -45,35 +45,35 @@ Pick one command path and run it.
 macOS/Linux (Homebrew):
 
 ```bash
-brew tap mtrifilo/tap https://github.com/mtrifilo/homebrew-tap && brew install mtrifilo/tap/glean
+brew tap mtrifilo/tap https://github.com/mtrifilo/homebrew-tap && brew install mtrifilo/tap/decant
 ```
 
 Windows (Scoop):
 
 ```powershell
-scoop bucket add mtrifilo https://github.com/mtrifilo/scoop-bucket; scoop install mtrifilo/glean
+scoop bucket add mtrifilo https://github.com/mtrifilo/scoop-bucket; scoop install mtrifilo/decant
 ```
 
 No package manager? Use the release installer:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/mtrifilo/glean/main/install | GLEAN_REPO=mtrifilo/glean bash
+curl -fsSL https://raw.githubusercontent.com/mtrifilo/decant/main/install | DECANT_REPO=mtrifilo/decant bash
 ```
 
 ```powershell
-$env:GLEAN_REPO="mtrifilo/glean"; irm https://raw.githubusercontent.com/mtrifilo/glean/main/install.ps1 | iex
+$env:DECANT_REPO="mtrifilo/decant"; irm https://raw.githubusercontent.com/mtrifilo/decant/main/install.ps1 | iex
 ```
 
 Verify install:
 
 ```bash
-glean --help
+decant --help
 ```
 
 Quick first run:
 
 ```bash
-pbpaste | glean clean | pbcopy
+pbpaste | decant clean | pbcopy
 ```
 
 Current prebuilt targets:
@@ -89,11 +89,11 @@ For unsupported targets (for example macOS `x64`, Linux `arm64`, Windows `arm64`
 From a compiled binary:
 
 ```bash
-glean update
+decant update
 ```
 
 Or re-run your install command (`brew upgrade`, `scoop update`, or installer script).
-Use `GLEAN_VERSION=<tag>` to pin a specific release.
+Use `DECANT_VERSION=<tag>` to pin a specific release.
 
 ## Source install (development or unsupported targets)
 
@@ -107,23 +107,23 @@ bun install
 bun link
 ```
 
-After linking, `glean` is available in your shell.
+After linking, `decant` is available in your shell.
 
 Installer env vars (script path only):
 
-- `GLEAN_VERSION` (default: `latest`)
-- `GLEAN_INSTALL_DIR` (custom binary destination)
+- `DECANT_VERSION` (default: `latest`)
+- `DECANT_INSTALL_DIR` (custom binary destination)
 
 ## Commands
 
-- `glean` - interactive mode (clipboard-first, auto-process + auto-copy + stats)
-- `glean clean` - deterministic HTML cleanup + markdown conversion
-- `glean extract` - Readability-first extraction, then cleanup + markdown conversion
-- `glean stats` - report character/token estimate deltas between input and markdown output
-- `glean update` - self-update to the latest release (compiled binaries only)
-- `glean --version` - print the current version
+- `decant` - interactive mode (clipboard-first, auto-process + auto-copy + stats)
+- `decant clean` - deterministic HTML cleanup + markdown conversion
+- `decant extract` - Readability-first extraction, then cleanup + markdown conversion
+- `decant stats` - report character/token estimate deltas between input and markdown output
+- `decant update` - self-update to the latest release (compiled binaries only)
+- `decant --version` - print the current version
 
-## No-subcommand options (`glean`)
+## No-subcommand options (`decant`)
 
 - `--mode clean|extract` choose pipeline for interactive/no-subcommand runs (default: `clean`)
 - `--aggressive` enable stronger pruning for interactive/no-subcommand runs (default: off)
@@ -148,7 +148,7 @@ Installer env vars (script path only):
 
 ## Interactive mode
 
-Run `glean` with no subcommand to enter interactive mode.
+Run `decant` with no subcommand to enter interactive mode.
 
 - Uses defaults automatically (`clean`, aggressive off)
 - Does not prompt for mode/pruning choices during normal flow (use flags to override)
@@ -158,39 +158,39 @@ Run `glean` with no subcommand to enter interactive mode.
 - Shows current-run stats and session totals (tokens/chars saved)
 - Use `--tui` for a full-screen OpenTUI variant with styled stats panels, color-coded output, and live clipboard polling
 
-Session stats are persisted to `~/.glean/stats.json` by default.  
-Set `GLEAN_STATS_PATH` to override the stats file location.
+Session stats are persisted to `~/.decant/stats.json` by default.
+Set `DECANT_STATS_PATH` to override the stats file location.
 
 ## Examples
 
 ```bash
 # Clipboard-first workflow on macOS
-pbpaste | glean clean | pbcopy
+pbpaste | decant clean | pbcopy
 
 # No-arg interactive workflow (recommended for everyday use)
-glean
+decant
 
 # No-arg interactive, but use extract mode + aggressive pruning
-glean --mode extract --aggressive
+decant --mode extract --aggressive
 
 # Copy directly from command output
-pbpaste | glean clean --copy
+pbpaste | decant clean --copy
 
 # Run extract mode against a local HTML snippet
-glean extract -i snippet.html
+decant extract -i snippet.html
 
 # Clean an RTF or DOC file (macOS — auto-detected)
-glean clean -i document.rtf
-glean clean -i document.doc
+decant clean -i document.rtf
+decant clean -i document.doc
 
 # Pipe RTF through stdin
-cat document.rtf | glean clean
+cat document.rtf | decant clean
 
 # Compare reductions as JSON
-glean stats -i snippet.html --format json
+decant stats -i snippet.html --format json
 
 # Full-screen OpenTUI mode
-glean --tui
+decant --tui
 ```
 
 ## LLM Session Handoff

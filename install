@@ -3,22 +3,22 @@ set -euo pipefail
 
 print_usage() {
   cat <<'EOF'
-Install Glean from GitHub Releases.
+Install Decant from GitHub Releases.
 
 Usage:
   install --repo <owner/repo> [--version <tag|latest>] [--install-dir <path>]
 
 Environment variables:
-  GLEAN_REPO         GitHub repo slug (for example owner/repo)
-  GLEAN_VERSION      Release tag (default: latest)
-  GLEAN_INSTALL_DIR  Install destination directory
+  DECANT_REPO         GitHub repo slug (for example owner/repo)
+  DECANT_VERSION      Release tag (default: latest)
+  DECANT_INSTALL_DIR  Install destination directory
   XDG_BIN_DIR        Fallback install directory
 EOF
 }
 
-repo="${GLEAN_REPO:-}"
-version="${GLEAN_VERSION:-latest}"
-install_dir="${GLEAN_INSTALL_DIR:-${XDG_BIN_DIR:-}}"
+repo="${DECANT_REPO:-}"
+version="${DECANT_VERSION:-latest}"
+install_dir="${DECANT_INSTALL_DIR:-${XDG_BIN_DIR:-}}"
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -47,7 +47,7 @@ while [[ $# -gt 0 ]]; do
 done
 
 if [[ -z "$repo" ]]; then
-  echo "Missing repository. Set GLEAN_REPO or pass --repo owner/repo." >&2
+  echo "Missing repository. Set DECANT_REPO or pass --repo owner/repo." >&2
   exit 1
 fi
 
@@ -55,7 +55,7 @@ if [[ -z "$install_dir" ]]; then
   if [[ -d "$HOME/bin" || ! -e "$HOME/bin" ]]; then
     install_dir="$HOME/bin"
   else
-    install_dir="$HOME/.glean/bin"
+    install_dir="$HOME/.decant/bin"
   fi
 fi
 
@@ -95,7 +95,7 @@ case "$uname_m" in
     ;;
 esac
 
-asset_name="glean-${os_name}-${arch_name}"
+asset_name="decant-${os_name}-${arch_name}"
 
 if [[ "$version" == "latest" ]]; then
   api_url="https://api.github.com/repos/${repo}/releases/latest"
@@ -141,12 +141,12 @@ if [[ -n "$checksum_url" ]]; then
 fi
 
 mkdir -p "$install_dir"
-install -m 755 "${tmp_dir}/${asset_name}" "${install_dir}/glean"
+install -m 755 "${tmp_dir}/${asset_name}" "${install_dir}/decant"
 
-echo "Installed glean ${tag_name:-$version} to ${install_dir}/glean"
-if ! command -v glean >/dev/null 2>&1; then
+echo "Installed decant ${tag_name:-$version} to ${install_dir}/decant"
+if ! command -v decant >/dev/null 2>&1; then
   echo "Note: '${install_dir}' is not currently on PATH for this shell."
-  echo "Add it to PATH, then run: glean --help"
+  echo "Add it to PATH, then run: decant --help"
 else
-  echo "Run: glean --help"
+  echo "Run: decant --help"
 fi

@@ -1,13 +1,13 @@
 param(
-  [string]$Repo = $env:GLEAN_REPO,
-  [string]$Version = $env:GLEAN_VERSION,
-  [string]$InstallDir = $env:GLEAN_INSTALL_DIR
+  [string]$Repo = $env:DECANT_REPO,
+  [string]$Version = $env:DECANT_VERSION,
+  [string]$InstallDir = $env:DECANT_INSTALL_DIR
 )
 
 $ErrorActionPreference = "Stop"
 
 if ([string]::IsNullOrWhiteSpace($Repo)) {
-  throw "Missing repository. Set GLEAN_REPO or pass -Repo owner/repo."
+  throw "Missing repository. Set DECANT_REPO or pass -Repo owner/repo."
 }
 
 if ([string]::IsNullOrWhiteSpace($Version)) {
@@ -15,7 +15,7 @@ if ([string]::IsNullOrWhiteSpace($Version)) {
 }
 
 if ([string]::IsNullOrWhiteSpace($InstallDir)) {
-  $InstallDir = Join-Path $HOME ".glean\bin"
+  $InstallDir = Join-Path $HOME ".decant\bin"
 }
 
 $archRaw = [System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture.ToString().ToLowerInvariant()
@@ -25,7 +25,7 @@ switch ($archRaw) {
   default { throw "Unsupported architecture: $archRaw" }
 }
 
-$assetName = "glean-windows-$arch.exe"
+$assetName = "decant-windows-$arch.exe"
 
 if ($Version -eq "latest") {
   $apiUrl = "https://api.github.com/repos/$Repo/releases/latest"
@@ -40,7 +40,7 @@ if (-not $asset) {
   throw "Could not find release asset '$assetName' for $Repo."
 }
 
-$tmpDir = Join-Path ([System.IO.Path]::GetTempPath()) ("glean-install-" + [System.Guid]::NewGuid().ToString("N"))
+$tmpDir = Join-Path ([System.IO.Path]::GetTempPath()) ("decant-install-" + [System.Guid]::NewGuid().ToString("N"))
 New-Item -ItemType Directory -Path $tmpDir | Out-Null
 
 try {
@@ -66,16 +66,16 @@ try {
   }
 
   New-Item -ItemType Directory -Path $InstallDir -Force | Out-Null
-  $targetPath = Join-Path $InstallDir "glean.exe"
+  $targetPath = Join-Path $InstallDir "decant.exe"
   Copy-Item -Path $binaryPath -Destination $targetPath -Force
-  Write-Host "Installed glean to $targetPath"
+  Write-Host "Installed decant to $targetPath"
 
   $pathEntries = ($env:Path -split ';')
   if ($pathEntries -notcontains $InstallDir) {
     Write-Host "Note: '$InstallDir' is not currently in PATH."
-    Write-Host "Add it to PATH, then run: glean --help"
+    Write-Host "Add it to PATH, then run: decant --help"
   } else {
-    Write-Host "Run: glean --help"
+    Write-Host "Run: decant --help"
   }
 }
 finally {

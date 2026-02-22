@@ -1,6 +1,6 @@
 # Development Workflow
 
-This guide covers the branch-to-release cycle for Glean contributions.
+This guide covers the branch-to-release cycle for Decant contributions.
 
 ## Branch Strategy
 
@@ -31,8 +31,8 @@ Examples: `feat/tui-polish`, `fix/clipboard-fallback`, `chore/update-deps`
    ```bash
    bun test
    # Smoke-test relevant commands
-   glean
-   glean --tui
+   decant
+   decant --tui
    ```
 
 4. **Update docs** if behavior changed:
@@ -53,7 +53,7 @@ Use the `/pr` Claude Code skill or `gh pr create` to open the PR. Every PR shoul
 - **What** changed (concrete summary of modifications)
 - **Why** it changed (motivation, user problem, or context)
 - **How to test** (steps a reviewer can follow)
-- **Scope check** (stays within Glean's core workflow focus)
+- **Scope check** (stays within Decant's core workflow focus)
 
 See `.github/PULL_REQUEST_TEMPLATE.md` for the full template.
 

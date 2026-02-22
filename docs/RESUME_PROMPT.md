@@ -5,7 +5,7 @@ Use these prompts to restart an LLM session efficiently.
 ## Fast Resume (Recommended)
 
 ```text
-You are resuming work on the `glean` CLI project.
+You are resuming work on the `decant` CLI project.
 
 Read these files first, in order:
 1) docs/llm-context.md
@@ -18,14 +18,14 @@ Then:
 - Run relevant tests and report outcomes.
 
 Constraints:
-- Keep `glean` focused on HTML/RTF/Word -> clean markdown workflow.
+- Keep `decant` focused on HTML/RTF/Word -> clean markdown workflow.
 - Prefer token-efficient investigation (targeted file reads, not broad scans).
 ```
 
 ## Deep-Dive Resume (When task is ambiguous)
 
 ```text
-You are resuming development on `glean`.
+You are resuming development on `decant`.
 
 Start with:
 - docs/llm-context.md
@@ -40,13 +40,13 @@ Then create:
 Validation requirements:
 - Run focused tests first
 - Run full test suite if behavior changed broadly
-- Report any risk of scope creep away from `glean` core intent
+- Report any risk of scope creep away from `decant` core intent
 ```
 
 ## Bug-Fix Resume
 
 ```text
-Resume `glean` and fix the reported issue.
+Resume `decant` and fix the reported issue.
 
 First read:
 - docs/llm-context.md

@@ -94,25 +94,25 @@ describe("parseChecksumsFile", () => {
   const windowsHash = "c".repeat(64);
 
   const content = [
-    `${darwinHash}  glean-darwin-arm64`,
-    `${linuxHash}  glean-linux-x64`,
-    `${windowsHash}  glean-windows-x64.exe`,
+    `${darwinHash}  decant-darwin-arm64`,
+    `${linuxHash}  decant-linux-x64`,
+    `${windowsHash}  decant-windows-x64.exe`,
   ].join("\n");
 
   test("finds matching asset hash", () => {
-    expect(parseChecksumsFile(content, "glean-linux-x64")).toBe(linuxHash);
+    expect(parseChecksumsFile(content, "decant-linux-x64")).toBe(linuxHash);
   });
 
   test("returns null for unknown asset", () => {
-    expect(parseChecksumsFile(content, "glean-freebsd-x64")).toBeNull();
+    expect(parseChecksumsFile(content, "decant-freebsd-x64")).toBeNull();
   });
 
   test("handles empty content", () => {
-    expect(parseChecksumsFile("", "glean-darwin-arm64")).toBeNull();
+    expect(parseChecksumsFile("", "decant-darwin-arm64")).toBeNull();
   });
 
   test("handles trailing newlines", () => {
-    expect(parseChecksumsFile(content + "\n\n", "glean-windows-x64.exe")).toBe(windowsHash);
+    expect(parseChecksumsFile(content + "\n\n", "decant-windows-x64.exe")).toBe(windowsHash);
   });
 });
 
@@ -121,7 +121,7 @@ describe("detectPlatform", () => {
     const result = detectPlatform();
     // On any CI/dev machine this should return a known value or null
     if (result !== null) {
-      expect(result).toMatch(/^glean-/);
+      expect(result).toMatch(/^decant-/);
     }
   });
 });
@@ -133,17 +133,17 @@ describe("isCompiledBinary", () => {
   });
 });
 
-describe("glean update (source mode)", () => {
+describe("decant update (source mode)", () => {
   test("prints source-mode message and suggests git pull", async () => {
     const result = await runCli(["update"]);
 
     expect(result.exitCode).toBe(0);
-    expect(result.stderr).toContain("running glean from source");
+    expect(result.stderr).toContain("running decant from source");
     expect(result.stderr).toContain("git pull");
   });
 });
 
-describe("glean --version", () => {
+describe("decant --version", () => {
   test("prints version matching package.json", async () => {
     const result = await runCli(["--version"]);
 

@@ -36,7 +36,7 @@ jobs:
 
     env:
       TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.event.release.tag_name }}
-      BINARY: glean-${{ matrix.os_name }}-${{ matrix.arch_name }}${{ matrix.binary_ext }}
+      BINARY: decant-${{ matrix.os_name }}-${{ matrix.arch_name }}${{ matrix.binary_ext }}
       GH_TOKEN: ${{ github.token }}
 
     steps:
@@ -81,7 +81,7 @@ jobs:
           fi
           echo "Version check passed."
 
-      - name: Verify glean clean pipeline
+      - name: Verify decant clean pipeline
         shell: bash
         run: |
           output=$(echo '<div><h1>Hello</h1><p>World</p></div>' | ./"$BINARY" clean)

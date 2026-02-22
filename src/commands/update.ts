@@ -3,7 +3,7 @@ import { access, constants, realpath, rename, unlink, writeFile } from "node:fs/
 import { dirname, join } from "node:path";
 import { version as localVersion } from "../../package.json";
 
-const REPO_SLUG = "mtrifilo/glean";
+const REPO_SLUG = "mtrifilo/decant";
 
 interface ReleaseAsset {
   name: string;
@@ -55,9 +55,9 @@ export function detectPlatform(): string | null {
   const platform = process.platform;
   const arch = process.arch;
 
-  if (platform === "darwin" && arch === "arm64") return "glean-darwin-arm64";
-  if (platform === "linux" && arch === "x64") return "glean-linux-x64";
-  if (platform === "win32" && arch === "x64") return "glean-windows-x64.exe";
+  if (platform === "darwin" && arch === "arm64") return "decant-darwin-arm64";
+  if (platform === "linux" && arch === "x64") return "decant-linux-x64";
+  if (platform === "win32" && arch === "x64") return "decant-windows-x64.exe";
 
   return null;
 }
@@ -84,7 +84,7 @@ export function sha256(data: Buffer): string {
 export async function fetchLatestRelease(): Promise<ReleasePayload> {
   const url = `https://api.github.com/repos/${REPO_SLUG}/releases/latest`;
   const headers: Record<string, string> = {
-    "User-Agent": "glean-self-update",
+    "User-Agent": "decant-self-update",
     Accept: "application/vnd.github+json",
   };
 
@@ -105,7 +105,7 @@ export async function fetchLatestRelease(): Promise<ReleasePayload> {
 
 async function downloadAsset(url: string): Promise<Buffer> {
   const headers: Record<string, string> = {
-    "User-Agent": "glean-self-update",
+    "User-Agent": "decant-self-update",
     Accept: "application/octet-stream",
   };
 
@@ -126,7 +126,7 @@ async function downloadAsset(url: string): Promise<Buffer> {
 
 async function atomicSwap(binaryPath: string, newData: Buffer): Promise<void> {
   const dir = dirname(binaryPath);
-  const tmpPath = join(dir, `.glean-update-${Date.now()}.tmp`);
+  const tmpPath = join(dir, `.decant-update-${Date.now()}.tmp`);
 
   try {
     await writeFile(tmpPath, newData, { mode: 0o755 });
@@ -145,7 +145,7 @@ export async function runUpdate(options: UpdateOptions = {}): Promise<void> {
   // Step 1: bail if running from source
   if (!isCompiledBinary()) {
     process.stderr.write(
-      "You are running glean from source. Self-update is only available for compiled binaries.\n" +
+      "You are running decant from source. Self-update is only available for compiled binaries.\n" +
         "To update, run: git pull && bun install\n",
     );
     return;
@@ -232,6 +232,6 @@ export async function runUpdate(options: UpdateOptions = {}): Promise<void> {
 
   // Step 10: success
   process.stderr.write(
-    `Successfully updated glean to v${remoteVersion}.\n`,
+    `Successfully updated decant to v${remoteVersion}.\n`,
   );
 }

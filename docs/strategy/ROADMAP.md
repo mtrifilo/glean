@@ -1,4 +1,4 @@
-# Glean Roadmap (Active)
+# Decant Roadmap (Active)
 
 For the full historical plan and milestone history, see `docs/plans/GLEAN_CLI_PLAN.md`.
 
@@ -11,10 +11,10 @@ For the full historical plan and milestone history, see `docs/plans/GLEAN_CLI_PL
 ### v0.3.0 — Distribution Confidence (Done)
 
 - [x] Audit and wire final repo slug in all placeholders
-- [x] CI smoke test workflow for release binaries (download, checksum, `glean --version`, `glean clean`)
+- [x] CI smoke test workflow for release binaries (download, checksum, `decant --version`, `decant clean`)
 - [x] Review installer scripts — confirmed production-ready, no changes needed
-- [x] Manual end-to-end installer validation on macOS (fresh install + `glean clean` pipeline)
-- [x] `glean update` upgrade-path validation (v0.2.0 → v0.3.0)
+- [x] Manual end-to-end installer validation on macOS (fresh install + `decant clean` pipeline)
+- [x] `decant update` upgrade-path validation (v0.2.0 → v0.3.0)
 - [x] Smoke test workflow passed on all 3 platforms (linux-x64, darwin-arm64, windows-x64)
 
 ### v0.4.0 — Developer Experience and Heuristic Safety (Done)
@@ -54,29 +54,28 @@ Add DOCX file support via `mammoth.js`. Extends the content detection + conversi
 - [ ] Update docs (README, CHANGELOG, llm-context.md)
 - [ ] End-to-end validation, cut v0.6.0 release
 
-### v0.6.1 — Rename to `decant`
+### v0.6.1 — Rename to `decant` (Done)
 
-Rename the project from `glean` to `decant` ("to pour off the clear liquid, leaving sediment behind"). The name `glean` conflicts with Meta's [facebookincubator/glean](https://github.com/facebookincubator/glean) code indexing system. `decant` is distinctive, memorable, and the metaphor is perfect — separating clean content from HTML sediment.
+Renamed the project from `glean` to `decant` ("to pour off the clear liquid, leaving sediment behind"). The name `glean` conflicts with Meta's [facebookincubator/glean](https://github.com/facebookincubator/glean) code indexing system. `decant` is distinctive, memorable, and the metaphor is perfect — separating clean content from HTML sediment.
 
-This is a full sweep across the entire project:
+Full sweep across the entire project:
 
-- [ ] CLI command: `glean` → `decant`
-- [ ] Package name in `package.json`
-- [ ] Namespace: `.glean/` → `.decant/`, `GLEAN_*` env vars → `DECANT_*`
-- [ ] All code references, imports, comments
-- [ ] README, CHANGELOG, all docs
-- [ ] Installer scripts (`install`, `install.ps1`)
-- [ ] Homebrew tap (`homebrew-tap`) and Scoop bucket (`scoop-bucket`)
-- [ ] GitHub repo rename (`mtrifilo/glean` → `mtrifilo/decant`)
-- [ ] GitHub releases, CI workflows
-- [ ] Binary artifact names
-- [ ] Update `glean update` → `decant update` self-update logic
-
-Should land before major new features ship to avoid a rename after the tool gains broader adoption.
+- [x] CLI command: `glean` → `decant`
+- [x] Package name in `package.json`
+- [x] Namespace: `.glean/` → `.decant/`, `GLEAN_*` env vars → `DECANT_*`
+- [x] All code references, imports, comments
+- [x] README, CHANGELOG, all docs
+- [x] Installer scripts (`install`, `install.ps1`)
+- [x] Homebrew formula and Scoop manifest
+- [x] GitHub issue/PR templates, CI workflows
+- [x] Binary artifact names
+- [x] `decant update` self-update logic
+- [ ] GitHub repo rename (`mtrifilo/glean` → `mtrifilo/decant`) — post-merge manual step
+- [ ] Homebrew tap and Scoop bucket repo updates — post-merge manual step
 
 #### Tier 1 — Core Differentiators
 
-*What makes people try Glean. Table-stakes format support plus the LLM-workflow and UX features no other tool offers.*
+*What makes people try Decant. Table-stakes format support plus the LLM-workflow and UX features no other tool offers.*
 
 ### v0.7.0 — PDF Support
 
@@ -84,7 +83,7 @@ Extract text from PDF files. PDFs are one of the most common document types peop
 
 ### v0.8.0 — URL Fetching
 
-Fetch and convert web pages directly (`glean clean --url https://...`). Skips the copy-paste-from-browser step entirely — the single biggest friction point in the current workflow. Needs to handle fetching, stripping chrome/nav/footer, and feeding the content HTML into the existing pipeline.
+Fetch and convert web pages directly (`decant clean --url https://...`). Skips the copy-paste-from-browser step entirely — the single biggest friction point in the current workflow. Needs to handle fetching, stripping chrome/nav/footer, and feeding the content HTML into the existing pipeline.
 
 ### v0.9.0 — Token Budget
 
@@ -103,11 +102,11 @@ Major upgrade to the full-screen TUI (`--tui`). Preserves the zero-friction clip
 
 #### Tier 2 — LLM Workflow Intelligence
 
-*What makes Glean uniquely useful. Features that go beyond conversion — helping users understand, control, and optimize their output for LLM consumption.*
+*What makes Decant uniquely useful. Features that go beyond conversion — helping users understand, control, and optimize their output for LLM consumption.*
 
 ### v0.11.0 — Diff Mode
 
-Show a before/after comparison of what was removed during cleaning (`glean clean -i page.html --diff`). Useful for understanding what the pipeline is stripping and for tuning options. Consider side-by-side vs. unified diff output.
+Show a before/after comparison of what was removed during cleaning (`decant clean -i page.html --diff`). Useful for understanding what the pipeline is stripping and for tuning options. Consider side-by-side vs. unified diff output.
 
 ### v0.12.0 — Quality Score
 
@@ -127,19 +126,19 @@ Add `--format json` for structured output (title, body, metadata, stats) and `--
 
 #### Tier 3 — Power User Workflow
 
-*Productivity and ergonomics. Features that make Glean faster and more comfortable for daily use.*
+*Productivity and ergonomics. Features that make Decant faster and more comfortable for daily use.*
 
 ### v0.16.0 — Batch Processing
 
-Process multiple files or an entire directory at once (`glean clean -i ./docs/`). Output individual markdown files or concatenated output. Enables bulk conversion workflows — becomes a force multiplier as format support grows.
+Process multiple files or an entire directory at once (`decant clean -i ./docs/`). Output individual markdown files or concatenated output. Enables bulk conversion workflows — becomes a force multiplier as format support grows.
 
 ### v0.17.0 — Output to File
 
-Smart output-to-file with auto-naming (`glean clean -i report.pdf -o` → `report.md`). Support explicit output path (`-o output.md`) and auto-derived names. For batch processing, output to a mirrored directory structure.
+Smart output-to-file with auto-naming (`decant clean -i report.pdf -o` → `report.md`). Support explicit output path (`-o output.md`) and auto-derived names. For batch processing, output to a mirrored directory structure.
 
 ### v0.18.0 — Config File
 
-Support a `.gleanrc` or `.glean/config.toml` for persisting default options. As the option surface grows (max-tokens, aggressive, output format, etc.), users shouldn't have to repeat flags every time. Support project-level and user-level config with sensible merge behavior.
+Support a `.decantrc` or `.decant/config.toml` for persisting default options. As the option surface grows (max-tokens, aggressive, output format, etc.), users shouldn't have to repeat flags every time. Support project-level and user-level config with sensible merge behavior.
 
 ### v0.19.0 — Prompt Wrapping
 
@@ -183,7 +182,7 @@ Convert tabular data files (CSV, TSV) into markdown tables. Useful for feeding s
 
 ### v0.27.0 — Watch Mode
 
-Monitor the clipboard or a directory for new content and auto-convert as it appears (`glean --watch` or `glean --watch-dir ./inbox/`). Enables continuous workflows where users repeatedly copy content and want it cleaned automatically. Note: approaches `ctxkit` scope boundary — evaluate whether this belongs here or in a separate tool.
+Monitor the clipboard or a directory for new content and auto-convert as it appears (`decant --watch` or `decant --watch-dir ./inbox/`). Enables continuous workflows where users repeatedly copy content and want it cleaned automatically. Note: approaches `ctxkit` scope boundary — evaluate whether this belongs here or in a separate tool.
 
 ## Open Decisions
 

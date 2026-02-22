@@ -1,6 +1,6 @@
 # Package Manager Distribution
 
-This guide covers how `glean` is published to Homebrew, Scoop, and (optionally) Winget.
+This guide covers how `decant` is published to Homebrew, Scoop, and (optionally) Winget.
 
 ## Goals
 
@@ -10,8 +10,8 @@ This guide covers how `glean` is published to Homebrew, Scoop, and (optionally) 
 
 ## Current Maintainer Assets
 
-- Homebrew formula template/output: `packaging/homebrew/glean.rb`
-- Scoop manifest template/output: `packaging/scoop/glean.json`
+- Homebrew formula template/output: `packaging/homebrew/decant.rb`
+- Scoop manifest template/output: `packaging/scoop/decant.json`
 - Manifest generator script:
   - `bun run package:manifests -- --tag vX.Y.Z --owner <owner> --repo <repo>`
 - Publish workflow:
@@ -25,13 +25,13 @@ Create a tap repository:
 
 Tap structure:
 
-- `Formula/glean.rb`
+- `Formula/decant.rb`
 
 End-user install:
 
 ```bash
 brew tap mtrifilo/tap https://github.com/mtrifilo/homebrew-tap
-brew install mtrifilo/tap/glean
+brew install mtrifilo/tap/decant
 ```
 
 ## 2) Scoop (Windows)
@@ -42,27 +42,27 @@ Create a bucket repository:
 
 Bucket structure:
 
-- `bucket/glean.json`
+- `bucket/decant.json`
 
 End-user install:
 
 ```powershell
 scoop bucket add mtrifilo https://github.com/mtrifilo/scoop-bucket
-scoop install mtrifilo/glean
+scoop install mtrifilo/decant
 ```
 
 ## 3) Automation Setup
 
 `package-managers.yml` can generate and publish Homebrew + Scoop metadata from a release tag.
 
-Required secret in `glean` repo:
+Required secret in `decant` repo:
 
 - `PACKAGE_MANAGER_PAT`
   - personal access token with `contents:write` access to:
     - `mtrifilo/homebrew-tap`
     - `mtrifilo/scoop-bucket`
 
-Optional repo variables in `glean` repo:
+Optional repo variables in `decant` repo:
 
 - `HOMEBREW_TAP_REPO` (default: `<owner>/homebrew-tap`)
 - `SCOOP_BUCKET_REPO` (default: `<owner>/scoop-bucket`)
@@ -83,7 +83,7 @@ Start manual submissions after Homebrew + Scoop are stable.
 Recommended process:
 
 1. Generate a new manifest using winget tooling.
-2. Point installer URL at `glean-windows-x64.exe` GitHub release asset.
+2. Point installer URL at `decant-windows-x64.exe` GitHub release asset.
 3. Use release checksum in the manifest.
 4. Submit PR to `microsoft/winget-pkgs`.
 

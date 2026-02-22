@@ -1,6 +1,6 @@
 # Release Day Runbook
 
-This runbook is a living checklist for the first public open-source release of `glean`.
+This runbook is a living checklist for the first public open-source release of `decant` (originally `glean`).
 Update this file in real time while executing each step.
 
 ## Snapshot
@@ -8,7 +8,7 @@ Update this file in real time while executing each step.
 - Date: 2026-02-16
 - Current branch: `main`
 - Current git state: 1 local commit + tracking `origin/main`
-- Remote configured: yes (`origin` -> `https://github.com/mtrifilo/glean.git`)
+- Remote configured: yes (`origin` -> `https://github.com/mtrifilo/decant.git`)
 - Existing tags: `v0.1.0`, `v0.1.1`, `v0.1.2`, `v0.1.3`
 
 ## Execution Rules
@@ -25,7 +25,7 @@ Update this file in real time while executing each step.
 ## Checklist
 
 - [x] Step 1 - Finalize public repo identity
-  - Confirm final GitHub slug (`mtrifilo/glean`).
+  - Confirm final GitHub slug (`mtrifilo/decant`).
   - Replace placeholder repo references in docs/install instructions.
   - Verify all install commands point to the final slug.
 
@@ -41,7 +41,7 @@ Update this file in real time while executing each step.
 
 - [x] Step 4 - Run local release validation
   - Run `bun test`.
-  - Run smoke checks: `glean`, `glean clean`, `glean stats`, `glean --tui`.
+  - Run smoke checks: `decant`, `decant clean`, `decant stats`, `decant --tui`.
   - Run `bun run build:binary` and validate binary help output.
 
 - [x] Step 5 - Confirm release artifact matrix
@@ -78,7 +78,7 @@ Update this file in real time while executing each step.
 
 - Status: `[x]`
 - Notes:
-  - Final slug confirmed as `mtrifilo/glean`.
+  - Final slug confirmed as `mtrifilo/decant` (originally `mtrifilo/glean`, renamed in v0.6.1).
   - Updated install/docs references in:
     - `README.md`
     - `docs/FAQ.md`
@@ -88,7 +88,7 @@ Update this file in real time while executing each step.
 
 - Status: `[x]`
 - Notes:
-  - Created GitHub repo: `https://github.com/mtrifilo/glean`.
+  - Created GitHub repo: `https://github.com/mtrifilo/decant`.
   - Initial commit created: `5d2188a`.
   - Pushed `main` and set upstream to `origin/main`.
 
@@ -109,13 +109,13 @@ Update this file in real time while executing each step.
 - Notes:
   - `bun test` passed locally (17/17).
   - Smoke checks passed:
-    - `printf '<article...>' | glean clean`
-    - `printf '<article...>' | glean stats`
-    - `printf '<article...>' | glean`
-  - `glean --tui` non-TTY behavior validated: exits `1` with clear TTY-required message.
+    - `printf '<article...>' | decant clean`
+    - `printf '<article...>' | decant stats`
+    - `printf '<article...>' | decant`
+  - `decant --tui` non-TTY behavior validated: exits `1` with clear TTY-required message.
   - `bun run build:binary` initially failed due GFM plugin default import mismatch.
   - Fixed in `src/pipeline/toMarkdown.ts` by switching to named `gfm` import.
-  - Re-ran validation: tests pass, binary build succeeds, `dist/glean --help` works.
+  - Re-ran validation: tests pass, binary build succeeds, `dist/decant --help` works.
 
 ### Step 5 - Confirm release artifact matrix
 
@@ -148,9 +148,9 @@ Update this file in real time while executing each step.
     - shell interpolation bug in binary rename step
   - Applied workflow/docs/installer fixes on `main`.
   - Reran release via workflow dispatch (`22082424548`) and published assets:
-    - `glean-darwin-arm64`
-    - `glean-linux-x64`
-    - `glean-windows-x64.exe`
+    - `decant-darwin-arm64`
+    - `decant-linux-x64`
+    - `decant-windows-x64.exe`
     - `checksums.txt`
   - Released `v0.1.1` from tag workflow run `22082550937`.
   - Released `v0.1.2` from tag workflow run `22082667775`.
@@ -168,14 +168,14 @@ Update this file in real time while executing each step.
   - Local validation now passes:
     - `bun test`
     - `bun run build:binary`
-    - `dist/glean --help`
-    - `printf '<article...>' | dist/glean clean`
-    - `printf '<article...>' | dist/glean stats --format json`
+    - `dist/decant --help`
+    - `printf '<article...>' | dist/decant clean`
+    - `printf '<article...>' | dist/decant stats --format json`
   - `v0.1.3` installer validation (macOS) succeeded end-to-end:
     - install download + checksum verification
-    - `glean --help`
-    - `glean clean`
-    - `glean stats --format json`
+    - `decant --help`
+    - `decant clean`
+    - `decant stats --format json`
   - `install.ps1` reviewed and updated to clearly fail on unsupported `windows-arm64`.
 
 ### Step 9 - Final open-source readiness pass
@@ -183,7 +183,7 @@ Update this file in real time while executing each step.
 - Status: `[x]`
 - Notes:
   - Updated `SECURITY.md` with explicit private advisory URL:
-    - `https://github.com/mtrifilo/glean/security/advisories/new`
+    - `https://github.com/mtrifilo/decant/security/advisories/new`
   - Updated `CODE_OF_CONDUCT.md` with explicit report-request workflow.
   - Added issue template contact links in `.github/ISSUE_TEMPLATE/config.yml` for:
     - private security reports
@@ -195,14 +195,14 @@ Update this file in real time while executing each step.
 - Status: `[x]`
 - Notes:
   - Announcement draft prepared (for release notes or pinned issue):
-    - `glean v0.1.3 is now available with working prebuilt binaries for darwin-arm64, linux-x64, and windows-x64.`
+    - `decant v0.1.3 is now available with working prebuilt binaries for darwin-arm64, linux-x64, and windows-x64.`
     - Install:
-      - `curl -fsSL https://raw.githubusercontent.com/mtrifilo/glean/main/install | GLEAN_REPO=mtrifilo/glean bash`
-      - `$env:GLEAN_REPO="mtrifilo/glean"; irm https://raw.githubusercontent.com/mtrifilo/glean/main/install.ps1 | iex`
+      - `curl -fsSL https://raw.githubusercontent.com/mtrifilo/decant/main/install | DECANT_REPO=mtrifilo/decant bash`
+      - `$env:DECANT_REPO="mtrifilo/decant"; irm https://raw.githubusercontent.com/mtrifilo/decant/main/install.ps1 | iex`
     - Upgrade:
-      - rerun installer with `GLEAN_REPO=mtrifilo/glean`
+      - rerun installer with `DECANT_REPO=mtrifilo/decant`
     - Core workflow:
-      - `pbpaste | glean clean | pbcopy`
+      - `pbpaste | decant clean | pbcopy`
   - Post-release watch plan:
     - monitor new issues for install/runtime regressions
     - prioritize binary/runtime fixes within first 48 hours
