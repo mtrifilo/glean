@@ -110,6 +110,7 @@ jobs:
           ref: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.tag || github.ref }}
           sparse-checkout: CHANGELOG.md
           sparse-checkout-cone-mode: false
+          path: changelog-src
 
       - name: Extract release notes from changelog
         id: notes
@@ -117,7 +118,7 @@ jobs:
           TAG="${{ github.event_name == 'workflow_dispatch' && github.event.inputs.tag || github.ref_name }}"
           VERSION="${TAG#v}"
           # Extract the section for this version (between its heading and the next version heading)
-          NOTES=$(awk "/^## \\[${VERSION}\\]/{found=1; next} /^## \\[/{if(found) exit} found{print}" CHANGELOG.md)
+          NOTES=$(awk "/^## \\[${VERSION}\\]/{found=1; next} /^## \\[/{if(found) exit} found{print}" changelog-src/CHANGELOG.md)
           # Write to file to preserve formatting
           echo "$NOTES" > release-notes.md
 
