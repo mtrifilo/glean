@@ -232,8 +232,8 @@ export async function runInteractive(options: InteractiveOptions): Promise<void>
     throw new Error("No HTML was provided in clipboard.");
   }
 
-  // Processing indicator
-  process.stdout.write(`\n${accent("\u25d0 Processing...")}\n`);
+  // Processing indicator (no trailing newline — stays on this line)
+  process.stdout.write(`\n${accent("\u25d0 Processing...")}`);
 
   const transformOptions = defaultTransformOptions(options.aggressive);
   const processed = processHtml(options.mode, html, transformOptions);
