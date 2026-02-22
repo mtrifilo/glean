@@ -52,7 +52,11 @@ jobs:
         shell: bash
         run: |
           expected=$(grep "$BINARY" checksums.txt | awk '{print $1}')
-          actual=$(shasum -a 256 "$BINARY" | awk '{print $1}')
+          if command -v shasum >/dev/null 2>&1; then
+            actual=$(shasum -a 256 "$BINARY" | awk '{print $1}')
+          else
+            actual=$(sha256sum "$BINARY" | awk '{print $1}')
+          fi
           echo "Expected: $expected"
           echo "Actual:   $actual"
           if [ "$expected" != "$actual" ]; then
