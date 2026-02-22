@@ -13,7 +13,9 @@
     "stats": "bun run src/cli.ts stats",
     "test": "bun test",
     "build:binary": "bun build src/cli.ts --compile --outfile dist/glean",
-    "package:manifests": "bun run scripts/generate-package-manager-manifests.ts"
+    "package:manifests": "bun run scripts/generate-package-manager-manifests.ts",
+    "update-golden": "bun run scripts/update-golden.ts",
+    "smoke-check": "bun run scripts/smoke-check.ts"
   },
   "dependencies": {
     "@mozilla/readability": "^0.6.0",

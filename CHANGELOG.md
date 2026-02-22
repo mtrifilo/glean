@@ -7,6 +7,13 @@ Semantic Versioning after `1.0.0`.
 
 ## [Unreleased]
 
+### Added
+
+- Golden fixture regeneration script (`bun run update-golden`) — rebuilds all `.expected.md` files from current pipeline output.
+- Pipeline smoke check with quality thresholds (`bun run smoke-check`) — enforces per-fixture and aggregate char-reduction floors to catch heuristic regressions.
+- Smoke check integrated into CI as a required step after tests.
+- "Tuning Heuristics" section in `CONTRIBUTING.md` — documents the safe workflow for changing pipeline rules.
+
 ## [0.3.0] - 2026-02-21
 
 ### Added

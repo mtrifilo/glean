@@ -23,3 +23,6 @@ jobs:
 
       - name: Run tests
         run: bun test
+
+      - name: Smoke check pipeline quality
+        run: bun run smoke-check

@@ -80,6 +80,11 @@ glean --tui
 - `src/lib/sessionStats.ts` - persistent session metrics
 - `src/lib/types.ts` - shared types
 
+### Developer scripts
+
+- `scripts/update-golden.ts` - regenerates `.expected.md` golden fixtures from current pipeline
+- `scripts/smoke-check.ts` - quality threshold guard (per-fixture ≥30% char reduction, mean ≥40%)
+
 ### Validation
 
 - `test/pipeline.test.ts` - pipeline behavior
