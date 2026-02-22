@@ -219,51 +219,49 @@ These are additive — no breaking changes to existing stats output.
 
 ## Implementation Phases
 
-### Phase 1 — Content Detection + RTF/DOC Support
+### Phase 1 — Content Detection + RTF/DOC Support (Done — released as v0.5.0)
 
-**Branch:** `feat/v050-phase1-rtf`
+**Branch:** `feat/v050-phase1-rtf` (merged)
 
 Deliverables:
-- [ ] `src/lib/contentDetect.ts` — `looksLikeHtml()`, `looksLikeRtf()`, `isDocBytes()`, `detectFormat()`
-- [ ] Remove duplicated `looksLikeHtml()` from `runInteractive.ts` and `experimental.ts`
-- [ ] `src/lib/convert.ts` — `convertRtfToHtml()`, `convertDocToHtml()` via `textutil`
-- [ ] `readClipboardRtf()` in `io.ts`
-- [ ] Wire detection into interactive + TUI clipboard polling
-- [ ] Wire RTF/DOC path into `runTransform()` in `cli.ts`
-- [ ] `test/fixtures/sample.rtf` + expected output
-- [ ] Unit + integration tests for RTF/DOC path
+- [x] `src/lib/contentDetect.ts` — `looksLikeHtml()`, `looksLikeRtf()`, `isDocBytes()`, `detectFormat()`
+- [x] Remove duplicated `looksLikeHtml()` from `runInteractive.ts` and `experimental.ts`
+- [x] `src/lib/convert.ts` — `convertRtfToHtml()`, `convertDocToHtml()` via `textutil`
+- [x] `readClipboardRtf()` in `io.ts`
+- [x] Wire detection into interactive + TUI clipboard polling
+- [x] Wire RTF/DOC path into `resolveHtmlInput()` in `cli.ts`
+- [x] `test/fixtures/sample.rtf`
+- [x] Unit + integration tests for RTF/DOC path
 
 Zero new dependencies. RTF clipboard is macOS-only; RTF/DOC file conversion works anywhere `textutil` is available.
 
-### Phase 2 — DOCX Support
+### Phase 2 — DOCX Support (planned for v0.6.0)
 
-**Branch:** `feat/v050-phase2-docx`
+**Branch:** TBD
 
 Deliverables:
 - [ ] Add `mammoth` dependency
 - [ ] `isDocxBytes()` in `contentDetect.ts`
 - [ ] `readInputBytes()` in `io.ts`
 - [ ] `convertDocxToHtml()` in `convert.ts`
-- [ ] `src/pipeline/processContent.ts` — format-aware wrapper around `processHtml()`
 - [ ] Surface mammoth conversion warnings via `--verbose` flag
 - [ ] Wire file-based DOCX path through CLI
 - [ ] `test/fixtures/sample.docx` + expected output
 - [ ] Unit + integration tests for DOCX path
 
-### Phase 3 — Polish + Release
+### Phase 3 — Stats Extension + Polish (planned for v0.6.0)
 
-**Branch:** `feat/v050-phase3-release`
+**Branch:** TBD
 
 Deliverables:
-- [ ] Rename `processHtml()` → `processContent()`, update all call sites
 - [ ] Add `sourceFormat` / `sourceChars` to `ContentStats`
 - [ ] Update stats display to show source format when not HTML
 - [ ] Update `update-golden.ts` and `smoke-check.ts` for new fixtures
-- [ ] Update README.md (usage examples for RTF/DOC/DOCX)
+- [ ] Update README.md (usage examples for DOCX)
 - [ ] Update CHANGELOG.md
 - [ ] Update `docs/llm-context.md`
 - [ ] End-to-end validation of all input paths
-- [ ] Cut v0.5.0 release
+- [ ] Cut v0.6.0 release
 
 ## Decided
 

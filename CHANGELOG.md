@@ -7,12 +7,26 @@ Semantic Versioning after `1.0.0`.
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-02-21
+
 ### Added
 
+- RTF and DOC input support (macOS) — auto-detected and converted to HTML via `textutil` (zero new dependencies).
+  - Clipboard: interactive and TUI modes detect RTF from Word/TextEdit automatically.
+  - File: `glean clean -i file.rtf` or `glean clean -i file.doc`.
+  - Pipe: `cat file.rtf | glean clean`.
+- Content detection module (`contentDetect.ts`) — unified format detection for HTML, RTF, DOC, and unknown input.
+- RTF clipboard reading via `pbpaste -Prefer rtf` for Word/TextEdit compatibility.
 - Golden fixture regeneration script (`bun run update-golden`) — rebuilds all `.expected.md` files from current pipeline output.
 - Pipeline smoke check with quality thresholds (`bun run smoke-check`) — enforces per-fixture and aggregate char-reduction floors to catch heuristic regressions.
 - Smoke check integrated into CI as a required step after tests.
 - "Tuning Heuristics" section in `CONTRIBUTING.md` — documents the safe workflow for changing pipeline rules.
+
+### Changed
+
+- `looksLikeHtml()` consolidated from duplicated copies in `runInteractive.ts` and `experimental.ts` into shared `contentDetect.ts`.
+- Interactive mode prompt updated to mention Word/RTF content alongside HTML.
+- `--input` help text updated to indicate HTML, RTF, and DOC support.
 
 ## [0.3.0] - 2026-02-21
 
