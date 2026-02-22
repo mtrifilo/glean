@@ -32,7 +32,7 @@ function printIntro(): void {
   const intro = [
     "",
     "glean interactive mode",
-    "Clipboard-first flow: copy HTML, run glean, paste clean markdown.",
+    "Clipboard-first flow: copy content (HTML, RTF, or Word), run glean, paste clean markdown.",
     "",
   ];
 

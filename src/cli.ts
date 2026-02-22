@@ -66,7 +66,7 @@ function parseStatsFormat(value: string): StatsFormat {
 
 function addCommonOptions(command: Command): Command {
   return command
-    .option("-i, --input <path>", "Read HTML input from a file path")
+    .option("-i, --input <path>", "Read input from a file path (HTML, RTF, or DOC)")
     .option("--copy", "Copy command output to the macOS clipboard")
     .option("--keep-links", "Preserve markdown links (default behavior)")
     .option("--strip-links", "Strip links and keep only their text")
