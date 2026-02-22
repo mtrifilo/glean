@@ -51,7 +51,18 @@ let markedReady = false;
 
 function renderPreviewMarkdown(markdown: string, maxLines = 12): string {
   if (!markedReady) {
-    marked.use(markedTerminal({ reflowText: true, width: 72 }));
+    const ext = markedTerminal({ reflowText: true, width: 72 });
+    // Fix marked-terminal bug: its `text` renderer reads raw `.text`
+    // instead of parsing `.tokens`, so inline formatting (bold, links)
+    // inside tight list items is lost. Override to parse tokens.
+    const origText = ext.renderer.text;
+    ext.renderer.text = function (token: any) {
+      if (typeof token === "object" && token.tokens) {
+        return origText.call(this, this.parser.parseInline(token.tokens));
+      }
+      return origText.call(this, token);
+    };
+    marked.use(ext);
     markedReady = true;
   }
 

@@ -23,7 +23,7 @@
     "commander": "^14.0.1",
     "linkedom": "^0.18.12",
     "mammoth": "^1.11.0",
-    "marked": "^17.0.3",
+    "marked": "15",
     "marked-terminal": "^7.3.0",
     "turndown": "^7.2.1",
     "turndown-plugin-gfm": "^1.0.2"
