@@ -1,10 +1,20 @@
 import { createInterface } from "node:readline/promises";
 import { stdin as input, stdout as output } from "node:process";
+import {
+  accent,
+  bold,
+  clearLine,
+  highlight,
+  muted,
+  statLabel,
+  statValue,
+  success,
+} from "../lib/ansi";
 import { detectFormat } from "../lib/contentDetect";
 import { convertRtfToHtml } from "../lib/convert";
 import { copyToClipboard, readClipboardRtf, readClipboardText } from "../lib/io";
 import { recordRunStats } from "../lib/sessionStats";
-import type { StatsMode, TransformOptions } from "../lib/types";
+import type { ContentStats, StatsMode, TransformOptions } from "../lib/types";
 import { processHtml } from "../pipeline/processHtml";
 import { runExperimentalTui } from "../tui/experimental";
 
@@ -13,6 +23,9 @@ interface InteractiveOptions {
   mode: StatsMode;
   aggressive: boolean;
 }
+
+const SPINNER = ["\u25d0", "\u25d3", "\u25d1", "\u25d2"];
+const SEPARATOR = "\u2500".repeat(37);
 
 function defaultTransformOptions(aggressive: boolean): TransformOptions {
   return {
@@ -24,19 +37,28 @@ function defaultTransformOptions(aggressive: boolean): TransformOptions {
   };
 }
 
+function fmt(n: number): string {
+  return n.toLocaleString();
+}
+
 function percent(value: number): string {
   return `${value.toFixed(2)}%`;
 }
 
-function printIntro(): void {
-  const intro = [
+function previewLines(markdown: string, limit = 20): string[] {
+  const lines = markdown.trim() ? markdown.trim().split("\n") : ["(empty output)"];
+  if (lines.length <= limit) return lines;
+  return [...lines.slice(0, limit), "..."];
+}
+
+function printIntro(mode: StatsMode, aggressive: boolean): void {
+  const lines = [
     "",
-    "decant interactive mode",
-    "Clipboard-first flow: copy content (HTML, RTF, or Word), run decant, paste clean markdown.",
+    `${bold(accent("decant"))} ${muted("\u00b7")} ${muted("interactive mode")}`,
+    `${muted("Mode:")} ${bold(statValue(mode))}    ${muted("Aggressive:")} ${bold(statValue(aggressive ? "on" : "off"))}`,
     "",
   ];
-
-  process.stdout.write(`${intro.join("\n")}`);
+  process.stdout.write(lines.join("\n"));
 }
 
 async function resolveClipboard(): Promise<string | null> {
@@ -60,14 +82,31 @@ async function waitForClipboardContent(): Promise<string> {
   const first = await resolveClipboard();
   if (first) return first;
 
+  // Show waiting state with helper text
+  process.stdout.write(
+    [
+      `${muted("Copy HTML from DevTools or content from Word.")}`,
+      `${muted("Press Enter to retry \u00b7 q to cancel")}`,
+      "",
+    ].join("\n"),
+  );
+
+  // Start spinner on the prompt line
+  let spin = 0;
+  const spinnerInterval = setInterval(() => {
+    clearLine();
+    const ch = SPINNER[spin % SPINNER.length];
+    process.stdout.write(accent(`${ch} Waiting for clipboard content...`));
+    spin += 1;
+  }, 500);
+
   const rl = createInterface({ input, output });
   try {
     while (true) {
-      const answer = (
-        await rl.question(
-          "No convertible content in clipboard. Copy HTML from DevTools or content from Word, then press Enter to retry (q to cancel): ",
-        )
-      )
+      clearInterval(spinnerInterval);
+      clearLine();
+
+      const answer = (await rl.question(muted("Press Enter to retry (q to cancel): ")))
         .trim()
         .toLowerCase();
 
@@ -76,40 +115,71 @@ async function waitForClipboardContent(): Promise<string> {
       }
 
       const resolved = await resolveClipboard();
-      if (resolved) return resolved;
+      if (resolved) {
+        return resolved;
+      }
 
-      process.stdout.write("Still no convertible clipboard content detected.\n");
+      process.stdout.write(`${muted("No convertible content detected. Try again.")}\n`);
     }
   } finally {
+    clearInterval(spinnerInterval);
     rl.close();
   }
 }
 
+function renderSection(title: string, lines: string[]): string {
+  return [
+    `${accent(title)}`,
+    muted(SEPARATOR),
+    ...lines,
+  ].join("\n");
+}
+
+function renderStats(stats: ContentStats): string {
+  return renderSection("Stats", [
+    `${statLabel("Chars    ")}${statValue(`${fmt(stats.inputChars)} \u2192 ${fmt(stats.outputChars)}`)}  ${highlight(`(${percent(stats.charReductionPct)} saved)`)}`,
+    `${statLabel("Tokens   ")}${statValue(`${fmt(stats.inputTokensEstimate)} \u2192 ${fmt(stats.outputTokensEstimate)}`)}  ${highlight(`(${percent(stats.tokenReductionPct)} saved)`)}`,
+  ]);
+}
+
+function renderSession(session: {
+  today: { runs: number; tokensSaved: number };
+  lifetime: { runs: number; tokensSaved: number };
+}): string {
+  return renderSection("Session", [
+    `${statLabel("Today:    ")}${statValue(`${fmt(session.today.runs)} runs \u00b7 ${fmt(session.today.tokensSaved)} tokens saved`)}`,
+    `${statLabel("Lifetime: ")}${statValue(`${fmt(session.lifetime.runs)} runs \u00b7 ${fmt(session.lifetime.tokensSaved)} tokens saved`)}`,
+  ]);
+}
+
+function renderPreview(markdown: string): string {
+  return renderSection("Preview", previewLines(markdown));
+}
+
 function renderSummary(
-  mode: StatsMode,
-  aggressive: boolean,
   markdown: string,
-  statsBlock: string,
+  stats: ContentStats,
+  session: {
+    available: boolean;
+    statsPath: string;
+    today: { runs: number; tokensSaved: number };
+    lifetime: { runs: number; tokensSaved: number };
+  },
 ): void {
-  process.stdout.write(
-    [
-      "",
-      "Processing complete.",
-      "Markdown copied to clipboard.",
-      "",
-      `Mode: ${mode}`,
-      `Aggressive pruning: ${aggressive ? "on" : "off"}`,
-      "",
-      "Output markdown:",
-      "----------------",
-      markdown.trim() || "(empty output)",
-      "",
-      "Stats:",
-      "------",
-      statsBlock,
-      "",
-    ].join("\n"),
-  );
+  const lines = [
+    "",
+    bold(success("\u2713 Markdown copied to clipboard")),
+    "",
+    renderStats(stats),
+    "",
+    renderSession(session),
+    "",
+    renderPreview(markdown),
+    "",
+    muted(`Tracking: ${session.available ? session.statsPath : "unavailable"}`),
+    "",
+  ];
+  process.stdout.write(lines.join("\n"));
 }
 
 export async function runInteractive(options: InteractiveOptions): Promise<void> {
@@ -123,12 +193,15 @@ export async function runInteractive(options: InteractiveOptions): Promise<void>
     }
   }
 
-  printIntro();
+  printIntro(options.mode, options.aggressive);
   const html = await waitForClipboardContent();
 
   if (!html.trim()) {
     throw new Error("No HTML was provided in clipboard.");
   }
+
+  // Processing indicator
+  process.stdout.write(`\n${accent("\u25d0 Processing...")}\n`);
 
   const transformOptions = defaultTransformOptions(options.aggressive);
   const processed = processHtml(options.mode, html, transformOptions);
@@ -136,28 +209,7 @@ export async function runInteractive(options: InteractiveOptions): Promise<void>
   await copyToClipboard(processed.markdown);
   const session = await recordRunStats(processed.stats);
 
-  const currentRunStatsLines = [
-    `- input chars: ${processed.stats.inputChars}`,
-    `- output chars: ${processed.stats.outputChars}`,
-    `- chars saved: ${processed.stats.charReduction} (${percent(processed.stats.charReductionPct)})`,
-    `- input tokens (est): ${processed.stats.inputTokensEstimate}`,
-    `- output tokens (est): ${processed.stats.outputTokensEstimate}`,
-    `- tokens saved: ${processed.stats.tokenReduction} (${percent(processed.stats.tokenReductionPct)})`,
-    `- aggressive mode: ${options.aggressive ? "on" : "off"}`,
-  ];
-
-  const sessionStatsLines = [
-    "",
-    "Session totals:",
-    `- today (${session.todayKey}) runs: ${session.today.runs}`,
-    `- today tokens saved: ${session.today.tokensSaved}`,
-    `- lifetime runs: ${session.lifetime.runs}`,
-    `- lifetime tokens saved: ${session.lifetime.tokensSaved}`,
-    `- tracking file: ${session.available ? session.statsPath : "unavailable in this environment"}`,
-  ];
-
-  renderSummary(options.mode, options.aggressive, processed.markdown, [
-    ...currentRunStatsLines,
-    ...sessionStatsLines,
-  ].join("\n"));
+  // Clear processing line and show results
+  clearLine();
+  renderSummary(processed.markdown, processed.stats, session);
 }

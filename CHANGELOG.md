@@ -7,7 +7,13 @@ Semantic Versioning after `1.0.0`.
 
 ## [Unreleased]
 
-_No unreleased changes._
+### Changed
+
+- Polished interactive mode (`decant` with no subcommand) — colored output, animated spinner while waiting for clipboard, formatted stats with arrows and reduction highlights, session totals, truncated 20-line preview instead of full output dump. Matches the TUI's visual style without requiring full-screen mode.
+
+### Added
+
+- `src/lib/ansi.ts` — zero-dependency ANSI color utility. Respects `NO_COLOR` env var and `TERM=dumb` per [no-color.org](https://no-color.org).
 
 ## [0.6.1] - 2026-02-22
 

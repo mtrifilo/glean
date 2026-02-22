@@ -4,19 +4,16 @@
 
 ## Recent Work
 
-- v0.6.0 Phase 1 — DOCX file support via `mammoth.js` (cross-platform, no macOS dependency)
-- Added `isDocxBytes()` ZIP magic detection, `readInputBytes()` binary I/O, `convertDocxToHtml()` conversion
-- CLI `resolveHtmlInput()` handles `.docx` files with new `--verbose` flag for mammoth warnings
-- Test fixtures (`sample.docx` + golden output) and unit/integration tests for DOCX path
-- Binary build verified — mammoth bundles cleanly with `bun build --compile`
+- Polished interactive mode UX — ANSI colors, animated spinner, formatted stats with arrows/highlights, session totals, truncated 20-line preview. Matches TUI visual style without full-screen mode. Added `src/lib/ansi.ts` (zero-dep, respects `NO_COLOR`).
 - v0.6.1 — renamed project from `glean` to `decant` (CLI, env vars, paths, docs, CI, installers)
+- v0.6.0 — DOCX file support via `mammoth.js`, source tracking in stats, `--verbose` flag
 - v0.5.0 — content detection + RTF/DOC support via macOS `textutil` (zero new deps)
 
 ## Checkpoint
 
-- **Current state:** v0.6.0 Phase 1 + Phase 2 complete. DOCX conversion + source tracking in stats. 77 tests passing.
-- **What's working:** HTML, RTF, DOC, and DOCX → clean markdown. Stats include `sourceFormat`/`sourceChars` for non-HTML inputs. Interactive, TUI, CLI pipe, and file input paths.
-- **What's next:** Cut v0.6.0 release, then v0.7.0 — PDF support.
+- **Current state:** v0.6.1 shipped. Interactive mode polished with ANSI colors, spinner, formatted stats. 77 tests passing.
+- **What's working:** HTML, RTF, DOC, and DOCX → clean markdown. Interactive mode now has visual parity with TUI (colors, formatted stats, preview). All CLI paths working.
+- **What's next:** v0.7.0 — PDF support.
 
 ## Product Intent
 
@@ -101,6 +98,7 @@ decant --tui
 
 ### Shared utilities and state
 
+- `src/lib/ansi.ts` - zero-dep ANSI color helpers (accent, success, muted, highlight, bold, dim; respects `NO_COLOR`)
 - `src/lib/contentDetect.ts` - format detection (`ContentFormat`, `detectFormat`, `looksLikeHtml`, `looksLikeRtf`, `isDocBytes`, `isDocxBytes`)
 - `src/lib/convert.ts` - RTF/DOC → HTML via macOS `textutil`, DOCX → HTML via `mammoth.js`
 - `src/lib/io.ts` - stdin/file/clipboard I/O (`readInput`, `readInputBytes`, `readClipboardRtf`)
@@ -123,8 +121,7 @@ decant --tui
 
 ## Priorities
 
-1. Cut v0.6.0 release
-2. v0.7.0 — PDF support
+1. v0.7.0 — PDF support
 
 The user directs priority. See `docs/strategy/ROADMAP.md` for full iteration plan.
 
