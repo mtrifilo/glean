@@ -47,11 +47,47 @@ function percent(value: number): string {
   return `${value.toFixed(2)}%`;
 }
 
+const PREVIEW_WIDTH = 72;
+const PREVIEW_MAX_LINES = 16;
+
 let markedReady = false;
 
-export function renderPreviewMarkdown(markdown: string, maxLines = 12): string {
+/**
+ * Word-wrap a single line to a max width, preserving ANSI escape codes
+ * (which are zero-width). Leading indent is preserved on continuation lines.
+ */
+function wrapLine(line: string, width: number): string[] {
+  // Measure visible length (strip ANSI codes)
+  const visLen = (s: string) => s.replace(/\x1b\[[0-9;]*m/g, "").length;
+
+  if (visLen(line) <= width) return [line];
+
+  // Detect leading whitespace for continuation indent
+  const indentMatch = line.replace(/\x1b\[[0-9;]*m/g, "").match(/^(\s*)/);
+  const indent = indentMatch ? indentMatch[1] : "";
+
+  const words = line.split(/( +)/);
+  const wrapped: string[] = [];
+  let current = "";
+
+  for (const word of words) {
+    if (visLen(current) + visLen(word) > width && current.trim()) {
+      wrapped.push(current);
+      current = indent + word.trimStart();
+    } else {
+      current += word;
+    }
+  }
+  if (current) wrapped.push(current);
+  return wrapped;
+}
+
+export function renderPreviewMarkdown(
+  markdown: string,
+  maxLines = PREVIEW_MAX_LINES,
+): string {
   if (!markedReady) {
-    const ext = markedTerminal({ reflowText: true, width: 72 });
+    const ext = markedTerminal({ reflowText: true, width: PREVIEW_WIDTH });
     // Fix marked-terminal bug: its `text` renderer reads raw `.text`
     // instead of parsing `.tokens`, so inline formatting (bold, links)
     // inside tight list items is lost. Override to parse tokens.
@@ -70,10 +106,14 @@ export function renderPreviewMarkdown(markdown: string, maxLines = 12): string {
   if (!trimmed) return muted("(empty output)");
 
   const rendered = (marked(trimmed) as string).trimEnd();
-  const lines = rendered.split("\n");
 
-  if (lines.length <= maxLines) return rendered;
-  return [...lines.slice(0, maxLines), "", muted("  ...")].join("\n");
+  // Word-wrap all lines to PREVIEW_WIDTH (marked-terminal skips list items)
+  const visual = rendered
+    .split("\n")
+    .flatMap((line) => wrapLine(line, PREVIEW_WIDTH));
+
+  if (visual.length <= maxLines) return visual.join("\n");
+  return [...visual.slice(0, maxLines), "", muted("  ...")].join("\n");
 }
 
 function printIntro(mode: StatsMode, aggressive: boolean): void {
