@@ -49,7 +49,7 @@ function percent(value: number): string {
 
 let markedReady = false;
 
-function renderPreviewMarkdown(markdown: string, maxLines = 12): string {
+export function renderPreviewMarkdown(markdown: string, maxLines = 12): string {
   if (!markedReady) {
     const ext = markedTerminal({ reflowText: true, width: 72 });
     // Fix marked-terminal bug: its `text` renderer reads raw `.text`
