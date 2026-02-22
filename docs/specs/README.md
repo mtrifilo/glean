@@ -6,7 +6,8 @@ For current project state and checkpoint, see [`docs/llm-context.md`](../llm-con
 
 ## Active Specs
 
-- [Word/RTF Support](./WORD_RTF_SUPPORT.md) — content detection, RTF/DOC conversion (v0.5.0 done), DOCX support (v0.6.0 planned)
+- [Word/RTF Support](./WORD_RTF_SUPPORT.md) — content detection, RTF/DOC conversion (v0.5.0), DOCX support (v0.6.0) — done
+- [TUI File Drop](./TUI_FILE_DROP.md) — drag-and-drop file processing via OpenTUI paste events (v0.11.0 planned)
 
 ## Spec Template
 
