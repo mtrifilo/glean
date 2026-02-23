@@ -7,6 +7,8 @@ Semantic Versioning after `1.0.0`.
 
 ## [Unreleased]
 
+## [0.10.0] - 2026-02-22
+
 ### Added
 
 - Token budget via `--max-tokens <n>` flag — set a maximum token budget for output.
