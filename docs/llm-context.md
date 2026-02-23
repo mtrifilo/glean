@@ -4,21 +4,21 @@
 
 ## Recent Work
 
-- v0.9.0 — URL fetching via `--url`/`-u` flag. Added `src/lib/fetchUrl.ts` (`isValidUrl()`, `fetchUrl()`), wired into CLI `resolveHtmlInput()`, added `"url"` to `ContentFormat`. Full test coverage in `test/fetchUrl.test.ts` + CLI integration tests.
-- v0.8.0 shipped — PDF text extraction via `unpdf` (MIT, cross-platform). Added `isPdfBytes()`, `convertPdfToHtml()`, wired into CLI `resolveHtmlInput()`. Test fixture + full test coverage.
-- v0.7.0 shipped — interactive mode polish (colors, spinner, formatted stats, word-wrapped preview) + raw markdown syntax highlighting replacing `marked`/`marked-terminal`.
-- v0.6.1 — renamed project from `glean` to `decant` (CLI, env vars, paths, docs, CI, installers)
-- v0.6.0 — DOCX file support via `mammoth.js`, source tracking in stats, `--verbose` flag
+- v0.9.0 shipped — URL fetching via `--url`/`-u` flag. Bun built-in `fetch()`, 15s timeout, content-type validation, redirect following. Mutually exclusive with `--input`.
+- v0.8.0 shipped — PDF text extraction via `unpdf` (MIT, cross-platform). Scanned/image PDFs return placeholder (OCR deferred to v0.22.0).
+- v0.7.0 shipped — interactive mode polish (colors, spinner, formatted stats, word-wrapped preview) + raw markdown syntax highlighting.
+- v0.6.1 shipped — renamed project from `glean` to `decant`.
+- v0.6.0 shipped — DOCX file support via `mammoth.js`, source tracking in stats, `--verbose` flag.
 
 ## Checkpoint
 
-- **Current state:** v0.9.0 URL fetching implemented. 130 tests passing (+ 2 skipped), 239 expect() calls across 7 test files.
-- **What's working:** HTML, RTF, DOC, DOCX, PDF → clean markdown. URL fetching via `--url`/`-u` with content-type validation, timeout, redirect following. Scanned/image PDFs return a placeholder comment (OCR deferred to v0.22.0).
+- **Current state:** v0.9.0 released. 130 tests passing (+ 2 skipped), 239 expect() calls across 7 test files.
+- **What's working:** HTML, RTF, DOC, DOCX, PDF → clean markdown. URL → HTML via `--url`/`-u`. Interactive clipboard-first mode. TUI full-screen mode.
 - **What's next:** See `docs/strategy/ROADMAP.md` — next up is token budget (v0.10.0).
 
 ## Product Intent
 
-Keep `decant` laser-focused on the HTML/RTF/DOC/DOCX/PDF → clean markdown workflow. Minimize friction: fast default behavior, clipboard-first, useful stats. Preserve scriptability and power-user workflows.
+Keep `decant` laser-focused on the HTML/RTF/DOC/DOCX/PDF/URL → clean markdown workflow. Minimize friction: fast default behavior, clipboard-first, useful stats. Preserve scriptability and power-user workflows.
 
 ## Task Routing
 
