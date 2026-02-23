@@ -4,17 +4,18 @@
 
 ## Recent Work
 
+- v0.10.0 shipped — Token budget via `--max-tokens N`. Section-aware parsing, piped error path (exit 1 + breakdown), TTY smart truncation (drop from end + warning), stats enrichment with per-section tokens and budget fields. New module `src/pipeline/tokenBudget.ts`.
 - v0.9.0 shipped — URL fetching via `--url`/`-u` flag. Bun built-in `fetch()`, 15s timeout, content-type validation, redirect following. Mutually exclusive with `--input`.
-- v0.8.0 shipped — PDF text extraction via `unpdf` (MIT, cross-platform). Scanned/image PDFs return placeholder (OCR deferred to v0.22.0).
+- v0.8.0 shipped — PDF text extraction via `unpdf` (MIT, cross-platform). Scanned/image PDFs return placeholder (OCR deferred to v0.23.0).
 - v0.7.0 shipped — interactive mode polish (colors, spinner, formatted stats, word-wrapped preview) + raw markdown syntax highlighting.
 - v0.6.1 shipped — renamed project from `glean` to `decant`.
 - v0.6.0 shipped — DOCX file support via `mammoth.js`, source tracking in stats, `--verbose` flag.
 
 ## Checkpoint
 
-- **Current state:** v0.9.0 released. 130 tests passing (+ 2 skipped), 239 expect() calls across 7 test files.
-- **What's working:** HTML, RTF, DOC, DOCX, PDF → clean markdown. URL → HTML via `--url`/`-u`. Interactive clipboard-first mode. TUI full-screen mode.
-- **What's next:** See `docs/strategy/ROADMAP.md` — next up is token budget (v0.10.0).
+- **Current state:** v0.10.0 ready. 159 tests passing (+ 2 skipped), 339 expect() calls across 8 test files.
+- **What's working:** HTML, RTF, DOC, DOCX, PDF → clean markdown. URL → HTML via `--url`/`-u`. Token budget via `--max-tokens`. Interactive clipboard-first mode. TUI full-screen mode.
+- **What's next:** See `docs/strategy/ROADMAP.md` — next up is interactive section selection (v0.11.0).
 
 ## Product Intent
 
@@ -42,6 +43,7 @@ Keep `decant` laser-focused on the HTML/RTF/DOC/DOCX/PDF/URL → clean markdown 
 | DOCX support | Stable | File input via `mammoth.js`, cross-platform |
 | PDF support | Stable | File input via `unpdf`, cross-platform, text-based |
 | URL fetching | Stable | `--url`/`-u` flag, content-type validation, 15s timeout |
+| Token budget | Stable | `--max-tokens N`, section-aware truncation, piped error + TTY warning |
 | Interactive mode | Stable | Clipboard-first, auto-detect HTML/RTF |
 | TUI mode | Stable | OpenTUI full-screen, clipboard polling |
 | Dev tooling | Stable | Golden fixtures, smoke check, CI integration |
@@ -78,6 +80,11 @@ decant clean --url https://example.com/article
 decant extract -u https://example.com/article
 decant stats --url https://example.com --format json
 
+# Token budget
+pbpaste | decant clean --max-tokens 2000 | pbcopy
+decant clean -i large-doc.html --max-tokens 4000
+decant stats -i report.pdf --max-tokens 2000
+
 # Full-screen TUI path
 decant --tui
 ```
@@ -109,6 +116,8 @@ decant --tui
   - HTML -> markdown conversion and normalization
 - `src/pipeline/stats.ts`
   - token/char estimation and formatted stats output
+- `src/pipeline/tokenBudget.ts`
+  - section parsing, budget analysis, truncation, formatted error/warning output
 
 ### Shared utilities and state
 
@@ -130,7 +139,8 @@ decant --tui
 ### Validation
 
 - `test/pipeline.test.ts` - pipeline behavior
-- `test/cli.test.ts` - command-level behavior (includes RTF, DOCX, PDF, URL integration tests)
+- `test/cli.test.ts` - command-level behavior (includes RTF, DOCX, PDF, URL, token budget integration tests)
+- `test/tokenBudget.test.ts` - token budget unit tests (section parsing, breakdown, truncation, formatters)
 - `test/fetchUrl.test.ts` - URL fetching unit tests (validation, HTML/XHTML, content-type rejection, HTTP errors, redirects, timeout)
 - `test/contentDetect.test.ts` - content detection unit tests (HTML, RTF, DOC, DOCX, PDF)
 - `test/convert.test.ts` - RTF/DOC conversion tests (macOS-gated) + DOCX + PDF conversion tests (cross-platform)
@@ -139,8 +149,9 @@ decant --tui
 
 ## Priorities
 
-1. v0.10.0 — Token budget
-2. v0.11.0 — TUI enhancements
+1. v0.11.0 — Interactive section selection (TUI `--max-tokens` section picker)
+2. v0.12.0 — TUI enhancements (scrollable preview, continuous mode, option toggling)
+3. v0.13.0 — Diff mode
 
 The user directs priority. See `docs/strategy/ROADMAP.md` for full iteration plan.
 

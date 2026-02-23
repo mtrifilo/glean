@@ -84,5 +84,10 @@ export function formatStatsMarkdown(stats: ContentStats): string {
     `- token_reduction: ${stats.tokenReduction} (${stats.tokenReductionPct}%)`,
   );
 
+  if (stats.maxTokens != null) {
+    lines.push(`- max_tokens_budget: ${stats.maxTokens}`);
+    lines.push(`- over_budget: ${stats.overBudget ? "yes" : "no"}`);
+  }
+
   return lines.join("\n");
 }

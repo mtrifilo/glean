@@ -12,6 +12,14 @@ import type { StatsFormat, StatsMode, TransformOptions } from "./lib/types";
 import { fetchUrl, isValidUrl } from "./lib/fetchUrl";
 import { processHtml } from "./pipeline/processHtml";
 import { type SourceInfo, formatStatsMarkdown } from "./pipeline/stats";
+import {
+  buildSectionBreakdown,
+  formatSectionBreakdown,
+  formatTokenBudgetError,
+  formatTokenBudgetWarning,
+  parseMarkdownSections,
+  truncateToTokenBudget,
+} from "./pipeline/tokenBudget";
 
 interface CommonOptions {
   input?: string;
@@ -25,6 +33,7 @@ interface CommonOptions {
   maxHeadingLevel?: number;
   aggressive?: boolean;
   verbose?: boolean;
+  maxTokens?: number;
 }
 
 interface StatsOptions extends CommonOptions {
@@ -60,6 +69,14 @@ function parseTransformMode(value: string): StatsMode {
   throw new InvalidArgumentError("Mode must be one of: clean, extract.");
 }
 
+function parseMaxTokens(value: string): number {
+  const parsed = Number.parseInt(value, 10);
+  if (!Number.isFinite(parsed) || parsed < 1) {
+    throw new InvalidArgumentError("--max-tokens must be a positive integer.");
+  }
+  return parsed;
+}
+
 function parseStatsFormat(value: string): StatsFormat {
   if (value === "md" || value === "json") {
     return value;
@@ -84,7 +101,8 @@ function addCommonOptions(command: Command): Command {
       6,
     )
     .option("--aggressive", "Apply stronger pruning heuristics")
-    .option("--verbose", "Show conversion warnings (e.g. from DOCX processing)");
+    .option("--verbose", "Show conversion warnings (e.g. from DOCX processing)")
+    .option("--max-tokens <n>", "Maximum token budget for output (truncates if exceeded)", parseMaxTokens);
 }
 
 function resolveTransformOptions(options: CommonOptions): TransformOptions {
@@ -176,6 +194,25 @@ async function runTransform(commandName: "clean" | "extract", options: CommonOpt
   const transformOptions = resolveTransformOptions(options);
   const processed = processHtml(commandName, html, transformOptions, source);
 
+  if (options.maxTokens != null) {
+    const sections = parseMarkdownSections(processed.markdown);
+    const breakdown = buildSectionBreakdown(sections, options.maxTokens);
+
+    if (breakdown.overBudget) {
+      if (!process.stdout.isTTY) {
+        process.stderr.write(`${formatTokenBudgetError(breakdown)}\n`);
+        process.exit(1);
+      }
+
+      const truncation = truncateToTokenBudget(sections, options.maxTokens);
+      process.stderr.write(`${formatTokenBudgetWarning(breakdown, truncation)}\n`);
+      await maybeCopyOutput(options.copy, truncation.markdown);
+      await recordRunStats(processed.stats);
+      writeStdout(truncation.markdown);
+      return;
+    }
+  }
+
   await maybeCopyOutput(options.copy, processed.markdown);
   await recordRunStats(processed.stats);
   writeStdout(processed.markdown);
@@ -190,10 +227,30 @@ async function runStats(options: StatsOptions) {
 
   const processed = processHtml(mode, html, transformOptions, source);
 
-  const output =
-    format === "json"
-      ? JSON.stringify(processed.stats, null, 2)
-      : formatStatsMarkdown(processed.stats);
+  if (options.maxTokens != null) {
+    const sections = parseMarkdownSections(processed.markdown);
+    const breakdown = buildSectionBreakdown(sections, options.maxTokens);
+
+    processed.stats.sections = sections.map((s) => ({
+      heading: s.heading,
+      level: s.level,
+      tokens: s.tokens,
+    }));
+    processed.stats.maxTokens = options.maxTokens;
+    processed.stats.overBudget = breakdown.overBudget;
+  }
+
+  let output: string;
+  if (format === "json") {
+    output = JSON.stringify(processed.stats, null, 2);
+  } else {
+    output = formatStatsMarkdown(processed.stats);
+    if (options.maxTokens != null) {
+      const sections = parseMarkdownSections(processed.markdown);
+      const breakdown = buildSectionBreakdown(sections, options.maxTokens);
+      output += `\n\n${formatSectionBreakdown(breakdown)}`;
+    }
+  }
 
   await maybeCopyOutput(options.copy, output);
   writeStdout(output);

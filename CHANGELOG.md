@@ -7,6 +7,17 @@ Semantic Versioning after `1.0.0`.
 
 ## [Unreleased]
 
+### Added
+
+- Token budget via `--max-tokens <n>` flag — set a maximum token budget for output.
+  - Supports `clean`, `extract`, and `stats` subcommands.
+  - **Piped (no TTY):** Errors with a section-by-section breakdown and actionable suggestions when output exceeds budget. No silent data loss in scripts.
+  - **TTY:** Smart truncation — drops sections from end, appends a truncation marker, and prints a warning with kept/dropped labels to stderr.
+  - **Stats:** Informational only — `--max-tokens` enriches stats output with per-section token breakdown, budget amount, and over-budget status. Never truncates.
+  - Section-aware: parses markdown output by heading boundaries. Whole sections are kept or dropped — no mid-sentence cuts.
+- `src/pipeline/tokenBudget.ts` — new module for section parsing, budget analysis, truncation, and formatted output.
+- `SectionStats` type and optional budget fields (`sections`, `maxTokens`, `overBudget`, `truncated`) on `ContentStats`.
+
 ## [0.9.0] - 2026-02-22
 
 ### Added

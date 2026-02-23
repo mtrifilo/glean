@@ -31,11 +31,13 @@ Every document carries noise — wrapper markup, nav blocks, styling attributes,
 
 **Scriptable.** Pipes work exactly how you'd expect: `pbpaste | decant clean | pbcopy`. JSON stats output, file input, URL input, and all options are flag-driven for easy automation.
 
+**Token budget.** Set `--max-tokens N` and Decant handles the rest. In scripts, it errors with a section-by-section breakdown so you never silently lose data. In a terminal, it smart-truncates by dropping sections from the end and tells you exactly what was kept. Stats mode shows the full budget analysis without touching the output.
+
 ## What's ahead
 
 Decant's roadmap is focused on the space between document conversion and LLM consumption — the workflow intelligence that no other tool provides:
 
-- **Token budget** (`--max-tokens`) — trim output to fit a context window
+- **Interactive section selection** — TUI section picker for `--max-tokens` workflows with real-time budget counter and content preview
 - **TUI workspace** — syntax-highlighted preview, scrollable output, option toggling, continuous mode
 - **Diff mode** — see exactly what the pipeline removed
 - **Quality scoring** — know how clean your output is before you paste it
@@ -148,6 +150,7 @@ Installer env vars (script path only):
 - `--max-heading-level <1-6>` clamp heading depth
 - `--aggressive` stronger pruning heuristics
 - `--verbose` show extra details (URL fetch progress, DOCX conversion warnings, PDF page count)
+- `--max-tokens <n>` set a token budget — errors in pipes, smart-truncates in TTY, enriches stats output
 
 ## Stats-only options
 
@@ -204,6 +207,15 @@ decant extract -u https://example.com/article
 
 # Fetch a URL with verbose logging
 decant clean -u https://example.com/article --verbose
+
+# Token budget — error if output exceeds 2000 tokens (piped)
+pbpaste | decant clean --max-tokens 2000 | pbcopy
+
+# Token budget — smart truncation in TTY
+decant clean -i large-doc.html --max-tokens 4000
+
+# Token budget — section breakdown in stats
+decant stats -i report.pdf --max-tokens 2000
 
 # Stats from a URL
 decant stats --url https://example.com/article --format json
