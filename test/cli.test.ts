@@ -383,3 +383,101 @@ describe("lifetime stats accumulation", () => {
     }
   });
 });
+
+describe("--max-tokens flag", () => {
+  test("over budget piped: exitCode 1, empty stdout, stderr has Error: and section breakdown", async () => {
+    const result = await runCli(["clean", "-i", "test/fixtures/docs.html", "--max-tokens", "10"]);
+
+    expect(result.exitCode).toBe(1);
+    expect(result.stdout).toBe("");
+    expect(result.stderr).toContain("Error:");
+    expect(result.stderr).toContain("budget: 10 tokens");
+    expect(result.stderr).toContain("Suggestions:");
+  });
+
+  test("under budget piped: exitCode 0, normal output", async () => {
+    const result = await runCli(["clean", "-i", "test/fixtures/docs.html", "--max-tokens", "99999"]);
+
+    expect(result.exitCode).toBe(0);
+    expect(result.stdout.length).toBeGreaterThan(0);
+    expect(result.stderr).not.toContain("Error:");
+  });
+
+  test("stats --max-tokens markdown format: includes budget lines + section table", async () => {
+    const result = await runCli([
+      "stats",
+      "-i",
+      "test/fixtures/docs.html",
+      "--max-tokens",
+      "10",
+    ]);
+
+    expect(result.exitCode).toBe(0);
+    expect(result.stdout).toContain("max_tokens_budget: 10");
+    expect(result.stdout).toContain("over_budget: yes");
+    expect(result.stdout).toContain("Section breakdown");
+  });
+
+  test("stats --max-tokens --format json: has maxTokens, overBudget, sections array", async () => {
+    const result = await runCli([
+      "stats",
+      "-i",
+      "test/fixtures/docs.html",
+      "--max-tokens",
+      "10",
+      "--format",
+      "json",
+    ]);
+
+    expect(result.exitCode).toBe(0);
+    const parsed = JSON.parse(result.stdout) as {
+      maxTokens?: number;
+      overBudget?: boolean;
+      sections?: Array<{ heading: string; level: number; tokens: number }>;
+    };
+    expect(parsed.maxTokens).toBe(10);
+    expect(parsed.overBudget).toBe(true);
+    expect(parsed.sections).toBeInstanceOf(Array);
+    expect(parsed.sections!.length).toBeGreaterThan(0);
+    expect(parsed.sections![0]).toHaveProperty("heading");
+    expect(parsed.sections![0]).toHaveProperty("level");
+    expect(parsed.sections![0]).toHaveProperty("tokens");
+  });
+
+  test("stats --max-tokens under budget shows overBudget false", async () => {
+    const result = await runCli([
+      "stats",
+      "-i",
+      "test/fixtures/docs.html",
+      "--max-tokens",
+      "99999",
+      "--format",
+      "json",
+    ]);
+
+    expect(result.exitCode).toBe(0);
+    const parsed = JSON.parse(result.stdout) as { overBudget?: boolean };
+    expect(parsed.overBudget).toBe(false);
+  });
+
+  test("invalid value (abc): exitCode 1, error message", async () => {
+    const result = await runCli(["clean", "-i", "test/fixtures/docs.html", "--max-tokens", "abc"]);
+
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toContain("--max-tokens must be a positive integer");
+  });
+
+  test("zero value: exitCode 1, error message", async () => {
+    const result = await runCli(["clean", "-i", "test/fixtures/docs.html", "--max-tokens", "0"]);
+
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toContain("--max-tokens must be a positive integer");
+  });
+
+  test("negative value: exitCode 1, error message", async () => {
+    const result = await runCli(["clean", "-i", "test/fixtures/docs.html", "--max-tokens", "-5"]);
+
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toContain("--max-tokens must be a positive integer");
+  });
+});

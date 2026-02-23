@@ -24,6 +24,12 @@ export interface ExtractResult {
   extractionReason: string;
 }
 
+export interface SectionStats {
+  heading: string;
+  level: number;
+  tokens: number;
+}
+
 export interface ContentStats {
   mode: StatsMode;
   inputChars: number;
@@ -36,4 +42,8 @@ export interface ContentStats {
   tokenReductionPct: number;
   sourceFormat?: string;
   sourceChars?: number;
+  sections?: SectionStats[];
+  maxTokens?: number;
+  overBudget?: boolean;
+  truncated?: boolean;
 }
