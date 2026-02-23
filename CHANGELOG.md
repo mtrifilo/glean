@@ -7,6 +7,8 @@ Semantic Versioning after `1.0.0`.
 
 ## [Unreleased]
 
+## [0.9.0] - 2026-02-22
+
 ### Added
 
 - URL fetching via `--url <url>` / `-u` flag — fetch and convert web pages directly, skipping the copy-paste-from-browser step.
