@@ -1,4 +1,4 @@
-export type ContentFormat = "html" | "rtf" | "doc" | "docx" | "pdf" | "unknown";
+export type ContentFormat = "html" | "rtf" | "doc" | "docx" | "pdf" | "url" | "unknown";
 
 export function looksLikeHtml(value: string): boolean {
   if (!value.trim()) {
