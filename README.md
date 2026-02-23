@@ -8,10 +8,11 @@ Token-efficient document-to-markdown for LLMs. Local, fast, interactive.
 
 ## Just `decant`
 
-Copy content from anywhere — a web page, a Word doc, an RTF file — then run `decant`. Clean markdown lands on your clipboard, ready to paste into your agent.
+Copy content from anywhere — a web page, a Word doc, an RTF file — then run `decant`. Or skip the clipboard entirely and fetch a URL directly.
 
 ```bash
-decant
+decant                                          # clipboard-first
+decant clean --url https://example.com/article  # fetch a web page
 ```
 
 ## Why this exists
@@ -26,7 +27,9 @@ Every document carries noise — wrapper markup, nav blocks, styling attributes,
 
 **Local and fast.** Single binary, zero runtime dependencies, works offline. Install with one command, update with `decant update`. No API keys, no cloud, no Python environment.
 
-**Scriptable.** Pipes work exactly how you'd expect: `pbpaste | decant clean | pbcopy`. JSON stats output, file input, and all options are flag-driven for easy automation.
+**URL fetching.** Skip the browser entirely — `decant clean --url https://...` fetches, cleans, and converts in one step. Content-type validation ensures you're getting HTML, not a PDF or JSON endpoint.
+
+**Scriptable.** Pipes work exactly how you'd expect: `pbpaste | decant clean | pbcopy`. JSON stats output, file input, URL input, and all options are flag-driven for easy automation.
 
 ## What's ahead
 
@@ -37,7 +40,7 @@ Decant's roadmap is focused on the space between document conversion and LLM con
 - **Diff mode** — see exactly what the pipeline removed
 - **Quality scoring** — know how clean your output is before you paste it
 - **Chunking for RAG** — split documents into sized chunks for retrieval pipelines
-- **PDF and more** — expanding format support (PDF text extraction now supported; OCR for scanned PDFs planned)
+- **More formats** — OCR for scanned PDFs, PowerPoint, EPUB, and more
 
 See the full [roadmap](docs/strategy/ROADMAP.md) for details.
 
@@ -144,7 +147,7 @@ Installer env vars (script path only):
 - `--no-preserve-tables` remove table output
 - `--max-heading-level <1-6>` clamp heading depth
 - `--aggressive` stronger pruning heuristics
-- `--verbose` show conversion warnings (e.g. from DOCX processing)
+- `--verbose` show extra details (URL fetch progress, DOCX conversion warnings, PDF page count)
 
 ## Stats-only options
 
