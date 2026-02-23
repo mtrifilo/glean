@@ -7,6 +7,18 @@ Semantic Versioning after `1.0.0`.
 
 ## [Unreleased]
 
+### Added
+
+- URL fetching via `--url <url>` / `-u` flag — fetch and convert web pages directly, skipping the copy-paste-from-browser step.
+  - Supports `clean`, `extract`, and `stats` subcommands.
+  - Content-type validation: accepts `text/html` and `application/xhtml+xml`; rejects non-HTML with actionable message.
+  - 15-second timeout, redirect following, custom User-Agent header.
+  - Mutually exclusive with `--input` — using both produces a clear error.
+  - `--verbose` logs URL being fetched, HTTP status, and chars received to stderr.
+- `src/lib/fetchUrl.ts` — `isValidUrl()` and `fetchUrl()` functions for URL fetching.
+- `"url"` added to `ContentFormat` type for type-safe stats tracking.
+- `sourceFormat: "url"` and `sourceChars` in stats JSON output for URL inputs.
+
 ## [0.8.0] - 2026-02-22
 
 ### Added

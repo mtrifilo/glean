@@ -1,4 +1,5 @@
-import { describe, expect, test } from "bun:test";
+import { afterAll, beforeAll, describe, expect, test } from "bun:test";
+import type { Server } from "bun";
 import { readFile, unlink } from "node:fs/promises";
 
 interface CliRunResult {
@@ -256,6 +257,96 @@ describe("RTF/DOC input", () => {
 
     expect(result.exitCode).toBe(0);
     expect(parsed.inputChars).toBeGreaterThan(0);
+  });
+});
+
+describe("URL input", () => {
+  let urlServer: Server;
+  let urlBase: string;
+
+  beforeAll(() => {
+    urlServer = Bun.serve({
+      port: 0,
+      fetch(req) {
+        const url = new URL(req.url);
+        if (url.pathname === "/page") {
+          return new Response(
+            "<html><head><title>Test Page</title></head><body><h1>Hello from URL</h1><p>This is fetched content.</p></body></html>",
+            { headers: { "Content-Type": "text/html" } },
+          );
+        }
+        return new Response("Not Found", { status: 404 });
+      },
+    });
+    urlBase = `http://localhost:${urlServer.port}`;
+  });
+
+  afterAll(() => {
+    urlServer.stop(true);
+  });
+
+  test("clean converts URL via --url", async () => {
+    const result = await runCli(["clean", "--url", `${urlBase}/page`]);
+
+    expect(result.exitCode).toBe(0);
+    expect(result.stdout).toContain("Hello from URL");
+    expect(result.stdout).toContain("fetched content");
+  });
+
+  test("extract converts URL via --url", async () => {
+    const result = await runCli(["extract", "--url", `${urlBase}/page`]);
+
+    expect(result.exitCode).toBe(0);
+    expect(result.stdout).toContain("Hello from URL");
+  });
+
+  test("stats works with URL and includes sourceFormat", async () => {
+    const result = await runCli(["stats", "--url", `${urlBase}/page`, "--format", "json"]);
+    const parsed = JSON.parse(result.stdout) as {
+      sourceFormat?: string;
+      sourceChars?: number;
+      inputChars: number;
+    };
+
+    expect(result.exitCode).toBe(0);
+    expect(parsed.sourceFormat).toBe("url");
+    expect(parsed.sourceChars).toBeGreaterThan(0);
+  });
+
+  test("--url and --input together errors", async () => {
+    const result = await runCli(["clean", "--url", `${urlBase}/page`, "-i", "test/fixtures/blog.html"]);
+
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toContain("Cannot use --input and --url together");
+  });
+
+  test("--url with invalid URL errors", async () => {
+    const result = await runCli(["clean", "--url", "not-a-url"]);
+
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toContain("Invalid URL");
+  });
+
+  test("--url with HTTP 404 errors", async () => {
+    const result = await runCli(["clean", "--url", `${urlBase}/nonexistent`]);
+
+    expect(result.exitCode).toBe(1);
+    expect(result.stderr).toContain("HTTP 404");
+  });
+
+  test("--verbose logs fetch details", async () => {
+    const result = await runCli(["clean", "--url", `${urlBase}/page`, "--verbose"]);
+
+    expect(result.exitCode).toBe(0);
+    expect(result.stderr).toContain("Fetching");
+    expect(result.stderr).toContain("chars received");
+  });
+
+  test("-u short flag works", async () => {
+    const result = await runCli(["clean", "-u", `${urlBase}/page`]);
+
+    expect(result.exitCode).toBe(0);
+    expect(result.stdout).toContain("Hello from URL");
   });
 });
 

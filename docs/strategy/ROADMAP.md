@@ -112,9 +112,19 @@ Extract text from PDF files and convert to clean markdown. PDFs are one of the m
 - `unpdf` exposes the full PDF.js API via `getDocumentProxy()` if we ever need low-level access to font sizes, positions, or marked content for structure inference.
 - `getDocumentProxy()` detaches the input ArrayBuffer — byte length must be captured before calling conversion.
 
-### v0.9.0 — URL Fetching
+### v0.9.0 — URL Fetching (Done)
 
-Fetch and convert web pages directly (`decant clean --url https://...`). Skips the copy-paste-from-browser step entirely — the single biggest friction point in the current workflow. Needs to handle fetching, stripping chrome/nav/footer, and feeding the content HTML into the existing pipeline.
+Fetch and convert web pages directly (`decant clean --url https://...`). Skips the copy-paste-from-browser step entirely.
+
+- [x] `src/lib/fetchUrl.ts` — `isValidUrl()`, `fetchUrl()` with User-Agent, 15s timeout, redirect following
+- [x] Content-type validation — accepts `text/html` and `application/xhtml+xml`, rejects non-HTML with actionable message
+- [x] `--url`/`-u` flag on `clean`, `extract`, `stats` subcommands
+- [x] Mutual exclusivity with `--input`
+- [x] `"url"` added to `ContentFormat` type
+- [x] `--verbose` logs fetch URL, HTTP status, chars received
+- [x] Unit tests (`test/fetchUrl.test.ts`) with local `Bun.serve()` test server
+- [x] CLI integration tests for URL path
+- [x] Update README, CHANGELOG, llm-context.md
 
 ### v0.10.0 — Token Budget
 

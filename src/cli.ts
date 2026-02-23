@@ -9,11 +9,13 @@ import { convertDocToHtml, convertDocxToHtml, convertPdfToHtml, convertRtfToHtml
 import { copyToClipboard, readInput, readInputBytes } from "./lib/io";
 import { recordRunStats } from "./lib/sessionStats";
 import type { StatsFormat, StatsMode, TransformOptions } from "./lib/types";
+import { fetchUrl, isValidUrl } from "./lib/fetchUrl";
 import { processHtml } from "./pipeline/processHtml";
 import { type SourceInfo, formatStatsMarkdown } from "./pipeline/stats";
 
 interface CommonOptions {
   input?: string;
+  url?: string;
   copy?: boolean;
   keepLinks?: boolean;
   stripLinks?: boolean;
@@ -68,6 +70,7 @@ function parseStatsFormat(value: string): StatsFormat {
 function addCommonOptions(command: Command): Command {
   return command
     .option("-i, --input <path>", "Read input from a file path (HTML, RTF, DOC, DOCX, or PDF)")
+    .option("-u, --url <url>", "Fetch and convert a web page URL")
     .option("--copy", "Copy command output to the macOS clipboard")
     .option("--keep-links", "Preserve markdown links (default behavior)")
     .option("--strip-links", "Strip links and keep only their text")
@@ -124,8 +127,17 @@ interface ResolvedInput {
 
 async function resolveHtmlInput(
   inputPath?: string,
-  options?: { verbose?: boolean },
+  options?: { verbose?: boolean; url?: string },
 ): Promise<ResolvedInput> {
+  if (inputPath && options?.url) {
+    throw new Error("Cannot use --input and --url together. Provide one or the other.");
+  }
+
+  if (options?.url) {
+    const result = await fetchUrl(options.url, { verbose: options.verbose });
+    return { html: result.html, source: { sourceFormat: "url", sourceChars: result.html.length } };
+  }
+
   if (inputPath && /\.pdf$/i.test(inputPath)) {
     const bytes = await readInputBytes(inputPath);
     const sourceChars = bytes.length;
@@ -159,7 +171,7 @@ async function resolveHtmlInput(
 }
 
 async function runTransform(commandName: "clean" | "extract", options: CommonOptions) {
-  const { html, source } = await resolveHtmlInput(options.input, { verbose: options.verbose });
+  const { html, source } = await resolveHtmlInput(options.input, { verbose: options.verbose, url: options.url });
 
   const transformOptions = resolveTransformOptions(options);
   const processed = processHtml(commandName, html, transformOptions, source);
@@ -170,7 +182,7 @@ async function runTransform(commandName: "clean" | "extract", options: CommonOpt
 }
 
 async function runStats(options: StatsOptions) {
-  const { html, source } = await resolveHtmlInput(options.input, { verbose: options.verbose });
+  const { html, source } = await resolveHtmlInput(options.input, { verbose: options.verbose, url: options.url });
 
   const mode = options.mode ?? "clean";
   const format = options.format ?? "md";
