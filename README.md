@@ -4,15 +4,15 @@
 [![Release](https://img.shields.io/github/v/release/mtrifilo/decant?color=blue)](https://github.com/mtrifilo/decant/releases/latest)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](./LICENSE)
 
-Token-efficient document-to-markdown for LLMs. Local, fast, interactive.
+Transform your clipboard into token-efficient markdown as fast as possible.
 
 ## Just `decant`
 
-Copy content from anywhere — a web page, a Word doc, an RTF file — then run `decant`. Or skip the clipboard entirely and fetch a URL directly.
+Copy content from anywhere — a web page, a Word doc, an RTF file — then run `decant`.
+Your clipboard will be instantly transformed into markdown, which you can paste into your agent for context.
 
 ```bash
 decant                                          # clipboard-first
-decant clean --url https://example.com/article  # fetch a web page
 ```
 
 ## Why this exists
