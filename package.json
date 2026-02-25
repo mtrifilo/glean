@@ -1,6 +1,6 @@
 {
   "name": "decant",
-  "version": "0.10.0",
+  "version": "0.11.0",
   "description": "CLI to clean noisy HTML and convert it to markdown for LLM context.",
   "type": "module",
   "private": true,
