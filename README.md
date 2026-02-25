@@ -37,7 +37,7 @@ Every document carries noise — wrapper markup, nav blocks, styling attributes,
 
 Decant's roadmap is focused on the space between document conversion and LLM consumption — the workflow intelligence that no other tool provides:
 
-- **Interactive section selection** — TUI section picker for `--max-tokens` workflows with real-time budget counter and content preview
+- **Interactive section selection** — TUI section picker for `--max-tokens` workflows with real-time budget counter and content preview (shipped in v0.11.0)
 - **TUI workspace** — syntax-highlighted preview, scrollable output, option toggling, continuous mode
 - **Diff mode** — see exactly what the pipeline removed
 - **Quality scoring** — know how clean your output is before you paste it
@@ -135,6 +135,7 @@ Installer env vars (script path only):
 
 - `--mode clean|extract` choose pipeline for interactive/no-subcommand runs (default: `clean`)
 - `--aggressive` enable stronger pruning for interactive/no-subcommand runs (default: off)
+- `--max-tokens <n>` set a token budget — enables the interactive section picker in TUI mode
 - `--tui` launch the full-screen OpenTUI interface with color-coded stats, bordered panels, and live clipboard detection (requires TTY; falls back to standard interactive mode if TUI startup fails)
 
 ## Common options (`clean`, `extract`, `stats`)
@@ -228,6 +229,9 @@ decant stats -i snippet.html --format json
 
 # Full-screen OpenTUI mode
 decant --tui
+
+# TUI with section picker — interactively choose which sections to keep
+decant --tui --max-tokens 2000
 ```
 
 ## LLM Session Handoff

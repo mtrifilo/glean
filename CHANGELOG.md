@@ -7,6 +7,18 @@ Semantic Versioning after `1.0.0`.
 
 ## [Unreleased]
 
+### Added
+
+- Interactive section picker in TUI mode (`--tui --max-tokens N`). After processing, a two-pane screen lets you toggle sections on/off with a real-time token budget counter and content preview.
+  - Left pane: checkbox list with token counts per section, windowed scroll that follows cursor. Right pane: preview of the cursor section's content.
+  - Keyboard: `↑`/`↓`/`j`/`k` navigate, `Space` toggle, `a` select all, `n` deselect all, `f` auto-fit within budget, `Enter` confirm, `q`/`Esc` cancel (outputs full markdown).
+  - Mouse: click a section row to move cursor and toggle selection.
+  - Budget bar: green (<80%), amber (80–100%), red (>100%). Over-budget is warned but not blocked.
+  - Auto-fit on open: sections pre-selected greedily from top until budget is filled.
+  - Picker is skipped for 0–1 sections (no choice to make).
+- `--max-tokens <n>` flag on the root `decant` command (previously only on subcommands). Enables the section picker when combined with `--tui`.
+- `src/tui/sectionPicker.ts` — new module for the section picker screen, keyboard handling, and pure utility functions.
+
 ## [0.10.0] - 2026-02-22
 
 ### Added

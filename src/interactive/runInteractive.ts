@@ -23,6 +23,7 @@ interface InteractiveOptions {
   forceTui: boolean;
   mode: StatsMode;
   aggressive: boolean;
+  maxTokens?: number;
 }
 
 const SPINNER = ["\u25d0", "\u25d3", "\u25d1", "\u25d2"];
@@ -230,6 +231,7 @@ export async function runInteractive(options: InteractiveOptions): Promise<void>
     const handled = await runExperimentalTui({
       mode: options.mode,
       aggressive: options.aggressive,
+      maxTokens: options.maxTokens,
     });
     if (handled) {
       return;
