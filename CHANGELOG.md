@@ -7,9 +7,11 @@ Semantic Versioning after `1.0.0`.
 
 ## [Unreleased]
 
+## [0.12.0] - 2026-02-24
+
 ### Added
 
-- **Scrollable results preview** — replace the ScrollBox-based results preview with a windowed plain Box that supports `j`/`k`/arrow key scrolling, `PageUp`/`PageDown`, and `Home`/`End`. Line count and scroll percentage shown in the preview title.
+- **Scrollable results preview** — replace the ScrollBox-based results preview with a windowed plain Box that supports `j`/`k`/arrow key scrolling, `PageUp`/`PageDown`, `Home`/`End`, and mouse wheel scrolling. Line count and scroll percentage shown in the preview title.
 - **Syntax-highlighted preview** — markdown headings, bold, italic, inline code, links, lists, blockquotes, and code fences are color-highlighted in the results preview and section picker preview pane.
 - **Keyboard shortcut bar** — contextual footer on all TUI screens showing available keys. Shared `shortcutBar()` function used by both results and section picker screens.
 - **Continuous mode** — after processing, press `c` to return to the waiting screen for the next clipboard change instead of exiting. Process multiple items in sequence without restarting.
