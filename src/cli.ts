@@ -45,6 +45,7 @@ interface RootOptions {
   tui?: boolean;
   mode?: StatsMode;
   aggressive?: boolean;
+  maxTokens?: number;
 }
 
 function parseHeadingLevel(value: string): number {
@@ -262,6 +263,7 @@ program
   .name("decant")
   .description("Clean noisy HTML and convert it into markdown context.")
   .version(version, "-V, --version")
+  .enablePositionalOptions()
   .option(
     "--mode <mode>",
     "Default pipeline for no-subcommand runs: clean or extract",
@@ -269,6 +271,7 @@ program
     "clean",
   )
   .option("--aggressive", "Apply stronger pruning heuristics for no-subcommand runs")
+  .option("--max-tokens <n>", "Maximum token budget for output (enables section picker in TUI)", parseMaxTokens)
   .option(
     "--tui",
     "Launch interactive mode and attempt experimental full-screen TUI first",
@@ -333,11 +336,12 @@ program.action(async function (this: Command) {
       forceTui: Boolean(options.tui),
       mode,
       aggressive,
+      maxTokens: options.maxTokens,
     });
     return;
   }
 
-  await runTransform(mode, { aggressive });
+  await runTransform(mode, { aggressive, maxTokens: options.maxTokens });
 });
 
 try {

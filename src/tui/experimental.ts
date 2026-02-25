@@ -1,14 +1,18 @@
 import { detectFormat } from "../lib/contentDetect";
 import { convertRtfToHtml } from "../lib/convert";
-import { highlightMarkdown } from "../lib/highlightMarkdown";
+
 import { copyToClipboard, readClipboardRtf, readClipboardText } from "../lib/io";
 import { recordRunStats } from "../lib/sessionStats";
 import type { StatsMode, TransformOptions } from "../lib/types";
 import { processHtml, type ProcessResult } from "../pipeline/processHtml";
+import { parseMarkdownSections } from "../pipeline/tokenBudget";
+import { estimateTokens } from "../pipeline/stats";
+import { runSectionPicker, splitIntoParagraphs } from "./sectionPicker";
 
 interface TuiRunOptions {
   mode: StatsMode;
   aggressive: boolean;
+  maxTokens?: number;
 }
 
 // Color palette
@@ -29,14 +33,6 @@ function defaultTransformOptions(aggressive: boolean): TransformOptions {
   };
 }
 
-function previewLines(markdown: string, limit = 20): string[] {
-  const lines = markdown.trim() ? markdown.trim().split("\n") : ["(empty output)"];
-  if (lines.length <= limit) {
-    return lines;
-  }
-
-  return [...lines.slice(0, limit), "..."];
-}
 
 function percent(value: number): string {
   return `${value.toFixed(2)}%`;
@@ -62,7 +58,7 @@ async function waitForExitKey(renderer: { keyInput: any }): Promise<void> {
 
 export async function runExperimentalTui(options: TuiRunOptions): Promise<boolean> {
   try {
-    const { createCliRenderer, Box, Text, TextAttributes } = await import("@opentui/core");
+    const { createCliRenderer, Box, Text, ScrollBox, TextAttributes } = await import("@opentui/core");
     const renderer = await createCliRenderer({
       exitOnCtrlC: true,
       useAlternateScreen: true,
@@ -114,6 +110,13 @@ export async function runExperimentalTui(options: TuiRunOptions): Promise<boolea
             Text({ content: "    " }),
             Text({ content: "Aggressive: ", fg: MUTED }),
             Text({ content: options.aggressive ? "on" : "off", fg: STAT_VALUE, attributes: BOLD }),
+            ...(options.maxTokens != null
+              ? [
+                  Text({ content: "    " }),
+                  Text({ content: "Budget: ", fg: MUTED }),
+                  Text({ content: `${options.maxTokens.toLocaleString()} tokens`, fg: STAT_VALUE, attributes: BOLD }),
+                ]
+              : []),
           ),
           Text({ content: " " }),
           // Spinner line: accent + bold
@@ -159,12 +162,24 @@ export async function runExperimentalTui(options: TuiRunOptions): Promise<boolea
       renderer.requestRender();
     };
 
+    const allPreviewLines = (markdown: string) =>
+      markdown.trim() ? markdown.trim().split("\n") : ["(empty output)"];
+
+    const colorLine = (line: string) => {
+      if (/^#{1,6}\s+/.test(line)) return Text({ content: line, fg: ACCENT, flexShrink: 0 });
+      if (/^```/.test(line)) return Text({ content: line, fg: MUTED, flexShrink: 0 });
+      if (/^>/.test(line)) return Text({ content: line, fg: MUTED, flexShrink: 0 });
+      if (/^---$/.test(line) || /^\*\*\*$/.test(line)) return Text({ content: line, fg: MUTED, flexShrink: 0 });
+      return Text({ content: line, fg: STAT_VALUE, flexShrink: 0 });
+    };
+
     const renderResultsScreen = (
       processed: ProcessResult,
       session: { today: { runs: number; tokensSaved: number }; lifetime: { runs: number; tokensSaved: number } },
     ) => {
       clearScreen();
       const stats = processed.stats;
+      const lines = allPreviewLines(processed.markdown);
 
       renderer.root.add(
         Box(
@@ -208,33 +223,28 @@ export async function runExperimentalTui(options: TuiRunOptions): Promise<boolea
             ),
           ),
           Text({ content: " " }),
-          // Output preview
-          Text({
-            content: "Output preview:",
-            fg: MUTED,
-            flexShrink: 0,
-          }),
-          Text({
-            content: "\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500",
-            fg: MUTED,
-            flexShrink: 0,
-          }),
-          // Preview container: fills remaining space, clips overflow
-          Box(
+          // Scrollable output preview
+          ScrollBox(
             {
+              border: true,
+              borderStyle: "rounded" as const,
+              borderColor: MUTED,
+              title: "Output preview",
+              titleAlignment: "left" as const,
+              scrollY: true,
+              viewportCulling: true,
+              contentOptions: {
+                flexDirection: "column" as const,
+              },
               flexGrow: 1,
               flexShrink: 1,
-              overflow: "hidden" as const,
-              minHeight: 1,
+              minHeight: 3,
             },
-            Text({
-              content: previewLines(highlightMarkdown(processed.markdown)).join("\n"),
-              wrapMode: "word",
-            }),
+            ...lines.map(colorLine),
           ),
           // Footer pinned at bottom
           Text({
-            content: "Press q, Enter, or Esc to exit",
+            content: "Scroll: \u2191\u2193/mouse  \u00b7  q/Enter/Esc exit",
             fg: MUTED,
             flexShrink: 0,
           }),
@@ -280,6 +290,52 @@ export async function runExperimentalTui(options: TuiRunOptions): Promise<boolea
 
       const transformOptions = defaultTransformOptions(options.aggressive);
       const processed = processHtml(options.mode, clipboardHtml, transformOptions);
+
+      // Section picker: if maxTokens set and >= 2 sections, let user choose
+      let finalMarkdown = processed.markdown;
+      if (options.maxTokens != null) {
+        let sections = parseMarkdownSections(processed.markdown);
+        // Fall back to paragraph splitting for single-section docs
+        if (sections.length < 2) {
+          const paragraphs = splitIntoParagraphs(processed.markdown);
+          if (paragraphs.length >= 2) {
+            sections = paragraphs;
+          }
+        }
+        if (sections.length >= 2) {
+          const pickerResult = await runSectionPicker({
+            sections,
+            maxTokens: options.maxTokens,
+            renderer,
+            Box,
+            Text,
+            ScrollBox,
+            TextAttributes,
+          });
+
+          if (!pickerResult.canceled) {
+            finalMarkdown = pickerResult.selectedSections.map((s) => s.content).join("\n");
+            // Recompute output stats for filtered content
+            processed.stats.outputChars = finalMarkdown.length;
+            processed.stats.outputTokensEstimate = estimateTokens(finalMarkdown);
+            processed.stats.charReduction = processed.stats.inputChars - processed.stats.outputChars;
+            processed.stats.charReductionPct =
+              processed.stats.inputChars === 0
+                ? 0
+                : Math.round(((processed.stats.inputChars - processed.stats.outputChars) / processed.stats.inputChars) * 10000) / 100;
+            processed.stats.tokenReduction = processed.stats.inputTokensEstimate - processed.stats.outputTokensEstimate;
+            processed.stats.tokenReductionPct =
+              processed.stats.inputTokensEstimate === 0
+                ? 0
+                : Math.round(((processed.stats.inputTokensEstimate - processed.stats.outputTokensEstimate) / processed.stats.inputTokensEstimate) * 10000) / 100;
+          }
+          // If canceled, finalMarkdown stays as full processed.markdown
+        }
+      }
+
+      // Update processed.markdown reference for results screen
+      processed.markdown = finalMarkdown;
+
       await copyToClipboard(processed.markdown);
       const session = await recordRunStats(processed.stats);
 

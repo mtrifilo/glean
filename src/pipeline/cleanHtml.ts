@@ -17,8 +17,12 @@ const CONTENT_PROTECTED_TAGS = new Set(["article", "main"]);
 const textDecoderWhitespace = /\s+/g;
 
 function wrapHtml(rawHtml: string): string {
-  if (/<html[\s>]/i.test(rawHtml) || /<body[\s>]/i.test(rawHtml)) {
+  if (/<html[\s>]/i.test(rawHtml)) {
     return rawHtml;
+  }
+
+  if (/<body[\s>]/i.test(rawHtml)) {
+    return `<!doctype html><html>${rawHtml}</html>`;
   }
 
   return `<!doctype html><html><body>${rawHtml}</body></html>`;

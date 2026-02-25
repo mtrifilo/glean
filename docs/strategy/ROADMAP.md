@@ -139,33 +139,23 @@ Section-aware token budget via `--max-tokens N` flag. Post-processing in the CLI
 - [x] Unit tests (`test/tokenBudget.test.ts`) + CLI integration tests
 - [x] Update README, CHANGELOG, llm-context.md
 
-### v0.11.0 — Interactive Section Selection
+### v0.11.0 — Interactive Section Selection (Done)
 
-Full-screen TUI section picker for `--max-tokens` workflows. When `--tui --max-tokens N` is used, inserts a section selection screen between processing and results. Users interactively choose which sections to keep, with a real-time token budget counter and a content preview pane.
+Full-screen TUI section picker for `--max-tokens` workflows. When `--tui --max-tokens N` is used, inserts a section selection screen between processing and results.
 
-**Section picker screen:**
-- Custom checkbox list built with `Box`/`Text` and keypress handlers (OpenTUI has no built-in multi-select widget)
-- Each row shows: checkbox, token count, heading name
-- Cursor row highlights and shows a content preview pane (first few lines of that section's markdown)
-- Real-time budget counter at bottom: green (under budget), amber (>80%), red (over budget) — updates instantly on toggle
-- Over-budget is warned but not blocked — user can confirm and proceed
-
-**Keyboard controls:**
-- `↑`/`↓` or `j`/`k` — move cursor
-- `Space` — toggle section on/off
-- `a` — select all
-- `n` — deselect all
-- `f` — auto-fit (greedily select from top until budget is filled)
-- `Enter` — confirm selection and output
-- `q` — cancel
-
-**Flow:** Waiting → Processing → Section Picker → Results
-
-**Design notes:**
-- Only activates in TUI mode with `--max-tokens` set. Without `--max-tokens`, TUI flow is unchanged.
-- Reuses `parseMarkdownSections()` and `estimateTokens()` from `tokenBudget.ts` — no new estimation logic.
-- Output is the concatenation of selected sections in document order.
-- First section (preamble or first heading) starts checked by default; auto-fit pre-selects sections that fit within budget.
+- [x] `src/tui/sectionPicker.ts` — new module: two-pane picker (section list + content preview), keyboard handling, budget counter
+- [x] Pure utility functions: `autoFitSelection()`, `computeSelectedTokens()`, `budgetColor()`
+- [x] `--max-tokens` threaded to root `decant` command via `enablePositionalOptions()` (coexists with subcommand `--max-tokens`)
+- [x] Plumbing: `cli.ts` → `runInteractive.ts` → `experimental.ts` → `runSectionPicker()`
+- [x] Budget display in TUI waiting screen when `--max-tokens` is set
+- [x] Stats recomputed after section filtering for accurate results screen
+- [x] Auto-fit on open: greedy top-down selection within budget, first section always included
+- [x] Over-budget warned (red bar) but not blocked — Enter still confirms
+- [x] Cancel (`q`/`Esc`) outputs full markdown, no filtering
+- [x] Picker skipped for 0–1 sections
+- [x] Keyboard: `↑`/`↓`/`j`/`k` navigate, `Space` toggle, `a` all, `n` none, `f` auto-fit, `Enter` confirm, `q` cancel
+- [x] Unit tests (`test/sectionPicker.test.ts`) + CLI integration test for root `--max-tokens`
+- [x] Update README, CHANGELOG, llm-context.md, ROADMAP
 
 ### v0.12.0 — TUI Enhancements
 

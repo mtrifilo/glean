@@ -147,6 +147,14 @@ describe("decant cli", () => {
     expect(result.exitCode).toBe(1);
     expect(result.stderr).toContain("requires an interactive terminal");
   });
+
+  test("root --help includes --max-tokens option", async () => {
+    const result = await runCli(["--help"]);
+
+    expect(result.exitCode).toBe(0);
+    expect(result.stdout).toContain("--max-tokens");
+    expect(result.stdout).toContain("token budget");
+  });
 });
 
 describe("DOCX input", () => {
