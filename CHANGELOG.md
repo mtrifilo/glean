@@ -7,6 +7,8 @@ Semantic Versioning after `1.0.0`.
 
 ## [Unreleased]
 
+## [0.11.0] - 2026-02-24
+
 ### Added
 
 - Interactive section picker in TUI mode (`--tui --max-tokens N`). After processing, a two-pane screen lets you toggle sections on/off with a real-time token budget counter and content preview.
