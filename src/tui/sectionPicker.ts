@@ -1,5 +1,6 @@
 import type { MarkdownSection } from "../pipeline/tokenBudget";
 import { estimateTokens } from "../pipeline/stats";
+import { buildFenceStateMap, colorLineRich, COLORS, shortcutBar } from "./tuiHighlight";
 
 // --- Paragraph splitting for single-section documents ---
 
@@ -51,15 +52,9 @@ interface PickerState {
   scrollOffset: number;
 }
 
-// --- Color palette (matches experimental.ts) ---
+// --- Color palette (from shared tuiHighlight.ts) ---
 
-const ACCENT = "#7dd3fc";
-const SUCCESS = "#4ade80";
-const MUTED = "#6b7280";
-const STAT_LABEL = "#94a3b8";
-const STAT_VALUE = "#f1f5f9";
-const HIGHLIGHT = "#fbbf24";
-const OVER_BUDGET = "#ef4444";
+const { ACCENT, SUCCESS, MUTED, STAT_LABEL, STAT_VALUE, HIGHLIGHT, OVER_BUDGET } = COLORS;
 
 // --- Pure utility functions (exported for testing) ---
 
@@ -107,21 +102,25 @@ const PREVIEW_MAX_LINES = 25;
 function buildPreviewTextNodes(
   section: MarkdownSection,
   Text: any,
+  TextAttributes?: any,
 ): any[] {
-  const lines = section.content.split("\n").slice(0, PREVIEW_MAX_LINES);
+  const allLines = section.content.split("\n");
+  const lines = allLines.slice(0, PREVIEW_MAX_LINES);
   const nodes: any[] = [];
 
-  for (const line of lines) {
-    if (/^#{1,6}\s+/.test(line)) {
-      nodes.push(Text({ content: line, fg: ACCENT }));
-    } else if (/^```/.test(line)) {
-      nodes.push(Text({ content: line, fg: MUTED }));
-    } else {
-      nodes.push(Text({ content: line, fg: STAT_VALUE }));
+  // Use colorLineRich for rich inline highlighting
+  const fenceState = buildFenceStateMap(lines);
+
+  for (let i = 0; i < lines.length; i++) {
+    const lineNodes = colorLineRich(lines[i], fenceState[i], Text, TextAttributes);
+    // Wrap each line's nodes in a row so they stay on one line
+    nodes.push(...lineNodes);
+    if (i < lines.length - 1) {
+      nodes.push(Text({ content: "" })); // line break
     }
   }
 
-  if (section.content.split("\n").length > PREVIEW_MAX_LINES) {
+  if (allLines.length > PREVIEW_MAX_LINES) {
     nodes.push(Text({ content: "...", fg: MUTED }));
   }
 
@@ -245,7 +244,7 @@ export function runSectionPicker(options: SectionPickerOptions): Promise<Section
 
     const previewSection = sections[state.cursor];
     const previewNodes = previewSection
-      ? buildPreviewTextNodes(previewSection, Text)
+      ? buildPreviewTextNodes(previewSection, Text, TextAttributes)
       : [Text({ content: "(no section)", fg: MUTED })];
 
     renderer.root.add(
@@ -304,22 +303,18 @@ export function runSectionPicker(options: SectionPickerOptions): Promise<Section
         // Budget bar
         buildBudgetBar(state, maxTokens, Text, Box, BOLD),
         // Shortcut legend
-        Box(
-          { flexDirection: "row" as const, flexShrink: 0 },
-          Text({ content: "  \u2191\u2193/j/k", fg: STAT_LABEL }),
-          Text({ content: " navigate  ", fg: MUTED }),
-          Text({ content: "Space/Click", fg: STAT_LABEL }),
-          Text({ content: " toggle  ", fg: MUTED }),
-          Text({ content: "a", fg: STAT_LABEL }),
-          Text({ content: " all  ", fg: MUTED }),
-          Text({ content: "n", fg: STAT_LABEL }),
-          Text({ content: " none  ", fg: MUTED }),
-          Text({ content: "f", fg: STAT_LABEL }),
-          Text({ content: " auto-fit  ", fg: MUTED }),
-          Text({ content: "Enter", fg: STAT_LABEL }),
-          Text({ content: " confirm  ", fg: MUTED }),
-          Text({ content: "q", fg: STAT_LABEL }),
-          Text({ content: " cancel", fg: MUTED }),
+        shortcutBar(
+          [
+            { key: "\u2191\u2193/j/k", label: "navigate" },
+            { key: "Space/Click", label: "toggle" },
+            { key: "a", label: "all" },
+            { key: "n", label: "none" },
+            { key: "f", label: "auto-fit" },
+            { key: "Enter", label: "confirm" },
+            { key: "q", label: "cancel" },
+          ],
+          Box,
+          Text,
         ),
       ),
     );

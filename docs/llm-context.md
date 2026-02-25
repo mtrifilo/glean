@@ -4,7 +4,8 @@
 
 ## Recent Work
 
-- v0.11.0 in progress — Interactive section selection TUI. New `src/tui/sectionPicker.ts` module with two-pane picker screen (section list + content preview), real-time budget counter, keyboard + mouse navigation, windowed scroll. `--max-tokens` threaded to root command for TUI use. Auto-fit greedy selection, over-budget warning (not blocking). Fixed ScrollBox layout (was overriding OpenTUI's internal flexDirection).
+- v0.12.0 in progress — TUI enhancements: scrollable windowed preview (j/k/arrows/PageUp/PageDown), rich syntax highlighting (headings, bold, italic, code, links, lists, blockquotes, code fences), shortcut bar on all screens, continuous mode (c to continue), option toggling (a=aggressive, m=mode), URL auto-detection in clipboard, file drag-and-drop via paste event. New modules: `src/tui/tuiHighlight.ts` (shared colors, colorLineRich, buildFenceStateMap, shortcutBar), `src/tui/tuiFileDrop.ts` (normalizePastedPath, isSupportedFile, readAndConvertFile). Duplicate clipboard detection via content hashing.
+- v0.11.0 shipped — Interactive section selection TUI. New `src/tui/sectionPicker.ts` module with two-pane picker screen (section list + content preview), real-time budget counter, keyboard + mouse navigation, windowed scroll. `--max-tokens` threaded to root command for TUI use. Auto-fit greedy selection, over-budget warning (not blocking). Fixed ScrollBox layout (was overriding OpenTUI's internal flexDirection).
 - v0.10.0 shipped — Token budget via `--max-tokens N`. Section-aware parsing, piped error path (exit 1 + breakdown), TTY smart truncation (drop from end + warning), stats enrichment with per-section tokens and budget fields. New module `src/pipeline/tokenBudget.ts`.
 - v0.9.0 shipped — URL fetching via `--url`/`-u` flag. Bun built-in `fetch()`, 15s timeout, content-type validation, redirect following. Mutually exclusive with `--input`.
 - v0.8.0 shipped — PDF text extraction via `unpdf` (MIT, cross-platform). Scanned/image PDFs return placeholder (OCR deferred to v0.23.0).
@@ -14,9 +15,9 @@
 
 ## Checkpoint
 
-- **Current state:** v0.11.0 in progress. 177 tests passing (+ 2 skipped), 359 expect() calls across 9 test files.
-- **What's working:** HTML, RTF, DOC, DOCX, PDF → clean markdown. URL → HTML via `--url`/`-u`. Token budget via `--max-tokens`. Interactive clipboard-first mode. TUI full-screen mode. TUI section picker via `--tui --max-tokens N`.
-- **What's next:** See `docs/strategy/ROADMAP.md` — next up is TUI enhancements (v0.12.0).
+- **Current state:** v0.12.0 in progress. 236 tests passing (+ 2 skipped), 461 expect() calls across 11 test files.
+- **What's working:** HTML, RTF, DOC, DOCX, PDF → clean markdown. URL → HTML via `--url`/`-u`. Token budget via `--max-tokens`. Interactive clipboard-first mode. TUI full-screen mode. TUI section picker via `--tui --max-tokens N`. TUI scrollable preview, syntax highlighting, continuous mode, option toggling, URL detection, file drag-and-drop.
+- **What's next:** See `docs/strategy/ROADMAP.md` — v0.12.0 release, then v0.13.0 Diff mode.
 
 ## Product Intent
 
@@ -46,7 +47,7 @@ Keep `decant` laser-focused on the HTML/RTF/DOC/DOCX/PDF/URL → clean markdown 
 | URL fetching | Stable | `--url`/`-u` flag, content-type validation, 15s timeout |
 | Token budget | Stable | `--max-tokens N`, section-aware truncation, piped error + TTY warning, TUI section picker |
 | Interactive mode | Stable | Clipboard-first, auto-detect HTML/RTF |
-| TUI mode | Stable | OpenTUI full-screen, clipboard polling |
+| TUI mode | Stable | OpenTUI full-screen, clipboard polling, URL detection, file drag-and-drop, continuous mode, option toggling, scrollable highlighted preview |
 | Dev tooling | Stable | Golden fixtures, smoke check, CI integration |
 
 ## Command Cheat Sheet
@@ -106,9 +107,13 @@ decant --tui --max-tokens 2000
 - `src/interactive/runInteractive.ts`
   - clipboard-first interactive logic, ANSI-colored stats, syntax-highlighted preview with word-wrap
 - `src/tui/experimental.ts`
-  - polished OpenTUI full-screen flow used by `--tui` (detects HTML + RTF on clipboard)
+  - polished OpenTUI full-screen flow used by `--tui` — clipboard polling, URL detection, file drag-and-drop, continuous mode, option toggling, windowed scrollable results
 - `src/tui/sectionPicker.ts`
   - interactive section picker screen for `--tui --max-tokens N` — two-pane layout, keyboard + mouse navigation, windowed scroll, budget counter
+- `src/tui/tuiHighlight.ts`
+  - shared TUI color palette, rich markdown line highlighting (colorLineRich), code fence state tracking (buildFenceStateMap), shortcut bar builder
+- `src/tui/tuiFileDrop.ts`
+  - file drag-and-drop support — path normalization, extension checking, file reading and conversion
 
 ### Core pipelines
 
@@ -148,6 +153,8 @@ decant --tui --max-tokens 2000
 - `test/cli.test.ts` - command-level behavior (includes RTF, DOCX, PDF, URL, token budget integration tests)
 - `test/tokenBudget.test.ts` - token budget unit tests (section parsing, breakdown, truncation, formatters)
 - `test/sectionPicker.test.ts` - section picker pure logic tests (auto-fit, token computation, budget colors)
+- `test/tuiHighlight.test.ts` - TUI highlighting tests (colorLineRich, buildFenceStateMap, shortcutBar)
+- `test/tuiFileDrop.test.ts` - file drop tests (path normalization, extension checking)
 - `test/fetchUrl.test.ts` - URL fetching unit tests (validation, HTML/XHTML, content-type rejection, HTTP errors, redirects, timeout)
 - `test/contentDetect.test.ts` - content detection unit tests (HTML, RTF, DOC, DOCX, PDF)
 - `test/convert.test.ts` - RTF/DOC conversion tests (macOS-gated) + DOCX + PDF conversion tests (cross-platform)
@@ -156,7 +163,7 @@ decant --tui --max-tokens 2000
 
 ## Priorities
 
-1. v0.12.0 — TUI enhancements (scrollable preview, continuous mode, option toggling)
+1. v0.12.0 — TUI enhancements (implemented, pending release)
 2. v0.13.0 — Diff mode
 3. v0.14.0 — Quality score
 

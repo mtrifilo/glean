@@ -157,17 +157,18 @@ Full-screen TUI section picker for `--max-tokens` workflows. When `--tui --max-t
 - [x] Unit tests (`test/sectionPicker.test.ts`) + CLI integration test for root `--max-tokens`
 - [x] Update README, CHANGELOG, llm-context.md, ROADMAP
 
-### v0.12.0 — TUI Enhancements
+### v0.12.0 — TUI Enhancements (Done)
 
-Major upgrade to the full-screen TUI (`--tui`). Preserves the zero-friction clipboard-first default while layering in interactivity. Currently the TUI is single-shot with a plain text preview — this iteration makes it a polished, re-usable workspace.
+Major upgrade to the full-screen TUI (`--tui`). Preserves the zero-friction clipboard-first default while layering in interactivity. The TUI is now a polished, re-usable workspace.
 
-- **File drag-and-drop** — detect pasted file paths via OpenTUI's `paste` event, resolve and convert HTML/RTF/DOC/DOCX files. Works across iTerm2, Kitty, WezTerm, Ghostty, and Terminal.app. Full spec: `docs/specs/TUI_FILE_DROP.md`.
-- **URL detection in clipboard** — polling loop detects URLs and auto-fetches + converts (requires v0.9.0 URL fetching). No new flags — just paste a URL instead of HTML.
-- **Syntax-highlighted markdown preview** — color headings, bold, code blocks, links, lists, and blockquotes using regex-based highlighting with OpenTUI's per-text `fg` colors.
-- **Scrollable preview** — replace the 20-line hard cap with `j`/`k` or arrow key scrolling so users can inspect the full output.
-- **Option toggling without restarting** — press `a` to toggle aggressive mode, `m` to switch clean/extract, and re-process instantly from the results screen (input stays in memory).
-- **Continuous mode** — after processing, return to the waiting screen for the next clipboard change instead of exiting. Process multiple items in sequence. Press `q` to exit when done.
-- **Keyboard shortcut bar** — persistent contextual footer showing available keys (e.g. `[a] aggressive  [m] mode  [↑↓] scroll  [q] quit`). Updates based on current screen state.
+- [x] **File drag-and-drop** — detect pasted file paths via OpenTUI's `paste` event, resolve and convert HTML/RTF/DOC/DOCX/PDF files. Works across iTerm2, Kitty, WezTerm, Ghostty, and Terminal.app. New module: `src/tui/tuiFileDrop.ts`.
+- [x] **URL detection in clipboard** — polling loop detects URLs and auto-fetches + converts. Shows "Fetching..." screen during download.
+- [x] **Syntax-highlighted markdown preview** — color headings, bold, italic, code blocks, inline code, links, lists, and blockquotes using regex-based highlighting with OpenTUI's per-text `fg` colors. New module: `src/tui/tuiHighlight.ts`.
+- [x] **Scrollable preview** — windowed plain Box with `j`/`k`/arrow/PageUp/PageDown/Home/End scrolling. Line count and scroll percentage in title bar.
+- [x] **Option toggling without restarting** — press `a` to toggle aggressive mode, `m` to switch clean/extract, and re-process instantly from the results screen (input stays in memory).
+- [x] **Continuous mode** — after processing, press `c` to return to the waiting screen for the next clipboard change. Process multiple items in sequence. Press `q` to exit when done. Duplicate clipboard detection via content hashing.
+- [x] **Keyboard shortcut bar** — persistent contextual footer showing available keys. Shared `shortcutBar()` function used by results and section picker screens.
+- [x] Shared color palette extracted from `experimental.ts` and `sectionPicker.ts` into `tuiHighlight.ts`. Section picker updated to use shared colors and enhanced preview highlighting.
 
 #### Tier 2 — LLM Workflow Intelligence
 

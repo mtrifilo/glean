@@ -7,6 +7,28 @@ Semantic Versioning after `1.0.0`.
 
 ## [Unreleased]
 
+### Added
+
+- **Scrollable results preview** — replace the ScrollBox-based results preview with a windowed plain Box that supports `j`/`k`/arrow key scrolling, `PageUp`/`PageDown`, and `Home`/`End`. Line count and scroll percentage shown in the preview title.
+- **Syntax-highlighted preview** — markdown headings, bold, italic, inline code, links, lists, blockquotes, and code fences are color-highlighted in the results preview and section picker preview pane.
+- **Keyboard shortcut bar** — contextual footer on all TUI screens showing available keys. Shared `shortcutBar()` function used by both results and section picker screens.
+- **Continuous mode** — after processing, press `c` to return to the waiting screen for the next clipboard change instead of exiting. Process multiple items in sequence without restarting.
+- **Option toggling** — press `a` on the results screen to toggle aggressive mode, `m` to switch between clean/extract mode. Re-processes the same input instantly.
+- **URL detection in clipboard** — the TUI waiting loop now detects URLs in the clipboard and auto-fetches + converts them. Shows a "Fetching..." screen during download.
+- **File drag-and-drop** — drag a file (HTML, HTM, RTF, DOC, DOCX, PDF) into the terminal during the waiting screen to process it. Uses OpenTUI's paste event to detect file paths.
+- `src/tui/tuiHighlight.ts` — shared TUI color palette, rich line highlighting (`colorLineRich`), code fence state tracking (`buildFenceStateMap`), and shortcut bar builder.
+- `src/tui/tuiFileDrop.ts` — file path normalization (`normalizePastedPath`), extension checking (`isSupportedFile`), and file reading/conversion (`readAndConvertFile`).
+- `test/tuiHighlight.test.ts` — 25 tests for rich highlighting, fence state map, and shortcut bar.
+- `test/tuiFileDrop.test.ts` — 29 tests for path normalization and extension checking.
+- Duplicate clipboard detection via content hashing — prevents re-processing the same content when returning to the waiting screen.
+
+### Changed
+
+- Section picker now uses shared color palette from `tuiHighlight.ts` instead of duplicated constants.
+- Section picker preview pane uses `colorLineRich` for richer syntax highlighting (inline code, bold, italic, links).
+- Section picker shortcut legend uses shared `shortcutBar()` function.
+- Waiting screen text updated: "Copy content or a URL, or drag a file here".
+
 ## [0.11.0] - 2026-02-24
 
 ### Added
