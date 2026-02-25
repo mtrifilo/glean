@@ -23,7 +23,7 @@ Every document carries noise — wrapper markup, nav blocks, styling attributes,
 
 **Token-aware output.** Decant doesn't just convert — it measures. Every run reports character and token reduction so you know how efficiently your content fits a context window.
 
-**Interactive, clipboard-first.** No flags, no file paths for the common case. Copy content, run `decant`, paste clean markdown. The full-screen TUI (`--tui`) adds live clipboard detection, color-coded stats, and styled preview panels.
+**Interactive, clipboard-first.** No flags, no file paths for the common case. Copy content, run `decant`, paste clean markdown. The full-screen TUI (`--tui`) adds live clipboard detection, URL auto-fetching, file drag-and-drop, syntax-highlighted scrollable preview, option toggling, and continuous mode.
 
 **Local and fast.** Single binary, zero runtime dependencies, works offline. Install with one command, update with `decant update`. No API keys, no cloud, no Python environment.
 
@@ -37,8 +37,8 @@ Every document carries noise — wrapper markup, nav blocks, styling attributes,
 
 Decant's roadmap is focused on the space between document conversion and LLM consumption — the workflow intelligence that no other tool provides:
 
-- **Interactive section selection** — TUI section picker for `--max-tokens` workflows with real-time budget counter and content preview (shipped in v0.11.0)
-- **TUI workspace** — syntax-highlighted preview, scrollable output, option toggling, continuous mode
+- **Interactive section selection** — TUI section picker for `--max-tokens` workflows with real-time budget counter and content preview
+- **TUI workspace** — syntax-highlighted scrollable preview, option toggling, continuous mode, URL detection, file drag-and-drop (shipped in v0.12.0)
 - **Diff mode** — see exactly what the pipeline removed
 - **Quality scoring** — know how clean your output is before you paste it
 - **Chunking for RAG** — split documents into sized chunks for retrieval pipelines
@@ -136,7 +136,7 @@ Installer env vars (script path only):
 - `--mode clean|extract` choose pipeline for interactive/no-subcommand runs (default: `clean`)
 - `--aggressive` enable stronger pruning for interactive/no-subcommand runs (default: off)
 - `--max-tokens <n>` set a token budget — enables the interactive section picker in TUI mode
-- `--tui` launch the full-screen OpenTUI interface with color-coded stats, bordered panels, and live clipboard detection (requires TTY; falls back to standard interactive mode if TUI startup fails)
+- `--tui` launch the full-screen OpenTUI interface with color-coded stats, bordered panels, live clipboard detection, URL auto-fetching, file drag-and-drop, scrollable syntax-highlighted preview, option toggling (`a`/`m`), and continuous mode (`c`) (requires TTY; falls back to standard interactive mode if TUI startup fails)
 
 ## Common options (`clean`, `extract`, `stats`)
 
@@ -169,7 +169,7 @@ Run `decant` with no subcommand to enter interactive mode.
 - Copies parsed markdown to clipboard automatically
 - Shows color-coded stats (chars/tokens saved with reduction percentages), session totals, and a truncated output preview
 - Respects `NO_COLOR` env var for plain-text fallback
-- Use `--tui` for a full-screen OpenTUI variant with bordered panels, live clipboard polling, and styled preview
+- Use `--tui` for a full-screen OpenTUI variant with bordered panels, live clipboard polling, URL auto-fetching, file drag-and-drop, scrollable syntax-highlighted preview, option toggling, and continuous mode
 
 Session stats are persisted to `~/.decant/stats.json` by default.
 Set `DECANT_STATS_PATH` to override the stats file location.
