@@ -204,9 +204,15 @@ export async function formatDiffAnsi(diff: DiffResult): Promise<string> {
 
   for (const line of diff.htmlLines) {
     switch (line.type) {
-      case "kept":
-        lines.push(success(`  ${line.text}`));
+      case "kept": {
+        // Tags in gray, text content in green
+        const colored = line.text.replace(
+          /(<[^>]*>)|([^<]+)/g,
+          (_, tag, text) => tag ? muted(tag) : success(text),
+        );
+        lines.push(`  ${colored}`);
         break;
+      }
       case "removed":
         lines.push(removed(`- ${line.text}`));
         break;

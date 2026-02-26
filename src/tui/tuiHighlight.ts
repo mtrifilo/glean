@@ -196,7 +196,9 @@ const DIFF_COLORS = {
 export type DiffLineType = "kept" | "removed" | "context";
 
 /**
- * Convert a DiffLine into a Text node with red/green coloring for TUI diff view.
+ * Convert a DiffLine into Text node(s) for TUI diff view.
+ * For "kept" lines, HTML tags render gray and text content renders green.
+ * Returns a single node or an array of nodes (caller wraps in a row Box).
  */
 export function colorDiffLine(
   text: string,
@@ -204,8 +206,32 @@ export function colorDiffLine(
   Text: any,
 ): any {
   switch (type) {
-    case "kept":
-      return Text({ content: `  ${text}`, fg: DIFF_COLORS.KEPT, flexShrink: 0 });
+    case "kept": {
+      // Split HTML line into tag vs text segments
+      const nodes: any[] = [Text({ content: "  ", fg: DIFF_COLORS.KEPT, flexShrink: 0 })];
+      // Match HTML tags and text between them
+      const pattern = /<[^>]*>/g;
+      let lastIndex = 0;
+      let match: RegExpExecArray | null;
+      while ((match = pattern.exec(text)) !== null) {
+        // Text before this tag
+        if (match.index > lastIndex) {
+          nodes.push(Text({ content: text.slice(lastIndex, match.index), fg: DIFF_COLORS.KEPT, flexShrink: 0 }));
+        }
+        // The tag itself — gray
+        nodes.push(Text({ content: match[0], fg: DIFF_COLORS.CONTEXT, flexShrink: 0 }));
+        lastIndex = match.index + match[0].length;
+      }
+      // Remaining text after last tag
+      if (lastIndex < text.length) {
+        nodes.push(Text({ content: text.slice(lastIndex), fg: DIFF_COLORS.KEPT, flexShrink: 0 }));
+      }
+      // If no tags were found, just render the whole line green
+      if (nodes.length === 1) {
+        nodes.push(Text({ content: text, fg: DIFF_COLORS.KEPT, flexShrink: 0 }));
+      }
+      return nodes;
+    }
     case "removed":
       return Text({ content: `- ${text}`, fg: DIFF_COLORS.REMOVED, flexShrink: 0 });
     case "context":

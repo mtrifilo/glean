@@ -345,10 +345,11 @@ export async function runExperimentalTui(options: TuiRunOptions): Promise<boolea
             // Left pane: HTML lines colored by diff type
             if (lineIdx < htmlLines.length) {
               const dl = htmlLines[lineIdx];
+              const diffNodes = colorDiffLine(dl.text, dl.type, Text);
               leftNodes.push(
                 Box(
                   { flexDirection: "row" as const, flexShrink: 0, height: 1 },
-                  colorDiffLine(dl.text, dl.type, Text),
+                  ...(Array.isArray(diffNodes) ? diffNodes : [diffNodes]),
                 ),
               );
             } else {
