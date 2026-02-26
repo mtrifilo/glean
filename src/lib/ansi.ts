@@ -3,13 +3,16 @@
  * Respects NO_COLOR (https://no-color.org) and TERM=dumb.
  */
 
-const enabled =
-  !process.env.NO_COLOR &&
-  process.env.TERM !== "dumb" &&
-  (process.stdout.isTTY === true || "FORCE_COLOR" in process.env);
+function isEnabled(): boolean {
+  return (
+    !process.env.NO_COLOR &&
+    process.env.TERM !== "dumb" &&
+    (process.stdout.isTTY === true || "FORCE_COLOR" in process.env)
+  );
+}
 
 const wrap = (open: string, close: string) =>
-  enabled ? (s: string) => `${open}${s}${close}` : (s: string) => s;
+  (s: string) => isEnabled() ? `${open}${s}${close}` : s;
 
 // Attributes
 export const bold = wrap("\x1b[1m", "\x1b[22m");
@@ -28,6 +31,9 @@ export const highlight = wrap("\x1b[38;5;214m", "\x1b[39m");
 export const statLabel = wrap("\x1b[38;5;146m", "\x1b[39m");
 // TUI #f1f5f9 → ANSI 253 (near-white)
 export const statValue = wrap("\x1b[38;5;253m", "\x1b[39m");
+
+// Red for removed/deleted content (ANSI 196)
+export const removed = wrap("\x1b[38;5;196m", "\x1b[39m");
 
 /** Carriage-return + clear-to-end-of-line (for inline spinner updates). */
 export const clearLine = () => process.stdout.write("\r\x1b[K");

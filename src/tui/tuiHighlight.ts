@@ -185,6 +185,34 @@ export function colorLineRich(
   );
 }
 
+// --- Diff line highlighting ---
+
+const DIFF_COLORS = {
+  KEPT: "#4ade80",    // green — same as SUCCESS
+  REMOVED: "#ef4444", // red — same as OVER_BUDGET
+  CONTEXT: "#6b7280", // gray — same as MUTED
+} as const;
+
+export type DiffLineType = "kept" | "removed" | "context";
+
+/**
+ * Convert a DiffLine into a Text node with red/green coloring for TUI diff view.
+ */
+export function colorDiffLine(
+  text: string,
+  type: DiffLineType,
+  Text: any,
+): any {
+  switch (type) {
+    case "kept":
+      return Text({ content: `  ${text}`, fg: DIFF_COLORS.KEPT, flexShrink: 0 });
+    case "removed":
+      return Text({ content: `- ${text}`, fg: DIFF_COLORS.REMOVED, flexShrink: 0 });
+    case "context":
+      return Text({ content: `  ${text}`, fg: DIFF_COLORS.CONTEXT, flexShrink: 0 });
+  }
+}
+
 // --- Shortcut bar ---
 
 export interface Shortcut {
