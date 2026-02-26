@@ -9,7 +9,8 @@ import { processHtml, type ProcessResult } from "../pipeline/processHtml";
 import { parseMarkdownSections } from "../pipeline/tokenBudget";
 import { estimateTokens } from "../pipeline/stats";
 import { runSectionPicker, splitIntoParagraphs } from "./sectionPicker";
-import { buildFenceStateMap, colorLineRich, COLORS, shortcutBar } from "./tuiHighlight";
+import { buildFenceStateMap, colorDiffLine, colorLineRich, COLORS, shortcutBar } from "./tuiHighlight";
+import { computeDiff, type DiffResult } from "../lib/diff";
 import { normalizePastedPath, isSupportedFile, readAndConvertFile } from "./tuiFileDrop";
 
 const { ACCENT, SUCCESS, MUTED, STAT_LABEL, STAT_VALUE, HIGHLIGHT } = COLORS;
@@ -184,10 +185,18 @@ export async function runExperimentalTui(options: TuiRunOptions): Promise<boolea
     const waitForResultsAction = (
       processed: ProcessResult,
       session: { today: { runs: number; tokensSaved: number }; lifetime: { runs: number; tokensSaved: number } },
+      inputHtml?: string,
     ): Promise<ResultsAction> => {
       const lines = allPreviewLines(processed.markdown);
       const fenceState = buildFenceStateMap(lines);
       const stats = processed.stats;
+
+      // Diff state
+      let showDiff = false;
+      let diffResult: DiffResult | null = null;
+      if (inputHtml) {
+        diffResult = computeDiff(inputHtml, processed.markdown);
+      }
 
       // Windowed scroll state
       // Chrome: outer border(2) + padding(2) + success(1) + space(1) + stats box(~6) + space(1) + session box(~4) + space(1) + preview border(2) + shortcut bar(1) = ~21
@@ -195,8 +204,16 @@ export async function runExperimentalTui(options: TuiRunOptions): Promise<boolea
       const visibleRows = Math.max(3, renderer.height - CHROME_LINES);
       let scrollOffset = 0;
 
+      /** Get the active set of lines for scrolling based on diff mode. */
+      const activeLineCount = () => {
+        if (showDiff && diffResult) {
+          return Math.max(diffResult.htmlLines.length, lines.length);
+        }
+        return lines.length;
+      };
+
       const adjustScroll = () => {
-        const maxOffset = Math.max(0, lines.length - visibleRows);
+        const maxOffset = Math.max(0, activeLineCount() - visibleRows);
         scrollOffset = Math.max(0, Math.min(scrollOffset, maxOffset));
       };
 
@@ -204,113 +221,232 @@ export async function runExperimentalTui(options: TuiRunOptions): Promise<boolea
         clearScreen();
         adjustScroll();
 
-        const windowedLines = lines.slice(scrollOffset, scrollOffset + visibleRows);
-        const previewNodes: any[] = [];
-        for (let i = 0; i < visibleRows; i++) {
-          if (i < windowedLines.length) {
-            const lineIdx = scrollOffset + i;
-            const lineNodes = colorLineRich(windowedLines[i], fenceState[lineIdx], Text, TextAttributes);
-            previewNodes.push(
-              Box(
-                { flexDirection: "row" as const, flexShrink: 0, height: 1 },
-                ...lineNodes,
-              ),
-            );
-          } else {
-            // Pad with empty rows to keep preview height stable
-            previewNodes.push(
-              Box({ flexShrink: 0, height: 1 }),
-            );
+        // --- Normal single-pane preview ---
+        if (!showDiff || !diffResult) {
+          const windowedLines = lines.slice(scrollOffset, scrollOffset + visibleRows);
+          const previewNodes: any[] = [];
+          for (let i = 0; i < visibleRows; i++) {
+            if (i < windowedLines.length) {
+              const lineIdx = scrollOffset + i;
+              const lineNodes = colorLineRich(windowedLines[i], fenceState[lineIdx], Text, TextAttributes);
+              previewNodes.push(
+                Box(
+                  { flexDirection: "row" as const, flexShrink: 0, height: 1 },
+                  ...lineNodes,
+                ),
+              );
+            } else {
+              previewNodes.push(
+                Box({ flexShrink: 0, height: 1 }),
+              );
+            }
           }
+
+          const scrollPct = lines.length <= visibleRows
+            ? ""
+            : ` (${Math.round((scrollOffset / Math.max(1, lines.length - visibleRows)) * 100)}%)`;
+          const previewTitle = `Output preview [${lines.length} lines]${scrollPct}`;
+
+          renderer.root.add(
+            Box(
+              outerBox,
+              Text({
+                content: "\u2713 Markdown copied to clipboard",
+                fg: SUCCESS,
+                attributes: BOLD,
+              }),
+              Text({ content: " " }),
+              Box(
+                innerBox("Stats"),
+                Box(
+                  { flexDirection: "row" as const, flexShrink: 0 },
+                  Text({ content: "Chars    ", fg: STAT_LABEL }),
+                  Text({ content: `${fmt(stats.inputChars)} \u2192 ${fmt(stats.outputChars)}  `, fg: STAT_VALUE }),
+                  Text({ content: `(${percent(stats.charReductionPct)} saved)`, fg: HIGHLIGHT }),
+                ),
+                Box(
+                  { flexDirection: "row" as const, flexShrink: 0 },
+                  Text({ content: "Tokens   ", fg: STAT_LABEL }),
+                  Text({ content: `${fmt(stats.inputTokensEstimate)} \u2192 ${fmt(stats.outputTokensEstimate)}  `, fg: STAT_VALUE }),
+                  Text({ content: `(${percent(stats.tokenReductionPct)} saved)`, fg: HIGHLIGHT }),
+                ),
+              ),
+              Text({ content: " " }),
+              Box(
+                innerBox("Session"),
+                Box(
+                  { flexDirection: "row" as const, flexShrink: 0 },
+                  Text({ content: "Today: ", fg: STAT_LABEL }),
+                  Text({ content: `${fmt(session.today.runs)} runs \u00b7 ${fmt(session.today.tokensSaved)} tokens saved`, fg: STAT_VALUE }),
+                ),
+                Box(
+                  { flexDirection: "row" as const, flexShrink: 0 },
+                  Text({ content: "Lifetime: ", fg: STAT_LABEL }),
+                  Text({ content: `${fmt(session.lifetime.runs)} runs \u00b7 ${fmt(session.lifetime.tokensSaved)} tokens saved`, fg: STAT_VALUE }),
+                ),
+              ),
+              Text({ content: " " }),
+              Box(
+                {
+                  border: true,
+                  borderStyle: "rounded" as const,
+                  borderColor: MUTED,
+                  title: previewTitle,
+                  titleAlignment: "left" as const,
+                  flexDirection: "column" as const,
+                  flexGrow: 1,
+                  flexShrink: 1,
+                  minHeight: 3,
+                  overflow: "hidden" as const,
+                  onMouseScroll: (event: { scroll?: { direction: string } }) => {
+                    if (!event.scroll) return;
+                    const maxOffset = Math.max(0, lines.length - visibleRows);
+                    if (event.scroll.direction === "up") {
+                      scrollOffset = Math.max(0, scrollOffset - 3);
+                    } else if (event.scroll.direction === "down") {
+                      scrollOffset = Math.min(maxOffset, scrollOffset + 3);
+                    }
+                    renderResults();
+                  },
+                },
+                ...previewNodes,
+              ),
+              shortcutBar(
+                [
+                  { key: "j/k", label: "scroll" },
+                  { key: "a", label: "aggressive" },
+                  { key: "m", label: "mode" },
+                  ...(diffResult ? [{ key: "d", label: "diff" }] : []),
+                  { key: "c", label: "continue" },
+                  { key: "q", label: "quit" },
+                ],
+                Box,
+                Text,
+              ),
+            ),
+          );
+        } else {
+          // --- Two-pane diff view ---
+          const htmlLines = diffResult.htmlLines;
+          const mdLines = lines;
+          const totalLines = Math.max(htmlLines.length, mdLines.length);
+
+          const scrollPct = totalLines <= visibleRows
+            ? ""
+            : ` (${Math.round((scrollOffset / Math.max(1, totalLines - visibleRows)) * 100)}%)`;
+
+          // Build left pane (HTML diff) and right pane (clean markdown)
+          const leftNodes: any[] = [];
+          const rightNodes: any[] = [];
+
+          for (let i = 0; i < visibleRows; i++) {
+            const lineIdx = scrollOffset + i;
+
+            // Left pane: HTML lines colored by diff type
+            if (lineIdx < htmlLines.length) {
+              const dl = htmlLines[lineIdx];
+              leftNodes.push(
+                Box(
+                  { flexDirection: "row" as const, flexShrink: 0, height: 1 },
+                  colorDiffLine(dl.text, dl.type, Text),
+                ),
+              );
+            } else {
+              leftNodes.push(Box({ flexShrink: 0, height: 1 }));
+            }
+
+            // Right pane: clean markdown with syntax highlighting
+            if (lineIdx < mdLines.length) {
+              const lineNodes = colorLineRich(mdLines[lineIdx], fenceState[lineIdx], Text, TextAttributes);
+              rightNodes.push(
+                Box(
+                  { flexDirection: "row" as const, flexShrink: 0, height: 1 },
+                  ...lineNodes,
+                ),
+              );
+            } else {
+              rightNodes.push(Box({ flexShrink: 0, height: 1 }));
+            }
+          }
+
+          const diffStats = diffResult.stats;
+          const diffTitle = `Original HTML [${diffStats.kept} kept, ${diffStats.removed} removed]${scrollPct}`;
+          const mdTitle = `Clean Markdown [${mdLines.length} lines]${scrollPct}`;
+
+          renderer.root.add(
+            Box(
+              outerBox,
+              Text({
+                content: "\u2713 Markdown copied to clipboard",
+                fg: SUCCESS,
+                attributes: BOLD,
+              }),
+              Text({ content: " " }),
+              // Two-pane layout
+              Box(
+                {
+                  flexDirection: "row" as const,
+                  flexGrow: 1,
+                  flexShrink: 1,
+                  width: "100%" as const,
+                  onMouseScroll: (event: { scroll?: { direction: string } }) => {
+                    if (!event.scroll) return;
+                    const maxOffset = Math.max(0, totalLines - visibleRows);
+                    if (event.scroll.direction === "up") {
+                      scrollOffset = Math.max(0, scrollOffset - 3);
+                    } else if (event.scroll.direction === "down") {
+                      scrollOffset = Math.min(maxOffset, scrollOffset + 3);
+                    }
+                    renderResults();
+                  },
+                },
+                // Left pane: HTML diff
+                Box(
+                  {
+                    border: true,
+                    borderStyle: "rounded" as const,
+                    borderColor: MUTED,
+                    title: diffTitle,
+                    titleAlignment: "left" as const,
+                    flexDirection: "column" as const,
+                    width: "50%" as const,
+                    flexShrink: 1,
+                    overflow: "hidden" as const,
+                  },
+                  ...leftNodes,
+                ),
+                // Right pane: clean markdown
+                Box(
+                  {
+                    border: true,
+                    borderStyle: "rounded" as const,
+                    borderColor: MUTED,
+                    title: mdTitle,
+                    titleAlignment: "left" as const,
+                    flexDirection: "column" as const,
+                    width: "50%" as const,
+                    flexShrink: 1,
+                    overflow: "hidden" as const,
+                  },
+                  ...rightNodes,
+                ),
+              ),
+              shortcutBar(
+                [
+                  { key: "j/k", label: "scroll" },
+                  { key: "a", label: "aggressive" },
+                  { key: "m", label: "mode" },
+                  { key: "d", label: "diff" },
+                  { key: "c", label: "continue" },
+                  { key: "q", label: "quit" },
+                ],
+                Box,
+                Text,
+              ),
+            ),
+          );
         }
 
-        // Scroll indicator
-        const scrollPct = lines.length <= visibleRows
-          ? ""
-          : ` (${Math.round((scrollOffset / Math.max(1, lines.length - visibleRows)) * 100)}%)`;
-        const previewTitle = `Output preview [${lines.length} lines]${scrollPct}`;
-
-        renderer.root.add(
-          Box(
-            outerBox,
-            Text({
-              content: "\u2713 Markdown copied to clipboard",
-              fg: SUCCESS,
-              attributes: BOLD,
-            }),
-            Text({ content: " " }),
-            // Stats box
-            Box(
-              innerBox("Stats"),
-              Box(
-                { flexDirection: "row" as const, flexShrink: 0 },
-                Text({ content: "Chars    ", fg: STAT_LABEL }),
-                Text({ content: `${fmt(stats.inputChars)} \u2192 ${fmt(stats.outputChars)}  `, fg: STAT_VALUE }),
-                Text({ content: `(${percent(stats.charReductionPct)} saved)`, fg: HIGHLIGHT }),
-              ),
-              Box(
-                { flexDirection: "row" as const, flexShrink: 0 },
-                Text({ content: "Tokens   ", fg: STAT_LABEL }),
-                Text({ content: `${fmt(stats.inputTokensEstimate)} \u2192 ${fmt(stats.outputTokensEstimate)}  `, fg: STAT_VALUE }),
-                Text({ content: `(${percent(stats.tokenReductionPct)} saved)`, fg: HIGHLIGHT }),
-              ),
-            ),
-            Text({ content: " " }),
-            // Session box
-            Box(
-              innerBox("Session"),
-              Box(
-                { flexDirection: "row" as const, flexShrink: 0 },
-                Text({ content: "Today: ", fg: STAT_LABEL }),
-                Text({ content: `${fmt(session.today.runs)} runs \u00b7 ${fmt(session.today.tokensSaved)} tokens saved`, fg: STAT_VALUE }),
-              ),
-              Box(
-                { flexDirection: "row" as const, flexShrink: 0 },
-                Text({ content: "Lifetime: ", fg: STAT_LABEL }),
-                Text({ content: `${fmt(session.lifetime.runs)} runs \u00b7 ${fmt(session.lifetime.tokensSaved)} tokens saved`, fg: STAT_VALUE }),
-              ),
-            ),
-            Text({ content: " " }),
-            // Windowed output preview
-            Box(
-              {
-                border: true,
-                borderStyle: "rounded" as const,
-                borderColor: MUTED,
-                title: previewTitle,
-                titleAlignment: "left" as const,
-                flexDirection: "column" as const,
-                flexGrow: 1,
-                flexShrink: 1,
-                minHeight: 3,
-                overflow: "hidden" as const,
-                onMouseScroll: (event: { scroll?: { direction: string } }) => {
-                  if (!event.scroll) return;
-                  const maxOffset = Math.max(0, lines.length - visibleRows);
-                  if (event.scroll.direction === "up") {
-                    scrollOffset = Math.max(0, scrollOffset - 3);
-                  } else if (event.scroll.direction === "down") {
-                    scrollOffset = Math.min(maxOffset, scrollOffset + 3);
-                  }
-                  renderResults();
-                },
-              },
-              ...previewNodes,
-            ),
-            // Shortcut bar
-            shortcutBar(
-              [
-                { key: "j/k", label: "scroll" },
-                { key: "a", label: "aggressive" },
-                { key: "m", label: "mode" },
-                { key: "c", label: "continue" },
-                { key: "q", label: "quit" },
-              ],
-              Box,
-              Text,
-            ),
-          ),
-        );
         renderer.requestRender();
       };
 
@@ -327,25 +463,38 @@ export async function runExperimentalTui(options: TuiRunOptions): Promise<boolea
               renderResults();
               return;
             case "down":
-            case "j":
-              scrollOffset = Math.min(Math.max(0, lines.length - visibleRows), scrollOffset + 1);
+            case "j": {
+              const maxOffset = Math.max(0, activeLineCount() - visibleRows);
+              scrollOffset = Math.min(maxOffset, scrollOffset + 1);
               renderResults();
               return;
+            }
             case "pageup":
               scrollOffset = Math.max(0, scrollOffset - visibleRows);
               renderResults();
               return;
-            case "pagedown":
-              scrollOffset = Math.min(Math.max(0, lines.length - visibleRows), scrollOffset + visibleRows);
+            case "pagedown": {
+              const maxOffset = Math.max(0, activeLineCount() - visibleRows);
+              scrollOffset = Math.min(maxOffset, scrollOffset + visibleRows);
               renderResults();
               return;
+            }
             case "home":
               scrollOffset = 0;
               renderResults();
               return;
-            case "end":
-              scrollOffset = Math.max(0, lines.length - visibleRows);
+            case "end": {
+              const maxOffset = Math.max(0, activeLineCount() - visibleRows);
+              scrollOffset = maxOffset;
               renderResults();
+              return;
+            }
+            case "d":
+              if (diffResult) {
+                showDiff = !showDiff;
+                scrollOffset = 0;
+                renderResults();
+              }
               return;
             case "a":
               renderer.keyInput.off("keypress", handler);
@@ -539,7 +688,7 @@ export async function runExperimentalTui(options: TuiRunOptions): Promise<boolea
           await copyToClipboard(processed.markdown);
           const session = await recordRunStats(processed.stats);
 
-          action = await waitForResultsAction(processed, session);
+          action = await waitForResultsAction(processed, session, clipboardHtml);
         }
 
         if (action === "quit") {

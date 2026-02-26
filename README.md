@@ -39,7 +39,7 @@ Decant's roadmap is focused on the space between document conversion and LLM con
 
 - **Interactive section selection** — TUI section picker for `--max-tokens` workflows with real-time budget counter and content preview
 - **TUI workspace** — syntax-highlighted scrollable preview, option toggling, continuous mode, URL detection, file drag-and-drop (shipped in v0.12.0)
-- **Diff mode** — see exactly what the pipeline removed
+- **Diff mode** — see exactly what the pipeline removed (`--diff` flag and TUI `d` toggle, shipped in v0.13.0)
 - **Quality scoring** — know how clean your output is before you paste it
 - **Chunking for RAG** — split documents into sized chunks for retrieval pipelines
 - **More formats** — OCR for scanned PDFs, PowerPoint, EPUB, and more
@@ -136,7 +136,7 @@ Installer env vars (script path only):
 - `--mode clean|extract` choose pipeline for interactive/no-subcommand runs (default: `clean`)
 - `--aggressive` enable stronger pruning for interactive/no-subcommand runs (default: off)
 - `--max-tokens <n>` set a token budget — enables the interactive section picker in TUI mode
-- `--tui` launch the full-screen OpenTUI interface with color-coded stats, bordered panels, live clipboard detection, URL auto-fetching, file drag-and-drop, scrollable syntax-highlighted preview, option toggling (`a`/`m`), and continuous mode (`c`) (requires TTY; falls back to standard interactive mode if TUI startup fails)
+- `--tui` launch the full-screen OpenTUI interface with color-coded stats, bordered panels, live clipboard detection, URL auto-fetching, file drag-and-drop, scrollable syntax-highlighted preview, option toggling (`a`/`m`), diff view (`d`), and continuous mode (`c`) (requires TTY; falls back to standard interactive mode if TUI startup fails)
 
 ## Common options (`clean`, `extract`, `stats`)
 
@@ -152,6 +152,7 @@ Installer env vars (script path only):
 - `--aggressive` stronger pruning heuristics
 - `--verbose` show extra details (URL fetch progress, DOCX conversion warnings, PDF page count)
 - `--max-tokens <n>` set a token budget — errors in pipes, smart-truncates in TTY, enriches stats output
+- `--diff` show what the pipeline removed (color-coded diff output, TTY only)
 
 ## Stats-only options
 
@@ -217,6 +218,10 @@ decant clean -i large-doc.html --max-tokens 4000
 
 # Token budget — section breakdown in stats
 decant stats -i report.pdf --max-tokens 2000
+
+# See what the pipeline removed (color-coded diff)
+decant clean -i page.html --diff
+pbpaste | decant extract --diff
 
 # Stats from a URL
 decant stats --url https://example.com/article --format json

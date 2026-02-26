@@ -4,7 +4,8 @@
 
 ## Recent Work
 
-- v0.12.0 in progress — TUI enhancements: scrollable windowed preview (j/k/arrows/PageUp/PageDown), rich syntax highlighting (headings, bold, italic, code, links, lists, blockquotes, code fences), shortcut bar on all screens, continuous mode (c to continue), option toggling (a=aggressive, m=mode), URL auto-detection in clipboard, file drag-and-drop via paste event. New modules: `src/tui/tuiHighlight.ts` (shared colors, colorLineRich, buildFenceStateMap, shortcutBar), `src/tui/tuiFileDrop.ts` (normalizePastedPath, isSupportedFile, readAndConvertFile). Duplicate clipboard detection via content hashing.
+- v0.13.0 in progress — Diff mode: `--diff` flag on CLI subcommands, `d` toggle in TUI for two-pane diff view (original HTML with kept/removed coloring + clean markdown). New module: `src/lib/diff.ts` (prettyPrintHtml, computeDiff, formatDiffAnsi). New TUI helper: `colorDiffLine` in tuiHighlight.ts. Extended `ProcessResult` with optional `inputHtml`. 17 new tests in `test/diff.test.ts`. New dep: `diff` (jsdiff).
+- v0.12.0 shipped — TUI enhancements: scrollable windowed preview (j/k/arrows/PageUp/PageDown/mouse wheel), rich syntax highlighting (headings, bold, italic, code, links, lists, blockquotes, code fences), shortcut bar on all screens, continuous mode (c to continue), option toggling (a=aggressive, m=mode), URL auto-detection in clipboard, file drag-and-drop via paste event. New modules: `src/tui/tuiHighlight.ts` (shared colors, colorLineRich, buildFenceStateMap, shortcutBar), `src/tui/tuiFileDrop.ts` (normalizePastedPath, isSupportedFile, readAndConvertFile). Duplicate clipboard detection via content hashing.
 - v0.11.0 shipped — Interactive section selection TUI. New `src/tui/sectionPicker.ts` module with two-pane picker screen (section list + content preview), real-time budget counter, keyboard + mouse navigation, windowed scroll. `--max-tokens` threaded to root command for TUI use. Auto-fit greedy selection, over-budget warning (not blocking). Fixed ScrollBox layout (was overriding OpenTUI's internal flexDirection).
 - v0.10.0 shipped — Token budget via `--max-tokens N`. Section-aware parsing, piped error path (exit 1 + breakdown), TTY smart truncation (drop from end + warning), stats enrichment with per-section tokens and budget fields. New module `src/pipeline/tokenBudget.ts`.
 - v0.9.0 shipped — URL fetching via `--url`/`-u` flag. Bun built-in `fetch()`, 15s timeout, content-type validation, redirect following. Mutually exclusive with `--input`.
@@ -15,9 +16,9 @@
 
 ## Checkpoint
 
-- **Current state:** v0.12.0 in progress. 236 tests passing (+ 2 skipped), 461 expect() calls across 11 test files.
-- **What's working:** HTML, RTF, DOC, DOCX, PDF → clean markdown. URL → HTML via `--url`/`-u`. Token budget via `--max-tokens`. Interactive clipboard-first mode. TUI full-screen mode. TUI section picker via `--tui --max-tokens N`. TUI scrollable preview, syntax highlighting, continuous mode, option toggling, URL detection, file drag-and-drop.
-- **What's next:** See `docs/strategy/ROADMAP.md` — v0.12.0 release, then v0.13.0 Diff mode.
+- **Current state:** v0.13.0 in progress. 253 tests passing (+ 2 skipped), 494 expect() calls across 12 test files. All tests pass in full-suite runs.
+- **What's working:** HTML, RTF, DOC, DOCX, PDF → clean markdown. URL → HTML via `--url`/`-u`. Token budget via `--max-tokens`. Interactive clipboard-first mode. TUI full-screen mode. TUI section picker via `--tui --max-tokens N`. TUI scrollable preview, syntax highlighting, continuous mode, option toggling, URL detection, file drag-and-drop. Diff mode via `--diff` flag and TUI `d` toggle.
+- **What's next:** Ship v0.13.0. Then v0.14.0 Quality Score.
 
 ## Product Intent
 
@@ -132,7 +133,8 @@ decant --tui --max-tokens 2000
 
 ### Shared utilities and state
 
-- `src/lib/ansi.ts` - zero-dep ANSI color helpers (accent, success, muted, highlight, bold, dim; respects `NO_COLOR` and `FORCE_COLOR`)
+- `src/lib/ansi.ts` - zero-dep ANSI color helpers (accent, success, muted, highlight, removed, bold, dim; respects `NO_COLOR` and `FORCE_COLOR`)
+- `src/lib/diff.ts` - diff engine for comparing original HTML vs clean markdown (prettyPrintHtml, computeDiff, formatDiffAnsi)
 - `src/lib/highlightMarkdown.ts` - regex-based ANSI syntax highlighting for raw markdown source
 - `src/lib/contentDetect.ts` - format detection (`ContentFormat`, `detectFormat`, `looksLikeHtml`, `looksLikeRtf`, `isDocBytes`, `isDocxBytes`, `isPdfBytes`)
 - `src/lib/convert.ts` - RTF/DOC → HTML via macOS `textutil`, DOCX → HTML via `mammoth.js`, PDF → HTML via `unpdf`
@@ -155,6 +157,7 @@ decant --tui --max-tokens 2000
 - `test/sectionPicker.test.ts` - section picker pure logic tests (auto-fit, token computation, budget colors)
 - `test/tuiHighlight.test.ts` - TUI highlighting tests (colorLineRich, buildFenceStateMap, shortcutBar)
 - `test/tuiFileDrop.test.ts` - file drop tests (path normalization, extension checking)
+- `test/diff.test.ts` - diff engine tests (prettyPrintHtml, computeDiff, formatDiffAnsi)
 - `test/fetchUrl.test.ts` - URL fetching unit tests (validation, HTML/XHTML, content-type rejection, HTTP errors, redirects, timeout)
 - `test/contentDetect.test.ts` - content detection unit tests (HTML, RTF, DOC, DOCX, PDF)
 - `test/convert.test.ts` - RTF/DOC conversion tests (macOS-gated) + DOCX + PDF conversion tests (cross-platform)
@@ -163,9 +166,9 @@ decant --tui --max-tokens 2000
 
 ## Priorities
 
-1. v0.12.0 — TUI enhancements (implemented, pending release)
-2. v0.13.0 — Diff mode
-3. v0.14.0 — Quality score
+1. v0.13.0 — Diff mode (implemented, ready to ship)
+2. v0.14.0 — Quality score
+3. v0.15.0 — Section filtering
 
 The user directs priority. See `docs/strategy/ROADMAP.md` for full iteration plan.
 

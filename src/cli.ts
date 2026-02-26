@@ -10,6 +10,7 @@ import { copyToClipboard, readInput, readInputBytes } from "./lib/io";
 import { recordRunStats } from "./lib/sessionStats";
 import type { StatsFormat, StatsMode, TransformOptions } from "./lib/types";
 import { fetchUrl, isValidUrl } from "./lib/fetchUrl";
+import { computeDiff, formatDiffAnsi } from "./lib/diff";
 import { processHtml } from "./pipeline/processHtml";
 import { type SourceInfo, formatStatsMarkdown } from "./pipeline/stats";
 import {
@@ -34,6 +35,7 @@ interface CommonOptions {
   aggressive?: boolean;
   verbose?: boolean;
   maxTokens?: number;
+  diff?: boolean;
 }
 
 interface StatsOptions extends CommonOptions {
@@ -103,7 +105,8 @@ function addCommonOptions(command: Command): Command {
     )
     .option("--aggressive", "Apply stronger pruning heuristics")
     .option("--verbose", "Show conversion warnings (e.g. from DOCX processing)")
-    .option("--max-tokens <n>", "Maximum token budget for output (truncates if exceeded)", parseMaxTokens);
+    .option("--max-tokens <n>", "Maximum token budget for output (truncates if exceeded)", parseMaxTokens)
+    .option("--diff", "Show what the pipeline removed (TTY only)");
 }
 
 function resolveTransformOptions(options: CommonOptions): TransformOptions {
@@ -193,7 +196,8 @@ async function runTransform(commandName: "clean" | "extract", options: CommonOpt
   const { html, source } = await resolveHtmlInput(options.input, { verbose: options.verbose, url: options.url });
 
   const transformOptions = resolveTransformOptions(options);
-  const processed = processHtml(commandName, html, transformOptions, source);
+  const wantDiff = Boolean(options.diff);
+  const processed = processHtml(commandName, html, transformOptions, source, { retainInput: wantDiff });
 
   if (options.maxTokens != null) {
     const sections = parseMarkdownSections(processed.markdown);
@@ -217,6 +221,16 @@ async function runTransform(commandName: "clean" | "extract", options: CommonOpt
   await maybeCopyOutput(options.copy, processed.markdown);
   await recordRunStats(processed.stats);
   writeStdout(processed.markdown);
+
+  if (wantDiff && processed.inputHtml) {
+    if (process.stdout.isTTY) {
+      const diff = computeDiff(processed.inputHtml, processed.markdown);
+      const formatted = await formatDiffAnsi(diff);
+      process.stderr.write(`\n${formatted}\n`);
+    } else {
+      process.stderr.write("--diff output is TTY-only (skipped in piped mode).\n");
+    }
+  }
 }
 
 async function runStats(options: StatsOptions) {

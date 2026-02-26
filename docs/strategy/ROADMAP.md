@@ -174,9 +174,18 @@ Major upgrade to the full-screen TUI (`--tui`). Preserves the zero-friction clip
 
 *What makes Decant uniquely useful. Features that go beyond conversion — helping users understand, control, and optimize their output for LLM consumption.*
 
-### v0.13.0 — Diff Mode
+### v0.13.0 — Diff Mode (Done)
 
-Show a before/after comparison of what was removed during cleaning (`decant clean -i page.html --diff`). Useful for understanding what the pipeline is stripping and for tuning options. Consider side-by-side vs. unified diff output.
+Show a before/after comparison of what was removed during cleaning. Makes the pipeline transparent by showing original HTML (color-coded to highlight kept vs removed content) alongside clean markdown output.
+
+- [x] `src/lib/diff.ts` — diff engine: `prettyPrintHtml()` for readable HTML formatting, `computeDiff()` using jsdiff for line-level diffing, `formatDiffAnsi()` for colored TTY output
+- [x] `--diff` flag on `clean` and `extract` subcommands — TTY: color-coded diff to stderr; piped: skipped with note
+- [x] TUI `d` toggle on results screen — two-pane layout (left: HTML with red/green annotations, right: clean markdown with syntax highlighting), synced scrolling
+- [x] `colorDiffLine()` in `tuiHighlight.ts` for TUI diff line rendering
+- [x] Extended `ProcessResult` with optional `inputHtml` field (via `retainInput` option)
+- [x] `removed` color (red ANSI 196) added to `ansi.ts`
+- [x] `test/diff.test.ts` — 17 tests for pretty-printing, diff computation, and ANSI formatting
+- [x] New dependency: `diff` (jsdiff v8)
 
 ### v0.14.0 — Quality Score
 
