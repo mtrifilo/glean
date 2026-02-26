@@ -1,11 +1,8 @@
 /**
  * Diff engine for comparing original HTML against clean markdown output.
- * Uses jsdiff to identify what the pipeline kept vs removed.
+ * Classifies HTML lines as kept or removed based on whether their text
+ * content appears in the clean markdown output.
  */
-
-import { diffLines } from "diff";
-import { toMarkdown } from "../pipeline/toMarkdown";
-import type { TransformOptions } from "./types";
 
 // --- Types ---
 
@@ -70,6 +67,42 @@ export function prettyPrintHtml(html: string): string {
   return result.join("\n");
 }
 
+// --- Text normalization helpers ---
+
+/** Decode common HTML entities to plain text for comparison. */
+function decodeEntities(text: string): string {
+  return text
+    .replace(/&#x([0-9a-fA-F]+);/g, (_, hex) => String.fromCharCode(parseInt(hex, 16)))
+    .replace(/&#(\d+);/g, (_, dec) => String.fromCharCode(parseInt(dec)))
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&apos;/g, "'")
+    .replace(/&nbsp;/g, " ");
+}
+
+/** Strip markdown formatting syntax to get plain text for comparison. */
+function stripMarkdownSyntax(text: string): string {
+  return text
+    .replace(/!\[([^\]]*)\]\([^)]*\)/g, "$1")   // ![alt](url) → alt
+    .replace(/\[([^\]]*)\]\([^)]*\)/g, "$1")     // [text](url) → text
+    .replace(/\*\*([^*]+)\*\*/g, "$1")            // **bold** → bold
+    .replace(/(?<!\*)\*([^*]+)\*(?!\*)/g, "$1")   // *italic* → italic
+    .replace(/(?<![a-zA-Z0-9])_([^_]+)_(?![a-zA-Z0-9])/g, "$1") // _italic_ → italic
+    .replace(/`([^`]+)`/g, "$1")                  // `code` → code
+    .replace(/^#{1,6}\s+/, "")                    // ## heading → heading
+    .replace(/^[-*+]\s+/, "")                     // - list → list
+    .replace(/^\d+\.\s+/, "")                     // 1. list → list
+    .replace(/^>\s*/, "")                         // > quote → quote
+    .trim();
+}
+
+/** Normalize text for comparison: decode entities, strip markdown, collapse whitespace. */
+function normalizeForComparison(text: string): string {
+  return decodeEntities(stripMarkdownSyntax(text)).replace(/\s+/g, " ").trim().toLowerCase();
+}
+
 // --- Diff computation ---
 
 /** Default transform options for naive conversion (no cleaning). */
@@ -86,41 +119,23 @@ const naiveOptions: TransformOptions = {
  *
  * Strategy:
  * 1. Pretty-print the original HTML
- * 2. Convert original HTML to markdown naively (no cleaning) to get a text baseline
- * 3. Use diffLines() to compare naive markdown vs clean markdown
- * 4. Map diff hunks back to HTML lines — lines whose content made it to
- *    the clean output are "kept", others are "removed"
+ * 2. For each HTML line, strip tags and decode entities to get plain text
+ * 3. Normalize clean markdown lines (strip formatting syntax) for comparison
+ * 4. Classify HTML lines as kept (text found in clean output) or removed
  */
 export function computeDiff(originalHtml: string, cleanMarkdown: string): DiffResult {
   const prettyHtml = prettyPrintHtml(originalHtml);
   const htmlLineTexts = prettyHtml.split("\n");
-
-  // Naive conversion: turn the original HTML into markdown with no cleaning
-  const naiveMarkdown = toMarkdown(originalHtml, naiveOptions);
-  const naiveLines = naiveMarkdown.split("\n");
   const cleanLines = cleanMarkdown.split("\n");
 
-  // Build a set of content from clean markdown for fast lookup
-  const cleanContentSet = new Set<string>();
+  // Build normalized plain-text versions of clean markdown lines for comparison
+  const cleanNormalized: string[] = [];
   for (const line of cleanLines) {
-    const trimmed = line.trim();
-    if (trimmed) cleanContentSet.add(trimmed);
+    const norm = normalizeForComparison(line);
+    if (norm) cleanNormalized.push(norm);
   }
 
-  // Diff naive vs clean to find which naive lines survived
-  const diff = diffLines(naiveMarkdown, cleanMarkdown);
-  const removedNaiveContent = new Set<string>();
-  for (const part of diff) {
-    if (part.removed) {
-      const partLines = part.value.split("\n");
-      for (const pl of partLines) {
-        const trimmed = pl.trim();
-        if (trimmed) removedNaiveContent.add(trimmed);
-      }
-    }
-  }
-
-  // Now classify each HTML line
+  // Classify each HTML line
   const htmlLines: DiffLine[] = [];
   let kept = 0;
   let removed = 0;
@@ -133,28 +148,22 @@ export function computeDiff(originalHtml: string, cleanMarkdown: string): DiffRe
       continue;
     }
 
-    // Check if any clean markdown line contains text from this HTML line
-    // Strip tags from the HTML line to get its text content
-    const textContent = trimmed.replace(/<[^>]*>/g, "").trim();
+    // Strip tags and decode entities to get plain text content
+    const textContent = decodeEntities(trimmed.replace(/<[^>]*>/g, "")).trim();
 
-    if (!textContent) {
-      // Pure markup tags — classify as removed if they're structural/noise
-      // Check if the tag itself is likely structural
-      const isStructural = /^<\/?(div|span|nav|header|footer|aside|section|script|style|link|meta|noscript)/i.test(trimmed);
-      if (isStructural) {
-        htmlLines.push({ text: htmlLine, type: "removed" });
-        removed++;
-      } else {
-        htmlLines.push({ text: htmlLine, type: "kept" });
-        kept++;
-      }
+    // Pure markup tags (no text content) or very short text — classify as context
+    if (!textContent || textContent.length < 3) {
+      htmlLines.push({ text: htmlLine, type: "context" });
       continue;
     }
 
-    // Check if the text content appears in the clean output
+    // Normalize the HTML text for comparison
+    const normalizedHtml = textContent.replace(/\s+/g, " ").trim().toLowerCase();
+
+    // Check if the text content appears in any clean markdown line
     let found = false;
-    for (const cleanLine of cleanContentSet) {
-      if (cleanLine.includes(textContent) || textContent.includes(cleanLine)) {
+    for (const cleanNorm of cleanNormalized) {
+      if (cleanNorm.includes(normalizedHtml) || normalizedHtml.includes(cleanNorm)) {
         found = true;
         break;
       }

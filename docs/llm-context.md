@@ -134,7 +134,7 @@ decant --tui --max-tokens 2000
 ### Shared utilities and state
 
 - `src/lib/ansi.ts` - zero-dep ANSI color helpers (accent, success, muted, highlight, removed, bold, dim; respects `NO_COLOR` and `FORCE_COLOR`)
-- `src/lib/diff.ts` - diff engine for comparing original HTML vs clean markdown (prettyPrintHtml, computeDiff, formatDiffAnsi)
+- `src/lib/diff.ts` - diff engine for comparing original HTML vs clean markdown (prettyPrintHtml, computeDiff, formatDiffAnsi); entity-aware text matching, no external deps
 - `src/lib/highlightMarkdown.ts` - regex-based ANSI syntax highlighting for raw markdown source
 - `src/lib/contentDetect.ts` - format detection (`ContentFormat`, `detectFormat`, `looksLikeHtml`, `looksLikeRtf`, `isDocBytes`, `isDocxBytes`, `isPdfBytes`)
 - `src/lib/convert.ts` - RTF/DOC → HTML via macOS `textutil`, DOCX → HTML via `mammoth.js`, PDF → HTML via `unpdf`

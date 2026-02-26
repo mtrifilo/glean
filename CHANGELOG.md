@@ -15,11 +15,10 @@ Semantic Versioning after `1.0.0`.
   - `src/lib/diff.ts` — diff engine: `prettyPrintHtml()` for readable HTML formatting, `computeDiff()` using jsdiff to classify kept vs removed content, `formatDiffAnsi()` for colored TTY output.
   - `colorDiffLine()` in `tuiHighlight.ts` for TUI diff line rendering.
   - `test/diff.test.ts` — 17 tests for pretty-printing, diff computation, and ANSI formatting.
-- New dependency: `diff` (jsdiff) for line-level diffing.
-
 ### Fixed
 
 - ANSI color helpers (`src/lib/ansi.ts`) now evaluate `NO_COLOR`/`FORCE_COLOR` lazily instead of once at module load time. Fixes 12 test failures that occurred in full-suite runs due to module caching order.
+- Diff engine text matching now decodes HTML entities and strips markdown formatting syntax before comparison. Content lines (`<p>`, `<li>`, etc.) are correctly classified as kept when their text appears in the clean output. Pure HTML tags are classified as neutral context.
 
 ## [0.12.0] - 2026-02-24
 

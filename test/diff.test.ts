@@ -114,14 +114,54 @@ describe("computeDiff", () => {
     expect(removedLines.length).toBeGreaterThan(0);
   });
 
-  test("structural tags classified as removed", () => {
+  test("pure HTML tags classified as context", () => {
     const html = "<nav></nav><div></div>";
     const markdown = "";
     const result = computeDiff(html, markdown);
 
     const navLine = result.htmlLines.find((l) => l.text.includes("<nav>"));
     expect(navLine).toBeDefined();
-    expect(navLine!.type).toBe("removed");
+    expect(navLine!.type).toBe("context");
+  });
+
+  test("HTML entities decoded for matching", () => {
+    const html = "<p>Tom &amp; Jerry&#x2019;s adventure</p>";
+    const markdown = "Tom & Jerry\u2019s adventure";
+    const result = computeDiff(html, markdown);
+
+    const line = result.htmlLines.find((l) => l.text.includes("Tom"));
+    expect(line).toBeDefined();
+    expect(line!.type).toBe("kept");
+  });
+
+  test("content with markdown link formatting matched as kept", () => {
+    const html = "<p>Visit <a href=\"https://example.com\">Example</a> for more info.</p>";
+    const markdown = "Visit [Example](https://example.com) for more info.";
+    const result = computeDiff(html, markdown);
+
+    const line = result.htmlLines.find((l) => l.text.includes("Visit"));
+    expect(line).toBeDefined();
+    expect(line!.type).toBe("kept");
+  });
+
+  test("content with markdown bold formatting matched as kept", () => {
+    const html = "<p>This is <strong>important</strong> text.</p>";
+    const markdown = "This is **important** text.";
+    const result = computeDiff(html, markdown);
+
+    const line = result.htmlLines.find((l) => l.text.includes("important"));
+    expect(line).toBeDefined();
+    expect(line!.type).toBe("kept");
+  });
+
+  test("short text content (< 3 chars) classified as context", () => {
+    const html = '<span aria-hidden="true">#</span>';
+    const markdown = "## Heading";
+    const result = computeDiff(html, markdown);
+
+    const line = result.htmlLines.find((l) => l.text.includes("#"));
+    expect(line).toBeDefined();
+    expect(line!.type).toBe("context");
   });
 });
 
