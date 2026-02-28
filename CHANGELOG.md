@@ -12,9 +12,10 @@ Semantic Versioning after `1.0.0`.
 - **Diff mode** — see what the pipeline removed during cleaning.
   - `--diff` flag on `clean` and `extract` subcommands. In TTY mode, prints a color-coded diff (green = kept, red = removed) to stderr after the markdown output. In piped mode, prints a note that `--diff` is TTY-only.
   - TUI diff toggle — press `d` on the results screen to switch between normal preview and a two-pane diff view (left: original HTML annotated with kept/removed, right: clean markdown with syntax highlighting). Both panes scroll in sync.
-  - `src/lib/diff.ts` — diff engine: `prettyPrintHtml()` for readable HTML formatting, `computeDiff()` using jsdiff to classify kept vs removed content, `formatDiffAnsi()` for colored TTY output.
-  - `colorDiffLine()` in `tuiHighlight.ts` for TUI diff line rendering.
-  - `test/diff.test.ts` — 17 tests for pretty-printing, diff computation, and ANSI formatting.
+  - `src/lib/diff.ts` — diff engine: `prettyPrintHtml()` for readable HTML formatting, `computeDiff()` with entity-aware text matching, `formatDiffAnsi()` for colored TTY output. Kept lines render HTML tags in gray and text content in green.
+  - `colorDiffLine()` in `tuiHighlight.ts` for TUI diff line rendering with per-segment coloring.
+  - `test/diff.test.ts` — 21 tests for pretty-printing, diff computation, entity decoding, and ANSI formatting.
+
 ### Fixed
 
 - ANSI color helpers (`src/lib/ansi.ts`) now evaluate `NO_COLOR`/`FORCE_COLOR` lazily instead of once at module load time. Fixes 12 test failures that occurred in full-suite runs due to module caching order.

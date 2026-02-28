@@ -4,7 +4,7 @@
 
 ## Recent Work
 
-- v0.13.0 in progress — Diff mode: `--diff` flag on CLI subcommands, `d` toggle in TUI for two-pane diff view (original HTML with kept/removed coloring + clean markdown). New module: `src/lib/diff.ts` (prettyPrintHtml, computeDiff, formatDiffAnsi). New TUI helper: `colorDiffLine` in tuiHighlight.ts. Extended `ProcessResult` with optional `inputHtml`. 17 new tests in `test/diff.test.ts`. New dep: `diff` (jsdiff).
+- v0.13.0 in progress — Diff mode: `--diff` flag on CLI subcommands, `d` toggle in TUI for two-pane diff view (original HTML with kept/removed coloring + clean markdown). New module: `src/lib/diff.ts` (prettyPrintHtml, computeDiff, formatDiffAnsi; entity-aware text matching, no external deps). Kept lines render HTML tags in gray and text content in green. New TUI helper: `colorDiffLine` in tuiHighlight.ts. Extended `ProcessResult` with optional `inputHtml`. 21 tests in `test/diff.test.ts`. Fixed ANSI color helpers to evaluate env vars lazily (fixes full-suite test ordering issue).
 - v0.12.0 shipped — TUI enhancements: scrollable windowed preview (j/k/arrows/PageUp/PageDown/mouse wheel), rich syntax highlighting (headings, bold, italic, code, links, lists, blockquotes, code fences), shortcut bar on all screens, continuous mode (c to continue), option toggling (a=aggressive, m=mode), URL auto-detection in clipboard, file drag-and-drop via paste event. New modules: `src/tui/tuiHighlight.ts` (shared colors, colorLineRich, buildFenceStateMap, shortcutBar), `src/tui/tuiFileDrop.ts` (normalizePastedPath, isSupportedFile, readAndConvertFile). Duplicate clipboard detection via content hashing.
 - v0.11.0 shipped — Interactive section selection TUI. New `src/tui/sectionPicker.ts` module with two-pane picker screen (section list + content preview), real-time budget counter, keyboard + mouse navigation, windowed scroll. `--max-tokens` threaded to root command for TUI use. Auto-fit greedy selection, over-budget warning (not blocking). Fixed ScrollBox layout (was overriding OpenTUI's internal flexDirection).
 - v0.10.0 shipped — Token budget via `--max-tokens N`. Section-aware parsing, piped error path (exit 1 + breakdown), TTY smart truncation (drop from end + warning), stats enrichment with per-section tokens and budget fields. New module `src/pipeline/tokenBudget.ts`.
@@ -16,7 +16,7 @@
 
 ## Checkpoint
 
-- **Current state:** v0.13.0 in progress. 253 tests passing (+ 2 skipped), 494 expect() calls across 12 test files. All tests pass in full-suite runs.
+- **Current state:** v0.13.0 in progress. 257 tests passing (+ 2 skipped), 502 expect() calls across 12 test files. All tests pass in full-suite runs.
 - **What's working:** HTML, RTF, DOC, DOCX, PDF → clean markdown. URL → HTML via `--url`/`-u`. Token budget via `--max-tokens`. Interactive clipboard-first mode. TUI full-screen mode. TUI section picker via `--tui --max-tokens N`. TUI scrollable preview, syntax highlighting, continuous mode, option toggling, URL detection, file drag-and-drop. Diff mode via `--diff` flag and TUI `d` toggle.
 - **What's next:** Ship v0.13.0. Then v0.14.0 Quality Score.
 

@@ -178,14 +178,14 @@ Major upgrade to the full-screen TUI (`--tui`). Preserves the zero-friction clip
 
 Show a before/after comparison of what was removed during cleaning. Makes the pipeline transparent by showing original HTML (color-coded to highlight kept vs removed content) alongside clean markdown output.
 
-- [x] `src/lib/diff.ts` — diff engine: `prettyPrintHtml()` for readable HTML formatting, `computeDiff()` using jsdiff for line-level diffing, `formatDiffAnsi()` for colored TTY output
+- [x] `src/lib/diff.ts` — diff engine: `prettyPrintHtml()` for readable HTML formatting, `computeDiff()` with entity-aware text matching (decodes HTML entities, strips markdown syntax for comparison, no external deps), `formatDiffAnsi()` for colored TTY output
 - [x] `--diff` flag on `clean` and `extract` subcommands — TTY: color-coded diff to stderr; piped: skipped with note
-- [x] TUI `d` toggle on results screen — two-pane layout (left: HTML with red/green annotations, right: clean markdown with syntax highlighting), synced scrolling
-- [x] `colorDiffLine()` in `tuiHighlight.ts` for TUI diff line rendering
+- [x] TUI `d` toggle on results screen — two-pane layout (left: HTML with gray tags + green text on kept lines, red on removed, right: clean markdown with syntax highlighting), synced scrolling
+- [x] `colorDiffLine()` in `tuiHighlight.ts` — per-segment coloring (tags gray, text green) for kept lines
 - [x] Extended `ProcessResult` with optional `inputHtml` field (via `retainInput` option)
 - [x] `removed` color (red ANSI 196) added to `ansi.ts`
-- [x] `test/diff.test.ts` — 17 tests for pretty-printing, diff computation, and ANSI formatting
-- [x] New dependency: `diff` (jsdiff v8)
+- [x] `test/diff.test.ts` — 21 tests for pretty-printing, diff computation, entity decoding, and ANSI formatting
+- [x] ANSI color helpers evaluate env vars lazily (fixes full-suite test ordering)
 
 ### v0.14.0 — Quality Score
 
