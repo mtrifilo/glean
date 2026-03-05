@@ -67,8 +67,7 @@ you can override with:
 
 ## Does Decant require OpenTUI?
 
-No. Standard interactive mode and CLI commands work without full-screen TUI.
-`--tui` enables the OpenTUI path.
+The full-screen TUI is the default interactive mode. CLI subcommands (`clean`, `extract`, `stats`) work without the TUI. Use `--no-tui` to skip the TUI and use standard clipboard mode.
 
 ## Is Decant intended to be a general context platform?
 

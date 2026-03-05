@@ -44,7 +44,7 @@ interface StatsOptions extends CommonOptions {
 }
 
 interface RootOptions {
-  tui?: boolean;
+  noTui?: boolean;
   mode?: StatsMode;
   aggressive?: boolean;
   maxTokens?: number;
@@ -286,10 +286,7 @@ program
   )
   .option("--aggressive", "Apply stronger pruning heuristics for no-subcommand runs")
   .option("--max-tokens <n>", "Maximum token budget for output (enables section picker in TUI)", parseMaxTokens)
-  .option(
-    "--tui",
-    "Launch interactive mode and attempt experimental full-screen TUI first",
-  )
+  .option("--no-tui", "Skip full-screen TUI; use standard clipboard mode")
   .showHelpAfterError();
 
 addCommonOptions(
@@ -339,15 +336,9 @@ program.action(async function (this: Command) {
   const mode = options.mode ?? "clean";
   const aggressive = Boolean(options.aggressive);
 
-  if (options.tui && !process.stdin.isTTY) {
-    throw new Error("--tui requires an interactive terminal (TTY).");
-  }
-
-  const shouldRunInteractive = process.stdin.isTTY || Boolean(options.tui);
-
-  if (shouldRunInteractive) {
+  if (process.stdin.isTTY) {
     await runInteractive({
-      forceTui: Boolean(options.tui),
+      skipTui: Boolean(options.noTui),
       mode,
       aggressive,
       maxTokens: options.maxTokens,

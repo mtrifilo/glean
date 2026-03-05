@@ -32,7 +32,7 @@ Examples: `feat/tui-polish`, `fix/clipboard-fallback`, `chore/update-deps`
    bun test
    # Smoke-test relevant commands
    decant
-   decant --tui
+   decant --no-tui
    ```
 
 4. **Update docs** if behavior changed:

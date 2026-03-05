@@ -187,19 +187,29 @@ Show a before/after comparison of what was removed during cleaning. Makes the pi
 - [x] `test/diff.test.ts` — 21 tests for pretty-printing, diff computation, entity decoding, and ANSI formatting
 - [x] ANSI color helpers evaluate env vars lazily (fixes full-suite test ordering)
 
-### v0.14.0 — Quality Score
+### v1.0.0 — TUI as Default (Done)
+
+TUI is now the default interactive mode. Running `decant` with no subcommand in a TTY launches the full-screen TUI. The `--tui` flag is removed; use `--no-tui` to opt out and fall back to standard clipboard mode.
+
+- [x] Replace `--tui` flag with `--no-tui` in `cli.ts`
+- [x] Invert `forceTui` → `skipTui` in `runInteractive.ts`
+- [x] TUI launches by default when stdin is a TTY
+- [x] Falls back to standard clipboard mode if TUI initialization fails
+- [x] Version bump to 1.0.0
+
+### v1.1.0 — Quality Score
 
 Estimate how "clean" the output is — ratio of meaningful content to boilerplate, formatting noise, or repeated patterns. Helps users decide whether to use `clean` vs. `extract`, or whether `--aggressive` is needed.
 
-### v0.15.0 — Section Filtering
+### v1.2.0 — Section Filtering
 
 Extract specific sections of a document by heading name, heading level, or CSS selector instead of converting the entire document. Useful for pulling a single chapter, section, or content block from a large document.
 
-### v0.16.0 — Chunking for RAG
+### v1.3.0 — Chunking for RAG
 
 Split long documents into sized chunks for RAG ingestion pipelines (`--chunk-size 1000 --chunk-overlap 100`). Output as multiple files or JSON array. Critical for users building retrieval-augmented generation systems.
 
-### v0.17.0 — Output Formats
+### v1.4.0 — Output Formats
 
 Add `--format json` for structured output (title, body, metadata, stats) and `--format text` for plain text (no markdown syntax). JSON output enables programmatic integration with other tools and pipelines.
 
@@ -207,23 +217,23 @@ Add `--format json` for structured output (title, body, metadata, stats) and `--
 
 *Productivity and ergonomics. Features that make Decant faster and more comfortable for daily use.*
 
-### v0.18.0 — Batch Processing
+### v1.5.0 — Batch Processing
 
 Process multiple files or an entire directory at once (`decant clean -i ./docs/`). Output individual markdown files or concatenated output. Enables bulk conversion workflows — becomes a force multiplier as format support grows.
 
-### v0.19.0 — Output to File
+### v1.6.0 — Output to File
 
 Smart output-to-file with auto-naming (`decant clean -i report.pdf -o` → `report.md`). Support explicit output path (`-o output.md`) and auto-derived names. For batch processing, output to a mirrored directory structure.
 
-### v0.20.0 — Config File
+### v1.7.0 — Config File
 
 Support a `.decantrc` or `.decant/config.toml` for persisting default options. As the option surface grows (max-tokens, aggressive, output format, etc.), users shouldn't have to repeat flags every time. Support project-level and user-level config with sensible merge behavior.
 
-### v0.21.0 — Prompt Wrapping
+### v1.8.0 — Prompt Wrapping
 
 Wrap output in a user-defined template (`--wrap "Summarize the following document:\n\n{content}"`). Supports template strings with `{content}`, `{filename}`, `{stats}` placeholders. Saves a manual step when feeding output directly into LLM prompts.
 
-### v0.22.0 — Verbose Stats
+### v1.9.0 — Verbose Stats
 
 Extended stats breakdown beyond token/char counts — section count, heading structure, image count, link count, table count, estimated reading time. Useful for understanding document structure at a glance.
 
@@ -231,27 +241,27 @@ Extended stats breakdown beyond token/char counts — section count, heading str
 
 *Breadth. Additional input formats, prioritized after the core workflow and intelligence features are solid.*
 
-### v0.23.0 — Image OCR
+### v1.10.0 — Image OCR
 
 Extract text from images (PNG, JPG, TIFF, etc.) using OCR. Covers screenshots, photos of documents, scanned PDFs, and other image-based text. Evaluate options like `tesseract.js` (local, zero external deps) vs. cloud OCR APIs.
 
-### v0.24.0 — PowerPoint / Keynote Support
+### v1.11.0 — PowerPoint / Keynote Support
 
 Extract text from presentation files (.pptx, .key). Slide decks are a common source of text content in professional settings. Evaluate `pptx-parser` or similar libraries. Keynote may be convertible via macOS `textutil` or Automator.
 
-### v0.25.0 — EPUB Support
+### v1.12.0 — EPUB Support
 
 Extract text from EPUB e-books. EPUBs are ZIP archives containing XHTML — the existing HTML pipeline can be reused once content is unpacked. Evaluate lightweight EPUB parsing libraries or direct ZIP + XHTML extraction.
 
-### v0.26.0 — Email Support (.eml / .mbox)
+### v1.13.0 — Email Support (.eml / .mbox)
 
 Extract body text from saved email files. Handles both individual `.eml` files and `.mbox` archives. Needs to handle MIME multipart (HTML + plain text alternatives), strip signatures/quoted replies, and handle attachments gracefully.
 
-### v0.27.0 — LaTeX Support
+### v1.14.0 — LaTeX Support
 
 Convert LaTeX `.tex` files to clean markdown. Academic papers and technical documents commonly use LaTeX. Since `.tex` is already plain text, this is primarily a syntax transformation (stripping preambles, converting commands to markdown equivalents). Evaluate `pandoc` as a conversion backend vs. custom parsing.
 
-### v0.28.0 — CSV/TSV to Markdown Tables
+### v1.15.0 — CSV/TSV to Markdown Tables
 
 Convert tabular data files (CSV, TSV) into markdown tables. Useful for feeding spreadsheet exports and data files into LLMs in a readable format. Handle edge cases like large files (truncation/sampling), quoted fields, and encoding detection.
 
@@ -259,7 +269,7 @@ Convert tabular data files (CSV, TSV) into markdown tables. Useful for feeding s
 
 *Ideas that push scope boundaries. Evaluate carefully before committing.*
 
-### v0.29.0 — Watch Mode
+### v1.16.0 — Watch Mode
 
 Monitor the clipboard or a directory for new content and auto-convert as it appears (`decant --watch` or `decant --watch-dir ./inbox/`). Enables continuous workflows where users repeatedly copy content and want it cleaned automatically. Note: approaches `ctxkit` scope boundary — evaluate whether this belongs here or in a separate tool.
 

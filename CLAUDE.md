@@ -53,7 +53,7 @@ Docs are only useful if they reflect reality. Treat doc updates as part of the t
 Before finalizing any change:
 
 1. `bun test` passes
-2. Smoke-test a relevant command (`decant`, `decant clean`, `decant --tui`)
+2. Smoke-test a relevant command (`decant`, `decant clean`, `decant --no-tui`)
 3. Update `docs/llm-context.md` if architecture or behavior changed
 4. Update `README.md` if user-facing behavior changed
 5. Update `CHANGELOG.md` under `[Unreleased]` for notable changes

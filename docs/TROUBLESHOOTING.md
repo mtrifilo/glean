@@ -79,11 +79,11 @@
 - `--copy` uses `pbcopy` and currently targets macOS workflows.
 - If clipboard write fails, pipe to stdout and copy manually as fallback.
 
-## `--tui` fails to start
+## TUI fails to start
 
-- `--tui` requires an interactive TTY.
-- If OpenTUI initialization fails, Decant should fall back to standard interactive mode.
-- Try plain `decant` to continue without full-screen TUI.
+- The TUI requires an interactive TTY.
+- If OpenTUI initialization fails, Decant automatically falls back to standard clipboard mode.
+- Use `decant --no-tui` to skip the TUI entirely.
 
 ## Output seems too aggressive
 

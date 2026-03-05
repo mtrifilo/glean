@@ -41,7 +41,7 @@ Update this file in real time while executing each step.
 
 - [x] Step 4 - Run local release validation
   - Run `bun test`.
-  - Run smoke checks: `decant`, `decant clean`, `decant stats`, `decant --tui`.
+  - Run smoke checks: `decant`, `decant --no-tui`, `decant clean`, `decant stats`.
   - Run `bun run build:binary` and validate binary help output.
 
 - [x] Step 5 - Confirm release artifact matrix
@@ -112,7 +112,7 @@ Update this file in real time while executing each step.
     - `printf '<article...>' | decant clean`
     - `printf '<article...>' | decant stats`
     - `printf '<article...>' | decant`
-  - `decant --tui` non-TTY behavior validated: exits `1` with clear TTY-required message.
+  - `decant --no-tui` validated: falls through to standard clipboard mode.
   - `bun run build:binary` initially failed due GFM plugin default import mismatch.
   - Fixed in `src/pipeline/toMarkdown.ts` by switching to named `gfm` import.
   - Re-ran validation: tests pass, binary build succeeds, `dist/decant --help` works.

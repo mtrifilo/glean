@@ -20,7 +20,7 @@ import { processHtml } from "../pipeline/processHtml";
 import { runExperimentalTui } from "../tui/experimental";
 
 interface InteractiveOptions {
-  forceTui: boolean;
+  skipTui: boolean;
   mode: StatsMode;
   aggressive: boolean;
   maxTokens?: number;
@@ -227,7 +227,7 @@ function renderSummary(
 }
 
 export async function runInteractive(options: InteractiveOptions): Promise<void> {
-  if (options.forceTui) {
+  if (!options.skipTui) {
     const handled = await runExperimentalTui({
       mode: options.mode,
       aggressive: options.aggressive,

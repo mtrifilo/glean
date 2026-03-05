@@ -4,21 +4,22 @@
 
 ## Recent Work
 
-- v0.13.0 in progress — Diff mode: `--diff` flag on CLI subcommands, `d` toggle in TUI for two-pane diff view (original HTML with kept/removed coloring + clean markdown). New module: `src/lib/diff.ts` (prettyPrintHtml, computeDiff, formatDiffAnsi; entity-aware text matching, no external deps). Kept lines render HTML tags in gray and text content in green. New TUI helper: `colorDiffLine` in tuiHighlight.ts. Extended `ProcessResult` with optional `inputHtml`. 21 tests in `test/diff.test.ts`. Fixed ANSI color helpers to evaluate env vars lazily (fixes full-suite test ordering issue).
-- v0.12.0 shipped — TUI enhancements: scrollable windowed preview (j/k/arrows/PageUp/PageDown/mouse wheel), rich syntax highlighting (headings, bold, italic, code, links, lists, blockquotes, code fences), shortcut bar on all screens, continuous mode (c to continue), option toggling (a=aggressive, m=mode), URL auto-detection in clipboard, file drag-and-drop via paste event. New modules: `src/tui/tuiHighlight.ts` (shared colors, colorLineRich, buildFenceStateMap, shortcutBar), `src/tui/tuiFileDrop.ts` (normalizePastedPath, isSupportedFile, readAndConvertFile). Duplicate clipboard detection via content hashing.
-- v0.11.0 shipped — Interactive section selection TUI. New `src/tui/sectionPicker.ts` module with two-pane picker screen (section list + content preview), real-time budget counter, keyboard + mouse navigation, windowed scroll. `--max-tokens` threaded to root command for TUI use. Auto-fit greedy selection, over-budget warning (not blocking). Fixed ScrollBox layout (was overriding OpenTUI's internal flexDirection).
-- v0.10.0 shipped — Token budget via `--max-tokens N`. Section-aware parsing, piped error path (exit 1 + breakdown), TTY smart truncation (drop from end + warning), stats enrichment with per-section tokens and budget fields. New module `src/pipeline/tokenBudget.ts`.
-- v0.9.0 shipped — URL fetching via `--url`/`-u` flag. Bun built-in `fetch()`, 15s timeout, content-type validation, redirect following. Mutually exclusive with `--input`.
-- v0.8.0 shipped — PDF text extraction via `unpdf` (MIT, cross-platform). Scanned/image PDFs return placeholder (OCR deferred to v0.23.0).
-- v0.7.0 shipped — interactive mode polish (colors, spinner, formatted stats, word-wrapped preview) + raw markdown syntax highlighting.
-- v0.6.1 shipped — renamed project from `glean` to `decant`.
-- v0.6.0 shipped — DOCX file support via `mammoth.js`, source tracking in stats, `--verbose` flag.
+- v1.0.0 shipped — TUI is now the default interactive mode. Running `decant` with no subcommand in a TTY launches the full-screen TUI. `--tui` flag removed, replaced by `--no-tui` to opt out. Falls back to standard clipboard mode if TUI initialization fails.
+- v0.13.0 shipped — Diff mode: `--diff` flag on CLI subcommands, `d` toggle in TUI for two-pane diff view. `src/lib/diff.ts` (prettyPrintHtml, computeDiff, formatDiffAnsi; entity-aware text matching, no external deps). `colorDiffLine` in tuiHighlight.ts. 21 tests in `test/diff.test.ts`. Fixed ANSI color helpers lazy env var evaluation.
+- v0.12.0 shipped — TUI enhancements: scrollable preview, syntax highlighting, shortcut bar, continuous mode, option toggling, URL detection, file drag-and-drop. New modules: tuiHighlight.ts, tuiFileDrop.ts.
+- v0.11.0 shipped — Interactive section selection TUI via `--max-tokens N`.
+- v0.10.0 shipped — Token budget via `--max-tokens N`.
+- v0.9.0 shipped — URL fetching via `--url`/`-u`.
+- v0.8.0 shipped — PDF text extraction via `unpdf`.
+- v0.7.0 shipped — Interactive mode polish + raw markdown syntax highlighting.
+- v0.6.1 shipped — Renamed project from `glean` to `decant`.
+- v0.6.0 shipped — DOCX file support via `mammoth.js`.
 
 ## Checkpoint
 
-- **Current state:** v0.13.0 in progress. 257 tests passing (+ 2 skipped), 502 expect() calls across 12 test files. All tests pass in full-suite runs.
-- **What's working:** HTML, RTF, DOC, DOCX, PDF → clean markdown. URL → HTML via `--url`/`-u`. Token budget via `--max-tokens`. Interactive clipboard-first mode. TUI full-screen mode. TUI section picker via `--tui --max-tokens N`. TUI scrollable preview, syntax highlighting, continuous mode, option toggling, URL detection, file drag-and-drop. Diff mode via `--diff` flag and TUI `d` toggle.
-- **What's next:** Ship v0.13.0. Then v0.14.0 Quality Score.
+- **Current state:** v1.0.0 shipped. 260 tests passing (+ 2 skipped), 507 expect() calls across 12 test files.
+- **What's working:** HTML, RTF, DOC, DOCX, PDF → clean markdown. URL → HTML via `--url`/`-u`. Token budget via `--max-tokens`. TUI as default interactive mode (full-screen, clipboard polling, URL detection, file drag-and-drop, continuous mode, aggressive toggle, diff view). Standard clipboard mode via `--no-tui`. TUI section picker via `--max-tokens N`. Diff mode via `--diff` flag and TUI `d` toggle.
+- **What's next:** v1.1.0 Quality Score. See ROADMAP.md.
 
 ## Product Intent
 
@@ -47,8 +48,8 @@ Keep `decant` laser-focused on the HTML/RTF/DOC/DOCX/PDF/URL → clean markdown 
 | PDF support | Stable | File input via `unpdf`, cross-platform, text-based |
 | URL fetching | Stable | `--url`/`-u` flag, content-type validation, 15s timeout |
 | Token budget | Stable | `--max-tokens N`, section-aware truncation, piped error + TTY warning, TUI section picker |
-| Interactive mode | Stable | Clipboard-first, auto-detect HTML/RTF |
-| TUI mode | Stable | OpenTUI full-screen, clipboard polling, URL detection, file drag-and-drop, continuous mode, option toggling, scrollable highlighted preview |
+| Interactive mode | Stable | TUI is default; `--no-tui` for standard clipboard mode |
+| TUI mode | Stable | OpenTUI full-screen (default), clipboard polling, URL detection, file drag-and-drop, continuous mode, aggressive toggle, diff view, scrollable highlighted preview |
 | Dev tooling | Stable | Golden fixtures, smoke check, CI integration |
 
 ## Command Cheat Sheet
@@ -88,11 +89,11 @@ pbpaste | decant clean --max-tokens 2000 | pbcopy
 decant clean -i large-doc.html --max-tokens 4000
 decant stats -i report.pdf --max-tokens 2000
 
-# Full-screen TUI path
-decant --tui
+# Standard clipboard mode (skip TUI)
+decant --no-tui
 
 # TUI with interactive section picker
-decant --tui --max-tokens 2000
+decant --max-tokens 2000
 ```
 
 ## Architecture
@@ -102,15 +103,15 @@ decant --tui --max-tokens 2000
 - `src/entry.ts`
   - bootstrap entry point — imports `./cli.ts`
 - `src/cli.ts`
-  - command registration, root options, no-subcommand flow, `resolveHtmlInput()` for format detection + conversion
+  - command registration, root options (`--no-tui`, `--mode`, `--aggressive`, `--max-tokens`), no-subcommand flow, `resolveHtmlInput()` for format detection + conversion
 - `src/commands/update.ts`
   - self-update logic (platform detection, GitHub release fetch, checksum verify, atomic swap)
 - `src/interactive/runInteractive.ts`
-  - clipboard-first interactive logic, ANSI-colored stats, syntax-highlighted preview with word-wrap
+  - interactive entry point — launches TUI by default (`skipTui: false`), falls back to standard clipboard mode. ANSI-colored stats, syntax-highlighted preview with word-wrap
 - `src/tui/experimental.ts`
-  - polished OpenTUI full-screen flow used by `--tui` — clipboard polling, URL detection, file drag-and-drop, continuous mode, option toggling, windowed scrollable results
+  - polished OpenTUI full-screen flow (default interactive mode) — clipboard polling, URL detection, file drag-and-drop, continuous mode, aggressive toggle, diff view, windowed scrollable results
 - `src/tui/sectionPicker.ts`
-  - interactive section picker screen for `--tui --max-tokens N` — two-pane layout, keyboard + mouse navigation, windowed scroll, budget counter
+  - interactive section picker screen for `--max-tokens N` — two-pane layout, keyboard + mouse navigation, windowed scroll, budget counter
 - `src/tui/tuiHighlight.ts`
   - shared TUI color palette, rich markdown line highlighting (colorLineRich), code fence state tracking (buildFenceStateMap), shortcut bar builder
 - `src/tui/tuiFileDrop.ts`
@@ -166,9 +167,9 @@ decant --tui --max-tokens 2000
 
 ## Priorities
 
-1. v0.13.0 — Diff mode (implemented, ready to ship)
-2. v0.14.0 — Quality score
-3. v0.15.0 — Section filtering
+1. v1.1.0 — Quality score
+2. v1.2.0 — Section filtering
+3. OpenTUI adoption — MarkdownRenderable, DiffRenderable, TextTableRenderable
 
 The user directs priority. See `docs/strategy/ROADMAP.md` for full iteration plan.
 

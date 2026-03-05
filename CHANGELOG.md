@@ -2,10 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
-The format is based on Keep a Changelog, and this project aims to follow
-Semantic Versioning after `1.0.0`.
+The format is based on Keep a Changelog, and this project follows
+Semantic Versioning.
 
 ## [Unreleased]
+
+## [1.0.0] - 2026-03-04
 
 ### Added
 
@@ -15,6 +17,11 @@ Semantic Versioning after `1.0.0`.
   - `src/lib/diff.ts` — diff engine: `prettyPrintHtml()` for readable HTML formatting, `computeDiff()` with entity-aware text matching, `formatDiffAnsi()` for colored TTY output. Kept lines render HTML tags in gray and text content in green.
   - `colorDiffLine()` in `tuiHighlight.ts` for TUI diff line rendering with per-segment coloring.
   - `test/diff.test.ts` — 21 tests for pretty-printing, diff computation, entity decoding, and ANSI formatting.
+
+### Changed
+
+- **TUI is now the default interactive mode** — running `decant` with no subcommand in a terminal launches the full-screen TUI. Falls back to standard clipboard mode if TUI initialization fails. Use `--no-tui` to skip TUI.
+- **Removed `--tui` flag** — replaced by `--no-tui` for opting out.
 
 ### Fixed
 

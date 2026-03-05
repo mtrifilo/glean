@@ -25,10 +25,10 @@ This guide describes how to cut and publish a new Decant release.
 5. Run validation:
    - `bun test`
    - smoke checks for:
-     - `decant`
+     - `decant` (launches TUI by default)
+     - `decant --no-tui` (standard clipboard mode)
      - `decant clean`
      - `decant stats`
-     - `decant --tui`
 6. Commit and push the release branch:
    ```bash
    git add package.json CHANGELOG.md

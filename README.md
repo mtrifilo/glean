@@ -23,7 +23,7 @@ Every document carries noise — wrapper markup, nav blocks, styling attributes,
 
 **Token-aware output.** Decant doesn't just convert — it measures. Every run reports character and token reduction so you know how efficiently your content fits a context window.
 
-**Interactive, clipboard-first.** No flags, no file paths for the common case. Copy content, run `decant`, paste clean markdown. The full-screen TUI (`--tui`) adds live clipboard detection, URL auto-fetching, file drag-and-drop, syntax-highlighted scrollable preview, option toggling, and continuous mode.
+**Interactive, clipboard-first.** No flags, no file paths for the common case. Copy content, run `decant`, paste clean markdown. The full-screen TUI launches by default with live clipboard detection, URL auto-fetching, file drag-and-drop, syntax-highlighted scrollable preview, diff view, option toggling, and continuous mode. Use `--no-tui` to fall back to standard clipboard mode.
 
 **Local and fast.** Single binary, zero runtime dependencies, works offline. Install with one command, update with `decant update`. No API keys, no cloud, no Python environment.
 
@@ -124,7 +124,7 @@ Installer env vars (script path only):
 
 ## Commands
 
-- `decant` - interactive mode (clipboard-first, auto-process + auto-copy + stats)
+- `decant` - interactive mode (full-screen TUI by default, auto-process + auto-copy + stats)
 - `decant clean` - deterministic HTML cleanup + markdown conversion
 - `decant extract` - Readability-first extraction, then cleanup + markdown conversion
 - `decant stats` - report character/token estimate deltas between input and markdown output
@@ -135,8 +135,8 @@ Installer env vars (script path only):
 
 - `--mode clean|extract` choose pipeline for interactive/no-subcommand runs (default: `clean`)
 - `--aggressive` enable stronger pruning for interactive/no-subcommand runs (default: off)
-- `--max-tokens <n>` set a token budget — enables the interactive section picker in TUI mode
-- `--tui` launch the full-screen OpenTUI interface with color-coded stats, bordered panels, live clipboard detection, URL auto-fetching, file drag-and-drop, scrollable syntax-highlighted preview, option toggling (`a`/`m`), diff view (`d`), and continuous mode (`c`) (requires TTY; falls back to standard interactive mode if TUI startup fails)
+- `--max-tokens <n>` set a token budget — enables the interactive section picker in TUI
+- `--no-tui` skip the full-screen TUI; use standard clipboard mode instead
 
 ## Common options (`clean`, `extract`, `stats`)
 
@@ -163,14 +163,12 @@ Installer env vars (script path only):
 
 Run `decant` with no subcommand to enter interactive mode.
 
+- Launches the full-screen TUI by default — live clipboard polling, URL auto-fetching, file drag-and-drop, scrollable syntax-highlighted preview, diff view (`d`), option toggling (`a`), and continuous mode (`c`)
+- Falls back to standard clipboard mode if TUI initialization fails
+- Use `--no-tui` to skip the TUI and use a simpler clipboard mode (auto-detect, auto-copy, stats summary)
 - Uses defaults automatically (`clean`, aggressive off)
 - Does not prompt for mode/pruning choices during normal flow (use flags to override)
-- Detects HTML or RTF in clipboard and runs immediately (Word/TextEdit copies work automatically)
-- If clipboard has no convertible content, shows an animated spinner while you copy, then press Enter to retry
-- Copies parsed markdown to clipboard automatically
-- Shows color-coded stats (chars/tokens saved with reduction percentages), session totals, and a truncated output preview
 - Respects `NO_COLOR` env var for plain-text fallback
-- Use `--tui` for a full-screen OpenTUI variant with bordered panels, live clipboard polling, URL auto-fetching, file drag-and-drop, scrollable syntax-highlighted preview, option toggling, and continuous mode
 
 Session stats are persisted to `~/.decant/stats.json` by default.
 Set `DECANT_STATS_PATH` to override the stats file location.
@@ -232,11 +230,11 @@ cat document.rtf | decant clean
 # Compare reductions as JSON
 decant stats -i snippet.html --format json
 
-# Full-screen OpenTUI mode
-decant --tui
+# Standard clipboard mode (skip TUI)
+decant --no-tui
 
 # TUI with section picker — interactively choose which sections to keep
-decant --tui --max-tokens 2000
+decant --max-tokens 2000
 ```
 
 ## LLM Session Handoff

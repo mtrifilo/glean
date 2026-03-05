@@ -141,11 +141,12 @@ describe("decant cli", () => {
     expect(hasExpectedMessage).toBe(true);
   });
 
-  test("tui flag requires a tty", async () => {
-    const result = await runCli(["--tui"]);
+  test("--no-tui flag is accepted", async () => {
+    const result = await runCli(["--no-tui"]);
 
-    expect(result.exitCode).toBe(1);
-    expect(result.stderr).toContain("requires an interactive terminal");
+    // In non-TTY test environment, it falls through to runTransform which
+    // expects input, so it should error about empty input — not unknown option.
+    expect(result.stderr).not.toContain("unknown option");
   });
 
   test("root --help includes --max-tokens option", async () => {
