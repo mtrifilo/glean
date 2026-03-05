@@ -114,3 +114,55 @@ describe("stats", () => {
     expect(stats.sourceChars).toBeUndefined();
   });
 });
+
+describe("noise keyword protection", () => {
+  test("headings with noise keyword classes are preserved", () => {
+    // Substack uses class="header-anchor-post" on <h2> elements.
+    // The "header" noise keyword must not strip headings.
+    const input = `
+      <html><body>
+        <article>
+          <p>Intro paragraph with enough text to not be considered low value by the pipeline heuristics.</p>
+          <h2 class="header-anchor-post">Structure: the most common culprit</h2>
+          <p>Content about structure that is important.</p>
+          <h2 class="header-anchor-post">Dynamics: teams behaving rationally</h2>
+          <p>Content about dynamics that is important.</p>
+        </article>
+      </body></html>
+    `;
+    const result = cleanHtml(input, defaultOptions);
+    const md = toMarkdown(result.cleanedHtml, defaultOptions);
+    expect(md).toContain("Structure: the most common culprit");
+    expect(md).toContain("Dynamics: teams behaving rationally");
+  });
+
+  test("containers with headings inside are not stripped as noise", () => {
+    // A div with class="post-header" containing an <h1> should be preserved.
+    const input = `
+      <html><body>
+        <div class="post-header">
+          <h1>Important Article Title</h1>
+          <h3>A subtitle that matters</h3>
+        </div>
+        <p>Article body text goes here with enough content to be meaningful.</p>
+      </body></html>
+    `;
+    const result = cleanHtml(input, defaultOptions);
+    const md = toMarkdown(result.cleanedHtml, defaultOptions);
+    expect(md).toContain("Important Article Title");
+    expect(md).toContain("A subtitle that matters");
+  });
+
+  test("paragraphs with noise keyword classes are preserved", () => {
+    // A <p> with a class matching a noise keyword should still be kept.
+    const input = `
+      <html><body>
+        <p class="newsletter-intro">This is important newsletter content.</p>
+        <p>Normal paragraph.</p>
+      </body></html>
+    `;
+    const result = cleanHtml(input, defaultOptions);
+    const md = toMarkdown(result.cleanedHtml, defaultOptions);
+    expect(md).toContain("This is important newsletter content");
+  });
+});

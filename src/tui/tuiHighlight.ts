@@ -232,8 +232,27 @@ export function colorDiffLine(
       }
       return nodes;
     }
-    case "removed":
-      return Text({ content: `- ${text}`, fg: DIFF_COLORS.REMOVED, flexShrink: 0 });
+    case "removed": {
+      // Split HTML line into tag vs text segments — tags gray, text red
+      const nodes: any[] = [Text({ content: "- ", fg: DIFF_COLORS.REMOVED, flexShrink: 0 })];
+      const pattern = /<[^>]*>/g;
+      let lastIndex = 0;
+      let match: RegExpExecArray | null;
+      while ((match = pattern.exec(text)) !== null) {
+        if (match.index > lastIndex) {
+          nodes.push(Text({ content: text.slice(lastIndex, match.index), fg: DIFF_COLORS.REMOVED, flexShrink: 0 }));
+        }
+        nodes.push(Text({ content: match[0], fg: DIFF_COLORS.CONTEXT, flexShrink: 0 }));
+        lastIndex = match.index + match[0].length;
+      }
+      if (lastIndex < text.length) {
+        nodes.push(Text({ content: text.slice(lastIndex), fg: DIFF_COLORS.REMOVED, flexShrink: 0 }));
+      }
+      if (nodes.length === 1) {
+        nodes.push(Text({ content: text, fg: DIFF_COLORS.REMOVED, flexShrink: 0 }));
+      }
+      return nodes;
+    }
     case "context":
       return Text({ content: `  ${text}`, fg: DIFF_COLORS.CONTEXT, flexShrink: 0 });
   }

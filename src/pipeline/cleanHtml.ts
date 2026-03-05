@@ -13,7 +13,11 @@ import {
 import type { CleanResult, TransformOptions } from "../lib/types";
 
 const CONTENT_CANDIDATE_SELECTOR = "article,main,section,div";
-const CONTENT_PROTECTED_TAGS = new Set(["article", "main"]);
+const CONTENT_PROTECTED_TAGS = new Set([
+  "article", "main",
+  "h1", "h2", "h3", "h4", "h5", "h6",
+  "p", "blockquote", "pre",
+]);
 const textDecoderWhitespace = /\s+/g;
 
 function wrapHtml(rawHtml: string): string {
@@ -129,6 +133,12 @@ function removeNoiseContainers(document: Document, aggressive: boolean): void {
     }
 
     if (CONTENT_PROTECTED_TAGS.has(tag) && !aggressive) {
+      continue;
+    }
+
+    // Also protect containers that hold protected child elements (e.g. a div
+    // with class="post-header" that wraps an <h1>).
+    if (!aggressive && el.querySelector([...CONTENT_PROTECTED_TAGS].join(","))) {
       continue;
     }
 

@@ -7,6 +7,18 @@ Semantic Versioning.
 
 ## [Unreleased]
 
+## [1.0.1] - 2026-03-04
+
+### Fixed
+
+- **Restored stashed polish work** lost during the v1.0.0 release branch switch.
+  - TUI: blank-line filtering in preview (re-inserts before headings/HRs), in-place reprocessing on aggressive toggle (`a` key no longer leaves results screen), aggressive stats row showing extra tokens removed, aggressive checkmark in shortcut bar, auto-indent for diff left pane with `h`/`l` manual pan, output hash recording to prevent clipboard re-processing, token count titles on diff panes.
+  - TUI: removed `m` (mode toggle) key handler per v0.13.0 design.
+  - Pipeline: expanded `CONTENT_PROTECTED_TAGS` to include `h1`–`h6`, `p`, `blockquote`, `pre`. Added container protection — skip elements whose children include protected tags.
+  - Diff: tag/text color splitting for removed lines (gray tags + red text), matching kept-line treatment.
+  - Diff engine: robust regex to strip incomplete opening tags and closing fragments.
+  - Tests: 3 noise keyword protection tests for heading, container, and paragraph preservation.
+
 ## [1.0.0] - 2026-03-04
 
 ### Added

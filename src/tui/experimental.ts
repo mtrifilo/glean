@@ -177,8 +177,20 @@ export async function runExperimentalTui(options: TuiRunOptions): Promise<boolea
       renderer.requestRender();
     };
 
-    const allPreviewLines = (markdown: string) =>
-      markdown.trim() ? markdown.trim().split("\n") : ["(empty output)"];
+    const allPreviewLines = (markdown: string) => {
+      if (!markdown.trim()) return ["(empty output)"];
+      const raw = markdown.trim().split("\n");
+      const result: string[] = [];
+      for (const line of raw) {
+        if (line.trim() === "") continue;
+        // Insert a blank line before headings and horizontal rules for visual separation
+        if (result.length > 0 && (/^#{1,6} /.test(line) || /^[-_*]{3,}$/.test(line.trim()))) {
+          result.push("");
+        }
+        result.push(line);
+      }
+      return result;
+    };
 
     // --- Results screen with windowed scroll and rich highlighting ---
 
@@ -187,9 +199,12 @@ export async function runExperimentalTui(options: TuiRunOptions): Promise<boolea
       session: { today: { runs: number; tokensSaved: number }; lifetime: { runs: number; tokensSaved: number } },
       inputHtml?: string,
     ): Promise<ResultsAction> => {
-      const lines = allPreviewLines(processed.markdown);
-      const fenceState = buildFenceStateMap(lines);
-      const stats = processed.stats;
+      let lines = allPreviewLines(processed.markdown);
+      let fenceState = buildFenceStateMap(lines);
+      let stats = processed.stats;
+
+      // Track baseline (non-aggressive) tokens for comparison
+      const baselineTokens = processed.stats.outputTokensEstimate;
 
       // Diff state
       let showDiff = false;
@@ -198,16 +213,35 @@ export async function runExperimentalTui(options: TuiRunOptions): Promise<boolea
         diffResult = computeDiff(inputHtml, processed.markdown);
       }
 
+      /** Re-process the same input and update all derived state in place. */
+      const reprocessInPlace = async () => {
+        const transformOptions = defaultTransformOptions(aggressive);
+        const reprocessed = processHtml(mode, inputHtml ?? processed.markdown, transformOptions);
+        processed.markdown = reprocessed.markdown;
+        processed.stats = reprocessed.stats;
+        lines = allPreviewLines(reprocessed.markdown);
+        fenceState = buildFenceStateMap(lines);
+        stats = reprocessed.stats;
+        if (inputHtml) {
+          diffResult = computeDiff(inputHtml, reprocessed.markdown);
+        }
+        scrollOffset = 0;
+        manualHScroll = false;
+        await copyToClipboard(reprocessed.markdown);
+      };
+
       // Windowed scroll state
-      // Normal view chrome: outer border(2) + padding(2) + success(1) + space(1) + stats box(~6) + space(1) + session box(~6) + space(1) + preview border(2) + shortcut bar(1) = ~23
-      const CHROME_LINES_NORMAL = 23;
-      // Diff view chrome: outer border(2) + padding(2) + success(1) + space(1) + pane border(2) + shortcut bar(1) = ~9
-      const CHROME_LINES_DIFF = 9;
+      // Normal: outer border(2) + padding(2) + success(1) + space(1) + stats box(~6) + space(1) + session box(~4) + space(1) + preview border(2) + shortcut bar(1) = ~21
+      const CHROME_LINES = 21;
+      // Diff: outer border(2) + padding(2) + success(1) + space(1) + pane borders(2) + shortcut bar(1) = 9
+      const DIFF_CHROME_LINES = 9;
       const getVisibleRows = () => {
-        const chrome = showDiff && diffResult ? CHROME_LINES_DIFF : CHROME_LINES_NORMAL;
+        const chrome = showDiff && diffResult ? DIFF_CHROME_LINES : CHROME_LINES + (aggressive ? 1 : 0);
         return Math.max(3, renderer.height - chrome);
       };
       let scrollOffset = 0;
+      let hScrollOffset = 0; // horizontal scroll for diff left pane
+      let manualHScroll = false; // true when user overrides with h/l
 
       /** Get the active set of lines for scrolling based on diff mode. */
       const activeLineCount = () => {
@@ -275,6 +309,17 @@ export async function runExperimentalTui(options: TuiRunOptions): Promise<boolea
                   Text({ content: `${fmt(stats.inputTokensEstimate)} \u2192 ${fmt(stats.outputTokensEstimate)}  `, fg: STAT_VALUE }),
                   Text({ content: `(${percent(stats.tokenReductionPct)} saved)`, fg: HIGHLIGHT }),
                 ),
+                ...(aggressive ? [Box(
+                  { flexDirection: "row" as const, flexShrink: 0 },
+                  Text({ content: "Aggressive ", fg: STAT_LABEL }),
+                  ...(stats.outputTokensEstimate < baselineTokens
+                    ? [
+                        Text({ content: `${fmt(baselineTokens - stats.outputTokensEstimate)} extra tokens removed`, fg: SUCCESS }),
+                      ]
+                    : [
+                        Text({ content: "no extra tokens removed — input already clean", fg: MUTED }),
+                      ]),
+                )] : []),
               ),
               Text({ content: " " }),
               Box(
@@ -319,8 +364,7 @@ export async function runExperimentalTui(options: TuiRunOptions): Promise<boolea
               shortcutBar(
                 [
                   { key: "j/k", label: "scroll" },
-                  { key: "a", label: "aggressive" },
-                  { key: "m", label: "mode" },
+                  { key: "a", label: aggressive ? "aggressive ✓" : "aggressive" },
                   ...(diffResult ? [{ key: "d", label: "diff" }] : []),
                   { key: "c", label: "continue" },
                   { key: "q", label: "quit" },
@@ -340,6 +384,27 @@ export async function runExperimentalTui(options: TuiRunOptions): Promise<boolea
             ? ""
             : ` (${Math.round((scrollOffset / Math.max(1, totalLines - getVisibleRows())) * 100)}%)`;
 
+          // Compute effective left-pane horizontal offset:
+          // manual (h/l) takes priority; auto-indent kicks in on vertical scroll
+          let effectiveHOffset: number;
+          if (manualHScroll) {
+            effectiveHOffset = hScrollOffset;
+          } else {
+            // Auto-compute from minimum indentation of visible lines
+            effectiveHOffset = Infinity;
+            for (let i = 0; i < getVisibleRows(); i++) {
+              const idx = scrollOffset + i;
+              if (idx < htmlLines.length) {
+                const raw = htmlLines[idx].text;
+                const trimmed = raw.trimStart();
+                if (trimmed.length > 0) {
+                  effectiveHOffset = Math.min(effectiveHOffset, raw.length - trimmed.length);
+                }
+              }
+            }
+            if (effectiveHOffset === Infinity) effectiveHOffset = 0;
+          }
+
           // Build left pane (HTML diff) and right pane (clean markdown)
           const leftNodes: any[] = [];
           const rightNodes: any[] = [];
@@ -350,7 +415,8 @@ export async function runExperimentalTui(options: TuiRunOptions): Promise<boolea
             // Left pane: HTML lines colored by diff type
             if (lineIdx < htmlLines.length) {
               const dl = htmlLines[lineIdx];
-              const diffNodes = colorDiffLine(dl.text, dl.type, Text);
+              const slicedText = effectiveHOffset > 0 ? dl.text.slice(effectiveHOffset) : dl.text;
+              const diffNodes = colorDiffLine(slicedText, dl.type, Text);
               leftNodes.push(
                 Box(
                   { flexDirection: "row" as const, flexShrink: 0, height: 1 },
@@ -363,7 +429,8 @@ export async function runExperimentalTui(options: TuiRunOptions): Promise<boolea
 
             // Right pane: clean markdown with syntax highlighting
             if (lineIdx < mdLines.length) {
-              const lineNodes = colorLineRich(mdLines[lineIdx], fenceState[lineIdx], Text, TextAttributes);
+              const mdLine = mdLines[lineIdx];
+              const lineNodes = colorLineRich(mdLine, fenceState[lineIdx], Text, TextAttributes);
               rightNodes.push(
                 Box(
                   { flexDirection: "row" as const, flexShrink: 0, height: 1 },
@@ -375,9 +442,8 @@ export async function runExperimentalTui(options: TuiRunOptions): Promise<boolea
             }
           }
 
-          const diffStats = diffResult.stats;
-          const diffTitle = `Original HTML [${diffStats.kept} kept, ${diffStats.removed} removed]${scrollPct}`;
-          const mdTitle = `Clean Markdown [${mdLines.length} lines]${scrollPct}`;
+          const diffTitle = `Original HTML [${fmt(stats.inputTokensEstimate)} tokens]${scrollPct}`;
+          const mdTitle = `Clean Markdown [${fmt(stats.outputTokensEstimate)} tokens]${scrollPct}`;
 
           renderer.root.add(
             Box(
@@ -440,8 +506,8 @@ export async function runExperimentalTui(options: TuiRunOptions): Promise<boolea
               shortcutBar(
                 [
                   { key: "j/k", label: "scroll" },
-                  { key: "a", label: "aggressive" },
-                  { key: "m", label: "mode" },
+                  { key: "h/l", label: "pan" },
+                  { key: "a", label: aggressive ? "aggressive ✓" : "aggressive" },
                   { key: "d", label: "diff" },
                   { key: "c", label: "continue" },
                   { key: "q", label: "quit" },
@@ -461,6 +527,10 @@ export async function runExperimentalTui(options: TuiRunOptions): Promise<boolea
 
         const handler = (event: { name?: string }) => {
           const key = (event.name ?? "").toLowerCase();
+
+          // Vertical scroll resets manual horizontal scroll → auto-indent resumes
+          const VERTICAL_KEYS = new Set(["up", "k", "down", "j", "pageup", "pagedown", "home", "end"]);
+          if (VERTICAL_KEYS.has(key)) manualHScroll = false;
 
           switch (key) {
             case "up":
@@ -495,22 +565,34 @@ export async function runExperimentalTui(options: TuiRunOptions): Promise<boolea
               renderResults();
               return;
             }
+            case "h":
+            case "left":
+              if (showDiff) {
+                manualHScroll = true;
+                hScrollOffset = Math.max(0, hScrollOffset - 4);
+                renderResults();
+              }
+              return;
+            case "l":
+            case "right":
+              if (showDiff) {
+                manualHScroll = true;
+                hScrollOffset += 4;
+                renderResults();
+              }
+              return;
             case "d":
               if (diffResult) {
                 showDiff = !showDiff;
                 scrollOffset = 0;
+                hScrollOffset = 0;
+                manualHScroll = false;
                 renderResults();
               }
               return;
             case "a":
-              renderer.keyInput.off("keypress", handler);
               aggressive = !aggressive;
-              resolve("reprocess");
-              return;
-            case "m":
-              renderer.keyInput.off("keypress", handler);
-              mode = mode === "clean" ? "extract" : "clean";
-              resolve("reprocess");
+              reprocessInPlace().then(renderResults);
               return;
             case "c":
               renderer.keyInput.off("keypress", handler);
@@ -692,6 +774,9 @@ export async function runExperimentalTui(options: TuiRunOptions): Promise<boolea
           processed.markdown = finalMarkdown;
 
           await copyToClipboard(processed.markdown);
+          // Record the output hash so clipboard polling won't re-process our own output
+          // (markdown with preserved <table> tags triggers looksLikeHtml)
+          lastInputHash = simpleHash(processed.markdown.trim());
           const session = await recordRunStats(processed.stats);
 
           action = await waitForResultsAction(processed, session, clipboardHtml);

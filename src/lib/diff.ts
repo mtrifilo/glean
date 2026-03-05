@@ -148,8 +148,10 @@ export function computeDiff(originalHtml: string, cleanMarkdown: string): DiffRe
       continue;
     }
 
-    // Strip tags and decode entities to get plain text content
-    const textContent = decodeEntities(trimmed.replace(/<[^>]*>/g, "")).trim();
+    // Strip complete tags, incomplete opening tags, and incomplete closing fragments
+    const textContent = decodeEntities(
+      trimmed.replace(/<[^>]*>/g, "").replace(/<[^>]*$/g, "").replace(/^[^<]*>/g, ""),
+    ).trim();
 
     // Pure markup tags (no text content) or very short text — classify as context
     if (!textContent || textContent.length < 3) {

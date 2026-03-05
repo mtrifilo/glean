@@ -4,6 +4,7 @@
 
 ## Recent Work
 
+- v1.0.1 shipped — Restored stashed polish work lost during v1.0.0 release: TUI blank-line filtering, in-place aggressive reprocessing, aggressive stats row, auto-indent for diff left pane, h/l pan, output hash recording, token count diff titles, removed mode toggle. Pipeline: expanded content-protected tags, container protection. Diff: removed-line tag splitting, incomplete tag stripping. 3 noise keyword tests.
 - v1.0.0 shipped — TUI is now the default interactive mode. Running `decant` with no subcommand in a TTY launches the full-screen TUI. `--tui` flag removed, replaced by `--no-tui` to opt out. Falls back to standard clipboard mode if TUI initialization fails.
 - v0.13.0 shipped — Diff mode: `--diff` flag on CLI subcommands, `d` toggle in TUI for two-pane diff view. `src/lib/diff.ts` (prettyPrintHtml, computeDiff, formatDiffAnsi; entity-aware text matching, no external deps). `colorDiffLine` in tuiHighlight.ts. 21 tests in `test/diff.test.ts`. Fixed ANSI color helpers lazy env var evaluation.
 - v0.12.0 shipped — TUI enhancements: scrollable preview, syntax highlighting, shortcut bar, continuous mode, option toggling, URL detection, file drag-and-drop. New modules: tuiHighlight.ts, tuiFileDrop.ts.
@@ -17,7 +18,7 @@
 
 ## Checkpoint
 
-- **Current state:** v1.0.0 shipped. 260 tests passing (+ 2 skipped), 507 expect() calls across 12 test files.
+- **Current state:** v1.0.1 shipped. 260 tests passing (+ 2 skipped), 506 expect() calls across 12 test files.
 - **What's working:** HTML, RTF, DOC, DOCX, PDF → clean markdown. URL → HTML via `--url`/`-u`. Token budget via `--max-tokens`. TUI as default interactive mode (full-screen, clipboard polling, URL detection, file drag-and-drop, continuous mode, aggressive toggle, diff view). Standard clipboard mode via `--no-tui`. TUI section picker via `--max-tokens N`. Diff mode via `--diff` flag and TUI `d` toggle.
 - **What's next:** v1.1.0 Quality Score. See ROADMAP.md.
 
