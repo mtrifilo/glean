@@ -14,6 +14,11 @@ Your clipboard will be instantly transformed into markdown, which you can paste 
 ```bash
 decant                                          # clipboard-first
 ```
+### Clean markdown for agents, data for nerds
+<img width="795" height="772" alt="Screenshot 2026-03-06 at 5 27 39 PM" src="https://github.com/user-attachments/assets/7af85c9a-757f-481a-8927-9005eb4daac2" />
+
+### Diff mode
+<img width="796" height="774" alt="Screenshot 2026-03-06 at 5 27 18 PM" src="https://github.com/user-attachments/assets/87483b33-34df-42e4-b7e1-c01b619afb65" />
 
 ## Why this exists
 
